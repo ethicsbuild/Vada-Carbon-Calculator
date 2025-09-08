@@ -1,0 +1,389 @@
+import type { Express } from "express";
+import { createServer, type Server } from "http";
+import { storage } from "./storage";
+import { carbonCalculatorService } from "./services/carbonCalculator";
+import { aiCoPilotService } from "./services/aiCopilot";
+import { reportGeneratorService } from "./services/reportGenerator";
+import { insertOrganizationSchema, insertCarbonCalculationSchema } from "@shared/schema";
+import { z } from "zod";
+
+export async function registerRoutes(app: Express): Promise<Server> {
+  // Health check
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
+  // User routes
+  app.get("/api/users/:id", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.id);
+      const user = await storage.getUser(userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user" });
+    }
+  });
+
+  app.post("/api/users", async (req, res) => {
+    try {
+      const userData = req.body;
+      const user = await storage.createUser(userData);
+      res.status(201).json(user);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create user" });
+    }
+  });
+
+  // Organization routes
+  app.get("/api/organizations/:id", async (req, res) => {
+    try {
+      const orgId = parseInt(req.params.id);
+      const organization = await storage.getOrganization(orgId);
+      if (!organization) {
+        return res.status(404).json({ message: "Organization not found" });
+      }
+      res.json(organization);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch organization" });
+    }
+  });
+
+  app.post("/api/organizations", async (req, res) => {
+    try {
+      const validatedData = insertOrganizationSchema.parse(req.body);
+      const organization = await storage.createOrganization(validatedData);
+      res.status(201).json(organization);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid organization data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create organization" });
+    }
+  });
+
+  app.get("/api/organizations/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const organizations = await storage.getOrganizationsByOwner(userId);
+      res.json(organizations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user organizations" });
+    }
+  });
+
+  // Carbon calculation routes
+  app.get("/api/calculations/:id", async (req, res) => {
+    try {
+      const calcId = parseInt(req.params.id);
+      const calculation = await storage.getCarbonCalculation(calcId);
+      if (!calculation) {
+        return res.status(404).json({ message: "Calculation not found" });
+      }
+      res.json(calculation);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch calculation" });
+    }
+  });
+
+  app.get("/api/calculations/organization/:orgId", async (req, res) => {
+    try {
+      const orgId = parseInt(req.params.orgId);
+      const calculations = await storage.getCarbonCalculationsByOrganization(orgId);
+      res.json(calculations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch organization calculations" });
+    }
+  });
+
+  app.get("/api/calculations/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const calculations = await storage.getCarbonCalculationsByUser(userId);
+      res.json(calculations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user calculations" });
+    }
+  });
+
+  app.post("/api/calculations", async (req, res) => {
+    try {
+      const validatedData = insertCarbonCalculationSchema.parse(req.body);
+      const calculation = await storage.createCarbonCalculation(validatedData);
+      res.status(201).json(calculation);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid calculation data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create calculation" });
+    }
+  });
+
+  // Carbon calculation engine routes
+  app.post("/api/calculate/estimate", async (req, res) => {
+    try {
+      const { organizationType, organizationSize, industry, annualRevenue } = req.body;
+      
+      if (!organizationType || !organizationSize || !industry) {
+        return res.status(400).json({ 
+          message: "Missing required fields: organizationType, organizationSize, industry" 
+        });
+      }
+
+      const result = await carbonCalculatorService.estimateEmissions(
+        organizationType,
+        organizationSize,
+        industry,
+        annualRevenue
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Calculation error:", error);
+      res.status(500).json({ message: "Failed to calculate emissions estimate" });
+    }
+  });
+
+  app.post("/api/calculate/detailed", async (req, res) => {
+    try {
+      const { scope1Data, scope2Data, scope3Data, organizationSize, industry } = req.body;
+      
+      if (!organizationSize || !industry) {
+        return res.status(400).json({ 
+          message: "Missing required fields: organizationSize, industry" 
+        });
+      }
+
+      const result = await carbonCalculatorService.calculateEmissions(
+        scope1Data || {},
+        scope2Data || {},
+        scope3Data || {},
+        organizationSize,
+        industry
+      );
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Calculation error:", error);
+      res.status(500).json({ message: "Failed to calculate detailed emissions" });
+    }
+  });
+
+  app.post("/api/calculate/save", async (req, res) => {
+    try {
+      const { userId, organizationId, calculationData, result } = req.body;
+      
+      if (!userId || !organizationId || !calculationData || !result) {
+        return res.status(400).json({ 
+          message: "Missing required fields: userId, organizationId, calculationData, result" 
+        });
+      }
+
+      const savedCalculation = await carbonCalculatorService.saveCalculation(
+        userId,
+        organizationId,
+        calculationData,
+        result
+      );
+      
+      res.status(201).json(savedCalculation);
+    } catch (error) {
+      console.error("Save calculation error:", error);
+      res.status(500).json({ message: "Failed to save calculation" });
+    }
+  });
+
+  // AI Co-Pilot routes
+  app.post("/api/copilot/start", async (req, res) => {
+    try {
+      const { userId, organizationType, organizationSize, industry } = req.body;
+      
+      if (!userId) {
+        return res.status(400).json({ message: "Missing required field: userId" });
+      }
+
+      const sessionId = `session_${userId}_${Date.now()}`;
+      const conversation = await aiCoPilotService.startConversation(
+        userId,
+        sessionId,
+        organizationType,
+        organizationSize,
+        industry
+      );
+      
+      res.status(201).json(conversation);
+    } catch (error) {
+      console.error("Co-pilot start error:", error);
+      res.status(500).json({ message: "Failed to start AI co-pilot session" });
+    }
+  });
+
+  app.post("/api/copilot/message", async (req, res) => {
+    try {
+      const { sessionId, message } = req.body;
+      
+      if (!sessionId || !message) {
+        return res.status(400).json({ message: "Missing required fields: sessionId, message" });
+      }
+
+      const response = await aiCoPilotService.continueConversation(sessionId, message);
+      res.json(response);
+    } catch (error) {
+      console.error("Co-pilot message error:", error);
+      res.status(500).json({ message: "Failed to process message" });
+    }
+  });
+
+  app.get("/api/copilot/history/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const conversations = await aiCoPilotService.getConversationHistory(userId);
+      res.json(conversations);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch conversation history" });
+    }
+  });
+
+  app.post("/api/copilot/end", async (req, res) => {
+    try {
+      const { sessionId } = req.body;
+      
+      if (!sessionId) {
+        return res.status(400).json({ message: "Missing required field: sessionId" });
+      }
+
+      await aiCoPilotService.endConversation(sessionId);
+      res.json({ message: "Conversation ended successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to end conversation" });
+    }
+  });
+
+  // Report generation routes
+  app.post("/api/reports/ghg-protocol", async (req, res) => {
+    try {
+      const { calculationId, userId, organizationData } = req.body;
+      
+      if (!calculationId || !userId || !organizationData) {
+        return res.status(400).json({ 
+          message: "Missing required fields: calculationId, userId, organizationData" 
+        });
+      }
+
+      const report = await reportGeneratorService.generateGHGProtocolReport(
+        calculationId,
+        userId,
+        organizationData
+      );
+      
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("GHG Protocol report error:", error);
+      res.status(500).json({ message: "Failed to generate GHG Protocol report" });
+    }
+  });
+
+  app.post("/api/reports/carbon-receipt", async (req, res) => {
+    try {
+      const { calculationId, userId, offsetData } = req.body;
+      
+      if (!calculationId || !userId) {
+        return res.status(400).json({ 
+          message: "Missing required fields: calculationId, userId" 
+        });
+      }
+
+      const report = await reportGeneratorService.generateCarbonReceipt(
+        calculationId,
+        userId,
+        offsetData
+      );
+      
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("Carbon receipt error:", error);
+      res.status(500).json({ message: "Failed to generate carbon receipt" });
+    }
+  });
+
+  app.post("/api/reports/csv-export", async (req, res) => {
+    try {
+      const { calculationId, userId } = req.body;
+      
+      if (!calculationId || !userId) {
+        return res.status(400).json({ 
+          message: "Missing required fields: calculationId, userId" 
+        });
+      }
+
+      const report = await reportGeneratorService.generateCSVExport(calculationId, userId);
+      res.status(201).json(report);
+    } catch (error) {
+      console.error("CSV export error:", error);
+      res.status(500).json({ message: "Failed to generate CSV export" });
+    }
+  });
+
+  app.get("/api/reports/:id", async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const report = await reportGeneratorService.getReport(reportId);
+      if (!report) {
+        return res.status(404).json({ message: "Report not found" });
+      }
+      res.json(report);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch report" });
+    }
+  });
+
+  app.get("/api/reports/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const reports = await reportGeneratorService.getUserReports(userId);
+      res.json(reports);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch user reports" });
+    }
+  });
+
+  app.post("/api/reports/verify/:id", async (req, res) => {
+    try {
+      const reportId = parseInt(req.params.id);
+      const blockchainHash = await reportGeneratorService.verifyOnBlockchain(reportId);
+      res.json({ blockchainHash, verified: true });
+    } catch (error) {
+      console.error("Blockchain verification error:", error);
+      res.status(500).json({ message: "Failed to verify on blockchain" });
+    }
+  });
+
+  // Achievement routes
+  app.get("/api/achievements/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const achievements = await storage.getUserAchievements(userId);
+      res.json(achievements);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch achievements" });
+    }
+  });
+
+  // Emission factors routes
+  app.get("/api/emission-factors", async (req, res) => {
+    try {
+      const { category } = req.query;
+      const factors = category 
+        ? await storage.getEmissionFactorsByCategory(category as string)
+        : await storage.getEmissionFactors();
+      res.json(factors);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch emission factors" });
+    }
+  });
+
+  const httpServer = createServer(app);
+  return httpServer;
+}
