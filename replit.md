@@ -26,7 +26,7 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Layer
 - **ORM**: Drizzle ORM with PostgreSQL dialect for type-safe database operations
-- **Database**: PostgreSQL via Neon serverless with WebSocket support
+- **Database**: PostgreSQL via Supabase with standard node-postgres connection
 - **Schema**: Comprehensive schema covering users, organizations, carbon calculations, AI conversations, reports, achievements, and emission factors
 - **Migration**: Drizzle Kit for schema migrations with output to migrations directory
 
@@ -45,7 +45,7 @@ Preferred communication style: Simple, everyday language.
 ## External Dependencies
 
 ### Database Infrastructure
-- **Neon Database**: Serverless PostgreSQL with connection pooling
+- **Supabase Database**: PostgreSQL-as-a-Service with real-time capabilities
 - **Drizzle ORM**: TypeScript ORM for database operations and schema management
 
 ### AI and ML Services
