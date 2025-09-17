@@ -176,7 +176,7 @@ export function LocationPicker({
           onBlur={(e) => {
             // Delay closing to allow for clicks on suggestions
             setTimeout(() => {
-              if (!e.currentTarget.contains(document.activeElement)) {
+              if (!e.currentTarget || !document.activeElement || !e.currentTarget.contains(document.activeElement)) {
                 setIsOpen(false);
               }
             }, 150);
