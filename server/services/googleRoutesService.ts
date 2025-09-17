@@ -37,7 +37,7 @@ export interface EmissionCalculation {
   vehicleType?: string;
 }
 
-export type TransportMode = 'car_petrol' | 'car_diesel' | 'car_hybrid' | 'car_electric' | 'flight_domestic' | 'flight_international' | 'train' | 'bus' | 'motorbike';
+export type TransportMode = 'car_petrol' | 'car_diesel' | 'car_hybrid' | 'car_electric' | 'van_petrol' | 'van_diesel' | 'truck_diesel' | 'ferry' | 'flight_domestic' | 'flight_international' | 'train' | 'bus' | 'motorbike';
 
 // Event-specific location and transportation interfaces
 export interface EventLocation {
@@ -82,6 +82,10 @@ export class GoogleRoutesService {
     car_diesel: 0.164,      // Average diesel car  
     car_hybrid: 0.109,      // Hybrid vehicle
     car_electric: 0.047,    // Electric vehicle (grid average)
+    van_petrol: 0.351,      // Petrol van (higher emissions than car)
+    van_diesel: 0.312,      // Diesel van
+    truck_diesel: 0.8,      // Large diesel truck (per km, not per passenger)
+    ferry: 0.15,            // Ferry per passenger
     flight_domestic: 0.255, // Domestic flight
     flight_international: 0.195, // International flight (more efficient per km)
     train: 0.041,          // Electric/diesel train
@@ -367,6 +371,10 @@ export class GoogleRoutesService {
       { mode: 'car_diesel', name: 'Diesel Car', description: 'Average diesel vehicle' },
       { mode: 'car_hybrid', name: 'Hybrid Car', description: 'Petrol-electric hybrid vehicle' },
       { mode: 'car_electric', name: 'Electric Car', description: 'Battery electric vehicle' },
+      { mode: 'van_petrol', name: 'Petrol Van', description: 'Commercial petrol van' },
+      { mode: 'van_diesel', name: 'Diesel Van', description: 'Commercial diesel van' },
+      { mode: 'truck_diesel', name: 'Diesel Truck', description: 'Large commercial truck' },
+      { mode: 'ferry', name: 'Ferry', description: 'Passenger ferry transport' },
       { mode: 'flight_domestic', name: 'Domestic Flight', description: 'Flights within country' },
       { mode: 'flight_international', name: 'International Flight', description: 'International flights' },
       { mode: 'train', name: 'Train', description: 'Electric or diesel train' },
@@ -393,10 +401,13 @@ export class GoogleRoutesService {
   }
 
   private mapTransportModeToRouteMode(transportMode: TransportMode): RouteOptions['travelMode'] {
-    if (transportMode.startsWith('car') || transportMode === 'motorbike') {
+    if (transportMode.startsWith('car') || transportMode === 'motorbike' || 
+        transportMode.startsWith('van') || transportMode.startsWith('truck')) {
       return 'DRIVE';
     } else if (transportMode === 'train' || transportMode === 'bus') {
       return 'TRANSIT';
+    } else if (transportMode === 'ferry') {
+      return 'DRIVE'; // Ferry routes typically use driving directions to the port
     }
     return 'DRIVE'; // Default fallback
   }

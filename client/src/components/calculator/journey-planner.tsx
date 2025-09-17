@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { LocationPicker } from '@/components/ui/location-picker';
-import { Trash2, Plus, Route, Car, Plane, Train, Bus, Calculator } from 'lucide-react';
+import { Trash2, Plus, Route, Car, Plane, Train, Bus, Truck, Ship, Calculator } from 'lucide-react';
 import type { Location } from '@/components/ui/location-picker';
 
 export interface Journey {
@@ -23,7 +23,7 @@ export interface Journey {
   co2eTonnes?: number;
 }
 
-export type TransportMode = 'car_petrol' | 'car_diesel' | 'car_hybrid' | 'car_electric' | 'flight_domestic' | 'flight_international' | 'train' | 'bus' | 'motorbike';
+export type TransportMode = 'car_petrol' | 'car_diesel' | 'car_hybrid' | 'car_electric' | 'van_petrol' | 'van_diesel' | 'truck_diesel' | 'ferry' | 'flight_domestic' | 'flight_international' | 'train' | 'bus' | 'motorbike';
 
 export interface JourneyPlannerResult {
   totalDistanceKm: number;
@@ -44,6 +44,10 @@ const transportModes = [
   { mode: 'car_diesel' as TransportMode, name: 'Diesel Car', icon: Car, color: 'text-orange-600' },
   { mode: 'car_hybrid' as TransportMode, name: 'Hybrid Car', icon: Car, color: 'text-blue-600' },
   { mode: 'car_electric' as TransportMode, name: 'Electric Car', icon: Car, color: 'text-green-600' },
+  { mode: 'van_petrol' as TransportMode, name: 'Petrol Van', icon: Truck, color: 'text-amber-600' },
+  { mode: 'van_diesel' as TransportMode, name: 'Diesel Van', icon: Truck, color: 'text-amber-700' },
+  { mode: 'truck_diesel' as TransportMode, name: 'Diesel Truck', icon: Truck, color: 'text-stone-600' },
+  { mode: 'ferry' as TransportMode, name: 'Ferry', icon: Ship, color: 'text-cyan-600' },
   { mode: 'flight_domestic' as TransportMode, name: 'Domestic Flight', icon: Plane, color: 'text-purple-600' },
   { mode: 'flight_international' as TransportMode, name: 'International Flight', icon: Plane, color: 'text-indigo-600' },
   { mode: 'train' as TransportMode, name: 'Train', icon: Train, color: 'text-green-700' },
