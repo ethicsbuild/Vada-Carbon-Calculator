@@ -261,6 +261,83 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Google Routes API integration routes
+  app.post("/api/routes/search-locations", async (req, res) => {
+    try {
+      const { query, region } = req.body;
+      
+      if (!query) {
+        return res.status(400).json({ message: "Query parameter is required" });
+      }
+
+      const { googleRoutesService } = await import("./services/googleRoutesService");
+      const locations = await googleRoutesService.searchLocations(query, region);
+      
+      res.json(locations);
+    } catch (error) {
+      console.error("Location search error:", error);
+      res.status(500).json({ message: "Failed to search locations" });
+    }
+  });
+
+  app.post("/api/routes/calculate-route", async (req, res) => {
+    try {
+      const { origin, destination, options } = req.body;
+      
+      if (!origin || !destination) {
+        return res.status(400).json({ message: "Origin and destination are required" });
+      }
+
+      const { googleRoutesService } = await import("./services/googleRoutesService");
+      const route = await googleRoutesService.calculateRoute(origin, destination, options);
+      
+      res.json(route);
+    } catch (error) {
+      console.error("Route calculation error:", error);
+      res.status(500).json({ message: "Failed to calculate route" });
+    }
+  });
+
+  app.post("/api/routes/calculate-travel-emissions", async (req, res) => {
+    try {
+      const { journeys } = req.body;
+      
+      if (!journeys || !Array.isArray(journeys)) {
+        return res.status(400).json({ message: "Journeys array is required" });
+      }
+
+      const { googleRoutesService } = await import("./services/googleRoutesService");
+      const result = await googleRoutesService.calculateTravelEmissions(journeys);
+      
+      res.json(result);
+    } catch (error) {
+      console.error("Travel emissions calculation error:", error);
+      res.status(500).json({ message: "Failed to calculate travel emissions" });
+    }
+  });
+
+  app.get("/api/routes/transport-modes", async (req, res) => {
+    try {
+      const { googleRoutesService } = await import("./services/googleRoutesService");
+      const transportModes = googleRoutesService.getTransportModes();
+      
+      res.json(transportModes);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get transport modes" });
+    }
+  });
+
+  app.get("/api/routes/emission-factors", async (req, res) => {
+    try {
+      const { googleRoutesService } = await import("./services/googleRoutesService");
+      const emissionFactors = googleRoutesService.getEmissionFactors();
+      
+      res.json(emissionFactors);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to get emission factors" });
+    }
+  });
+
   // Report generation routes
   app.post("/api/reports/ghg-protocol", async (req, res) => {
     try {

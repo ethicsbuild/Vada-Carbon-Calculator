@@ -31,6 +31,25 @@ export interface CoPilotContext {
     industry: string;
     previousCalculations?: number;
   };
+  eventProfile?: {
+    eventType?: string;
+    companyRole?: string;
+    expectedAttendance?: number;
+    eventDuration?: any;
+    venue?: any;
+    staffing?: any;
+    production?: any;
+    audience?: any;
+    transportation?: any;
+    waste?: any;
+  };
+  questionnaire?: {
+    currentSection: string;
+    completedSections: string[];
+    estimatedProgress: number;
+    pendingQuestions: string[];
+    skippedQuestions: string[];
+  };
   userPreferences?: {
     detailLevel: "basic" | "intermediate" | "expert";
     estimationMode: boolean;
@@ -39,32 +58,40 @@ export interface CoPilotContext {
 }
 
 export class AiCoPilotService {
-  private readonly systemPrompt = `You are CarbonCoPilot, an expert AI assistant specializing in carbon footprint calculations using the GHG Protocol 2025 standards. You guide users through Scope 1, 2, and 3 emissions calculations with a conversational, supportive approach.
+  private readonly systemPrompt = `You are CarbonCoPilot, an expert AI assistant specializing in carbon footprint calculations for event production using the GHG Protocol 2025 standards. You are both a sustainability expert AND an experienced event production professional who understands the unique challenges and logistics of live events.
 
-Your capabilities:
-- GHG Protocol 2025 compliance expertise
-- Intelligent data estimation for missing information
-- Context-aware recommendations based on organization type and industry
-- Memory of previous interactions and user preferences
-- Step-by-step guidance through complex calculations
-- Industry-specific insights and benchmarking
+Your event production expertise includes:
+- All types of events: concerts, festivals, conferences, sports events, theater, corporate events, weddings, trade shows
+- Event logistics: staging, audio/visual, lighting, power requirements, crew sizes, transportation
+- Venue types: indoor/outdoor, arenas, theaters, convention centers, private venues
+- Production scales: intimate events to large festivals with multiple stages
+- Event roles: producers, venue operators, vendors, talent agencies, catering, A/V companies
+- Sustainability in events: waste management, renewable energy, carbon offsetting
 
-Your personality:
-- Professional yet approachable
-- Patient and encouraging
-- Detail-oriented but not overwhelming
-- Focused on accuracy and compliance
-- Supportive of sustainability goals
+Your conversational approach:
+- Ask specific, relevant questions based on event type and company role
+- Guide users through a natural questionnaire that feels like talking to an expert consultant
+- Provide context and suggestions to help users understand emission sources
+- Show real-time progress and estimated carbon impact as they answer
+- Offer event-specific insights and benchmarking against similar events
+- Suggest practical reduction strategies that work for live events
 
-Always:
-- Ask clarifying questions when data is unclear
-- Provide estimates when exact data isn't available
-- Explain the reasoning behind calculations
-- Offer industry-specific insights
-- Suggest next steps and improvements
-- Maintain context across conversations
+Questionnaire progression (adapt based on event type and role):
+1. Event Type & Role: What type of event? What's your company's role?
+2. Basic Info: Attendance, duration, venue type and location
+3. Staff & Logistics: Crew size, staff numbers, setup/strike days
+4. Production: Stages, A/V requirements, power needs, generators
+5. Audience: Food service, alcohol, merchandising, transportation
+6. Transportation: Staff travel, equipment shipping, audience travel
+7. Sustainability: Current practices, reduction opportunities
 
-Current conversation context: {context}`;
+For each question, provide:
+- Context about why it matters for carbon calculations
+- Typical ranges/examples for their event type
+- Real-time emission estimates as data is collected
+- Next steps based on their responses
+
+Current conversation context: {context}`
 
   async startConversation(
     userId: number,
@@ -75,12 +102,20 @@ Current conversation context: {context}`;
   ): Promise<AiConversation> {
     const context: CoPilotContext = {
       userId,
-      currentStep: "organization_setup",
+      currentStep: organizationType === "event" ? "event_type_selection" : "organization_setup",
       collectedData: {},
       organizationProfile: organizationType ? {
         type: organizationType,
         size: organizationSize || "",
         industry: industry || "",
+      } : undefined,
+      eventProfile: organizationType === "event" ? {} : undefined,
+      questionnaire: organizationType === "event" ? {
+        currentSection: "event_type",
+        completedSections: [],
+        estimatedProgress: 0,
+        pendingQuestions: [],
+        skippedQuestions: [],
       } : undefined,
       userPreferences: {
         detailLevel: "intermediate",
@@ -173,12 +208,19 @@ Current conversation context: {context}`;
 
 Current context: ${JSON.stringify(context)}
 
-Extract any numerical values, units, organization details, preferences, or calculation-related information. Return a JSON object with:
-- extractedData: object containing any structured data found
-- nextStep: the next logical step in the calculation process
+Extract any event production data, numerical values, units, organization details, or preferences. Return a JSON object with:
+- extractedData: object containing any structured data found (event details, numbers, locations, etc.)
+- nextStep: the next logical step in the questionnaire or calculation process
 - confidence: how confident you are in the extraction (0-1)
+- eventCategory: if applicable, the category of data (venue, staffing, production, transportation, etc.)
 
-Focus on GHG Protocol categories: Scope 1 (direct emissions), Scope 2 (energy), Scope 3 (value chain).`,
+Focus on event production elements that impact carbon emissions:
+- Event basics: type, size, duration, location
+- Venue: type, capacity, power requirements
+- Production: stages, A/V, lighting, equipment
+- People: attendance, staff, crew
+- Transportation: audience travel, staff travel, equipment shipping
+- Services: catering, accommodation, waste management`,
           },
           {
             role: "user",
@@ -217,27 +259,54 @@ Focus on GHG Protocol categories: Scope 1 (direct emissions), Scope 2 (energy), 
         ],
         functions: [
           {
-            name: "estimate_emissions",
-            description: "Estimate carbon emissions when user has incomplete data",
+            name: "estimate_event_emissions",
+            description: "Estimate carbon emissions for an event based on current data",
             parameters: {
               type: "object",
               properties: {
-                organizationType: { type: "string" },
-                organizationSize: { type: "string" },
-                industry: { type: "string" },
-                dataAvailable: { type: "object" },
+                eventType: { type: "string" },
+                attendance: { type: "number" },
+                venue: { type: "object" },
+                duration: { type: "object" },
+                partialData: { type: "object" },
               },
             },
           },
           {
-            name: "calculate_emissions",
-            description: "Perform detailed carbon footprint calculation",
+            name: "calculate_event_emissions",
+            description: "Perform detailed event carbon footprint calculation",
             parameters: {
               type: "object",
               properties: {
+                eventProfile: { type: "object" },
                 scope1Data: { type: "object" },
                 scope2Data: { type: "object" },
                 scope3Data: { type: "object" },
+              },
+            },
+          },
+          {
+            name: "suggest_next_questions",
+            description: "Suggest the next most important questions based on event type and current data",
+            parameters: {
+              type: "object",
+              properties: {
+                eventType: { type: "string" },
+                companyRole: { type: "string" },
+                currentData: { type: "object" },
+                completedSections: { type: "array" },
+              },
+            },
+          },
+          {
+            name: "provide_event_benchmarks",
+            description: "Provide industry benchmarks and comparison for similar events",
+            parameters: {
+              type: "object",
+              properties: {
+                eventType: { type: "string" },
+                attendance: { type: "number" },
+                calculatedEmissions: { type: "number" },
               },
             },
           },
@@ -288,6 +357,60 @@ Focus on GHG Protocol categories: Scope 1 (direct emissions), Scope 2 (energy), 
     context: CoPilotContext
   ): Promise<{ response: string; suggestedActions: string[]; nextStep: string; calculationResult?: any }> {
     switch (functionName) {
+      case "estimate_event_emissions":
+        const eventEstimation = await this.calculateEventEmissions(
+          args.eventType,
+          args.attendance,
+          args.venue,
+          args.duration,
+          args.partialData
+        );
+        
+        return {
+          response: `Based on your event details, I estimate the carbon footprint at approximately **${eventEstimation.total.toFixed(1)} tCO2e**.
+
+📊 **Quick Breakdown:**
+🎪 Venue & Production: ${eventEstimation.venue.toFixed(1)} tCO2e
+🚗 Transportation: ${eventEstimation.transportation.toFixed(1)} tCO2e
+⚡ Energy: ${eventEstimation.energy.toFixed(1)} tCO2e
+🍽️ Catering: ${eventEstimation.catering.toFixed(1)} tCO2e
+🗑️ Waste: ${eventEstimation.waste.toFixed(1)} tCO2e
+
+*This is a preliminary estimate. Let's continue the questionnaire to get a more accurate calculation and identify reduction opportunities!*
+
+What would you like to focus on next?`,
+          suggestedActions: ["continue_questionnaire", "explore_reductions", "get_benchmarks"],
+          nextStep: this.getNextEventStep(context, args.eventType),
+          calculationResult: eventEstimation,
+        };
+
+      case "suggest_next_questions":
+        const questions = this.getEventSpecificQuestions(
+          args.eventType,
+          args.companyRole,
+          args.currentData,
+          args.completedSections
+        );
+        
+        return {
+          response: questions.questionText,
+          suggestedActions: questions.suggestedActions,
+          nextStep: questions.nextStep,
+        };
+
+      case "provide_event_benchmarks":
+        const benchmarks = this.getEventBenchmarks(
+          args.eventType,
+          args.attendance,
+          args.calculatedEmissions
+        );
+        
+        return {
+          response: benchmarks,
+          suggestedActions: ["improve_performance", "continue_calculation", "generate_report"],
+          nextStep: "report_generation",
+        };
+
       case "estimate_emissions":
         const estimation = await carbonCalculatorService.estimateEmissions(
           args.organizationType,
@@ -329,6 +452,25 @@ Focus on GHG Protocol categories: Scope 1 (direct emissions), Scope 2 (energy), 
   }
 
   private getWelcomeMessage(context: CoPilotContext): string {
+    // Event-specific welcome
+    if (context.organizationProfile?.type === "event" || context.eventProfile) {
+      return `🎭 Welcome to CarbonCoPilot for Event Production! I'm your AI sustainability consultant specializing in carbon footprint calculations for live events.
+
+As an expert in both event production AND carbon accounting, I'll guide you through a conversational questionnaire that feels like talking to a sustainability consultant who actually understands your business.
+
+🎯 **What I'll help you with:**
+✅ Calculate emissions for ANY type of event (concerts, festivals, conferences, corporate events, etc.)
+✅ Understand YOUR company's specific role and responsibilities
+✅ Get real-time emission estimates as we talk
+✅ Generate GHG Protocol 2025 compliant reports
+✅ Discover practical reduction strategies that work for live events
+✅ Benchmark against similar events in the industry
+
+**Let's start with the basics:** What type of event are you working on, and what's your company's role in producing it?
+
+*I'll ask targeted questions based on your event type and role to make this as relevant and efficient as possible.*`;
+    }
+    
     if (context.organizationProfile) {
       return `👋 Welcome to CarbonCoPilot! I see you're working with a ${context.organizationProfile.type} organization in the ${context.organizationProfile.industry} sector. I'm here to guide you through a comprehensive carbon footprint calculation that's fully compliant with GHG Protocol 2025 standards.
 
@@ -342,17 +484,45 @@ I'll tailor the process to your organization's specific requirements and industr
 
     return `👋 Welcome to CarbonCoPilot! I'm your AI-powered guide for carbon footprint calculations using the latest GHG Protocol 2025 standards.
 
-I'll help you:
-✅ Calculate Scope 1, 2, and 3 emissions accurately
-✅ Estimate missing data using industry benchmarks
-✅ Ensure full GHG Protocol compliance
-✅ Generate verified carbon reports
-✅ Identify reduction opportunities
+**Choose your calculation type:**
+🎭 **Event Production** - Specialized questionnaire for concerts, festivals, conferences, corporate events, and more
+🏢 **Organization** - Standard carbon footprint for businesses, nonprofits, and institutions
 
-To get started, could you tell me about your organization? What type of organization are you calculating for, and what industry are you in?`;
+Which type of calculation would you like to start with?`;
   }
 
   private getSuggestedActions(context: CoPilotContext): string[] {
+    // Event-specific suggested actions
+    if (context.eventProfile) {
+      switch (context.currentStep) {
+        case "event_type_selection":
+          return ["concert", "festival", "conference", "corporate_event", "other_event"];
+        case "event_basic_info":
+          return ["add_venue_details", "estimate_attendance", "set_duration"];
+        case "event_staff_logistics":
+          return ["add_crew_size", "staff_transportation", "setup_details"];
+        case "event_venue_setup":
+          return ["stage_details", "power_requirements", "venue_specs"];
+        case "event_transportation":
+          return ["audience_travel", "equipment_shipping", "staff_travel"];
+        case "event_equipment_av":
+          return ["sound_system", "lighting_rig", "video_screens"];
+        case "event_audience_catering":
+          return ["food_service", "alcohol_service", "waste_management"];
+        case "scope1_calculation":
+          return ["generator_power", "vehicle_fuel", "on_site_emissions"];
+        case "scope2_calculation":
+          return ["venue_electricity", "grid_power", "heating_cooling"];
+        case "scope3_calculation":
+          return ["travel_emissions", "catering_emissions", "waste_emissions"];
+        case "report_generation":
+          return ["event_report", "sustainability_recommendations", "offset_calculation"];
+        default:
+          return ["continue_questionnaire", "get_estimate", "skip_section"];
+      }
+    }
+    
+    // Standard organization flow
     switch (context.currentStep) {
       case "organization_setup":
         return ["setup_organization", "quick_estimate", "detailed_calculation"];
@@ -370,6 +540,27 @@ To get started, could you tell me about your organization? What type of organiza
   }
 
   private getNextStep(context: CoPilotContext): string {
+    // Event-specific flow
+    if (context.eventProfile) {
+      const eventSteps = [
+        "event_type_selection",
+        "event_basic_info",
+        "event_staff_logistics",
+        "event_venue_setup",
+        "event_transportation",
+        "event_equipment_av",
+        "event_audience_catering",
+        "scope1_calculation",
+        "scope2_calculation",
+        "scope3_calculation",
+        "report_generation"
+      ];
+      
+      const currentIndex = eventSteps.indexOf(context.currentStep);
+      return currentIndex < eventSteps.length - 1 ? eventSteps[currentIndex + 1] : "completed";
+    }
+    
+    // Standard organization flow
     const steps = [
       "organization_setup",
       "scope1_calculation", 
@@ -394,6 +585,166 @@ To get started, could you tell me about your organization? What type of organiza
         updatedAt: new Date(),
       });
     }
+  }
+
+  // Event-specific helper methods
+  private async calculateEventEmissions(
+    eventType: string,
+    attendance: number,
+    venue: any,
+    duration: any,
+    partialData: any
+  ): Promise<any> {
+    // Quick estimation logic for events based on type and basic data
+    const baseEmissions = {
+      venue: 0,
+      transportation: 0,
+      energy: 0,
+      catering: 0,
+      waste: 0,
+      total: 0
+    };
+
+    // Event type multipliers (tCO2e per attendee)
+    const eventMultipliers: Record<string, number> = {
+      concert: 0.012,
+      festival: 0.025,
+      conference: 0.008,
+      sports_event: 0.015,
+      theater_performance: 0.006,
+      wedding: 0.005,
+      corporate_event: 0.007,
+      trade_show: 0.010,
+      community_event: 0.004,
+      outdoor_event: 0.020,
+      other: 0.010
+    };
+
+    const multiplier = eventMultipliers[eventType] || 0.010;
+    const totalBase = attendance * multiplier;
+
+    // Distribute emissions across categories
+    baseEmissions.venue = totalBase * 0.25;
+    baseEmissions.transportation = totalBase * 0.35;
+    baseEmissions.energy = totalBase * 0.20;
+    baseEmissions.catering = totalBase * 0.15;
+    baseEmissions.waste = totalBase * 0.05;
+    baseEmissions.total = totalBase;
+
+    // Adjust based on duration if provided
+    if (duration?.days > 1) {
+      const durationMultiplier = 1 + (duration.days - 1) * 0.3;
+      Object.keys(baseEmissions).forEach(key => {
+        baseEmissions[key] *= durationMultiplier;
+      });
+    }
+
+    return baseEmissions;
+  }
+
+  private getNextEventStep(context: CoPilotContext, eventType: string): string {
+    const completedSections = context.questionnaire?.completedSections || [];
+    
+    // Determine next step based on event type and completed sections
+    if (!completedSections.includes('basic_info')) {
+      return 'event_basic_info';
+    }
+    if (!completedSections.includes('venue_setup') && ['concert', 'festival', 'theater_performance'].includes(eventType)) {
+      return 'event_venue_setup';
+    }
+    if (!completedSections.includes('transportation')) {
+      return 'event_transportation';
+    }
+    if (!completedSections.includes('catering') && ['festival', 'conference', 'corporate_event'].includes(eventType)) {
+      return 'event_audience_catering';
+    }
+    
+    return 'scope1_calculation';
+  }
+
+  private getEventSpecificQuestions(
+    eventType: string,
+    companyRole: string,
+    currentData: any,
+    completedSections: string[]
+  ): { questionText: string; suggestedActions: string[]; nextStep: string } {
+    // Generate targeted questions based on event type and role
+    const eventQuestions: Record<string, any> = {
+      concert: {
+        venue: "For your concert venue, what's the capacity and do you need generators for power?",
+        transportation: "How will your crew and equipment get to the venue? Any long-distance travel for talent?",
+        production: "How many stages are you setting up? What size sound system and lighting rig?"
+      },
+      festival: {
+        venue: "Is this an outdoor festival? How many stages and what's the total site footprint?",
+        transportation: "How will attendees get there? Are you providing shuttles or encouraging carpooling?",
+        production: "What's your power plan - generators, grid connection, or renewable sources?"
+      },
+      conference: {
+        venue: "Is this at a hotel, convention center, or corporate facility? How many rooms/spaces?",
+        transportation: "What percentage of attendees are flying in vs driving? Any international speakers?",
+        catering: "Are you providing meals for all attendees? Local catering or hotel catering?"
+      },
+      corporate_event: {
+        venue: "Company facility or external venue? Indoor/outdoor components?",
+        transportation: "Are you flying in employees from other offices? Providing transportation?",
+        production: "A/V requirements - simple presentation setup or full production?"
+      }
+    };
+
+    const defaultQuestions = {
+      venue: "What type of venue are you using and where is it located?",
+      transportation: "How will people and equipment get to your event?",
+      production: "What production elements will you need for your event?"
+    };
+
+    const questions = eventQuestions[eventType] || defaultQuestions;
+    const nextSection = !completedSections.includes('venue') ? 'venue' : 
+                      !completedSections.includes('transportation') ? 'transportation' : 'production';
+
+    return {
+      questionText: questions[nextSection] || "Let's continue with the next section of your event planning.",
+      suggestedActions: [`add_${nextSection}_details`, "estimate_current", "skip_section"],
+      nextStep: `event_${nextSection}`
+    };
+  }
+
+  private getEventBenchmarks(eventType: string, attendance: number, calculatedEmissions: number): string {
+    // Industry benchmarks per attendee (tCO2e)
+    const benchmarks: Record<string, { low: number; average: number; high: number }> = {
+      concert: { low: 0.008, average: 0.012, high: 0.020 },
+      festival: { low: 0.015, average: 0.025, high: 0.040 },
+      conference: { low: 0.005, average: 0.008, high: 0.015 },
+      sports_event: { low: 0.010, average: 0.015, high: 0.025 },
+      corporate_event: { low: 0.004, average: 0.007, high: 0.012 }
+    };
+
+    const benchmark = benchmarks[eventType] || benchmarks.conference;
+    const perAttendee = calculatedEmissions / attendance;
+    
+    let performance = "average";
+    if (perAttendee <= benchmark.low) performance = "excellent";
+    else if (perAttendee <= benchmark.average) performance = "good";
+    else if (perAttendee <= benchmark.high) performance = "needs improvement";
+    else performance = "significantly above average";
+
+    return `📊 **Industry Benchmark Comparison**
+
+Your event: **${perAttendee.toFixed(3)} tCO2e per attendee**
+Industry average for ${eventType}s: **${benchmark.average.toFixed(3)} tCO2e per attendee**
+
+Performance rating: **${performance}**
+
+${performance === "excellent" ? "🌟 Outstanding! You're in the top 25% for sustainability." :
+  performance === "good" ? "✅ Good performance, slightly better than average." :
+  performance === "needs improvement" ? "⚠️ Above average - some opportunities for improvement." :
+  "🚨 Well above industry average - significant reduction opportunities available."}
+
+**Typical reduction strategies for ${eventType}s:**
+• Encourage public transport/carpooling (can reduce by 20-30%)
+• Use renewable energy sources (can reduce by 15-25%)
+• Local sourcing for catering (can reduce by 10-15%)
+• Digital materials instead of printed (can reduce by 5-10%)`;
   }
 }
 

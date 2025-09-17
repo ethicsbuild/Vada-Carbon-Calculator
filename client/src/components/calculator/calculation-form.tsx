@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RocketIcon, Calculator, Zap } from 'lucide-react';
 import type { CalculationResult, OrganizationProfile, Scope1Data, Scope2Data, Scope3Data } from '@/types/carbon';
+import { JourneyPlanner, type JourneyPlannerResult } from './journey-planner';
 
 const organizationSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
@@ -38,6 +39,8 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
   const [scope1Data, setScope1Data] = useState<Scope1Data>({});
   const [scope2Data, setScope2Data] = useState<Scope2Data>({});
   const [scope3Data, setScope3Data] = useState<Scope3Data>({});
+  const [journeyPlannerData, setJourneyPlannerData] = useState<JourneyPlannerResult | null>(null);
+  const [useJourneyPlanner, setUseJourneyPlanner] = useState(false);
 
   const form = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
@@ -69,13 +72,53 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
   const handleDetailedCalculation = async () => {
     if (!organizationData) return;
     
+    // Merge journey planner data with scope3Data if using journey planner
+    let finalScope3Data = { ...scope3Data };
+    if (useJourneyPlanner && journeyPlannerData) {
+      finalScope3Data.businessTravel = journeyPlannerData.totalDistanceKm;
+      // Include detailed journey emissions for precise calculation
+      finalScope3Data.journeyEmissions = {
+        totalCO2eTonnes: journeyPlannerData.totalCO2eTonnes,
+        totalCO2eKg: journeyPlannerData.totalCO2eKg,
+        totalDistanceKm: journeyPlannerData.totalDistanceKm,
+        journeyBreakdown: journeyPlannerData.journeyBreakdown.map(journey => ({
+          transportMode: journey.transportMode,
+          distanceKm: journey.distanceKm || 0,
+          co2eKg: journey.co2eKg || 0,
+          co2eTonnes: journey.co2eTonnes || 0,
+          passengerCount: journey.passengerCount
+        }))
+      };
+    }
+    
     await onCalculate({
       scope1Data,
       scope2Data,
-      scope3Data,
+      scope3Data: finalScope3Data,
       organizationSize: organizationData.size,
       industry: organizationData.industry,
     });
+  };
+
+  const handleJourneyPlannerResult = (result: JourneyPlannerResult) => {
+    setJourneyPlannerData(result);
+    // Store detailed journey emissions data with mode-specific calculations
+    setScope3Data(prev => ({
+      ...prev,
+      businessTravel: result.totalDistanceKm, // Keep for backward compatibility
+      journeyEmissions: {
+        totalCO2eTonnes: result.totalCO2eTonnes,
+        totalCO2eKg: result.totalCO2eKg,
+        totalDistanceKm: result.totalDistanceKm,
+        journeyBreakdown: result.journeyBreakdown.map(journey => ({
+          transportMode: journey.transportMode,
+          distanceKm: journey.distanceKm || 0,
+          co2eKg: journey.co2eKg || 0,
+          co2eTonnes: journey.co2eTonnes || 0,
+          passengerCount: journey.passengerCount
+        }))
+      }
+    }));
   };
 
   return (
@@ -403,26 +446,68 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                 All other indirect emissions in your value chain (mandatory per GHG Protocol 2025)
               </p>
             </div>
+
+            {/* Journey Planner Toggle */}
+            <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+              <CardContent className="p-4">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h4 className="font-medium text-blue-900 dark:text-blue-100">
+                      Smart Journey Planner
+                    </h4>
+                    <p className="text-sm text-blue-700 dark:text-blue-300 mt-1">
+                      Automatically calculate business travel emissions using Google Routes
+                    </p>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="use-journey-planner"
+                      checked={useJourneyPlanner}
+                      onCheckedChange={(checked) => setUseJourneyPlanner(checked === true)}
+                      data-testid="use-journey-planner"
+                    />
+                    <Label htmlFor="use-journey-planner" className="text-sm">
+                      Enable
+                    </Label>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
             
+            {/* Journey Planner or Manual Input */}
+            {useJourneyPlanner ? (
+              <JourneyPlanner
+                onCalculate={handleJourneyPlannerResult}
+                isLoading={isLoading}
+                className="mb-4"
+              />
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label className="text-sm font-medium">Business Travel (km/year)</Label>
+                  <Input
+                    type="number"
+                    className="mt-1"
+                    value={scope3Data.businessTravel || ''}
+                    onChange={(e) => setScope3Data(prev => ({...prev, businessTravel: parseFloat(e.target.value) || 0}))}
+                    data-testid="business-travel-manual"
+                  />
+                </div>
+                <div>
+                  <Label className="text-sm font-medium">Employee Commuting (km/year)</Label>
+                  <Input
+                    type="number"
+                    className="mt-1"
+                    value={scope3Data.employeeCommuting || ''}
+                    onChange={(e) => setScope3Data(prev => ({...prev, employeeCommuting: parseFloat(e.target.value) || 0}))}
+                    data-testid="employee-commuting-manual"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Other Scope 3 Inputs */}
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-sm font-medium">Business Travel (km/year)</Label>
-                <Input
-                  type="number"
-                  className="mt-1"
-                  value={scope3Data.businessTravel || ''}
-                  onChange={(e) => setScope3Data(prev => ({...prev, businessTravel: parseFloat(e.target.value) || 0}))}
-                />
-              </div>
-              <div>
-                <Label className="text-sm font-medium">Employee Commuting (km/year)</Label>
-                <Input
-                  type="number"
-                  className="mt-1"
-                  value={scope3Data.employeeCommuting || ''}
-                  onChange={(e) => setScope3Data(prev => ({...prev, employeeCommuting: parseFloat(e.target.value) || 0}))}
-                />
-              </div>
               <div>
                 <Label className="text-sm font-medium">Waste Generated (kg/year)</Label>
                 <Input
@@ -430,6 +515,7 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                   className="mt-1"
                   value={scope3Data.wasteGenerated || ''}
                   onChange={(e) => setScope3Data(prev => ({...prev, wasteGenerated: parseFloat(e.target.value) || 0}))}
+                  data-testid="waste-generated"
                 />
               </div>
               <div>
@@ -439,14 +525,53 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                   className="mt-1"
                   value={scope3Data.purchasedGoods || ''}
                   onChange={(e) => setScope3Data(prev => ({...prev, purchasedGoods: parseFloat(e.target.value) || 0}))}
+                  data-testid="purchased-goods"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Paper Consumption (kg/year)</Label>
+                <Input
+                  type="number"
+                  className="mt-1"
+                  value={scope3Data.paperConsumption || ''}
+                  onChange={(e) => setScope3Data(prev => ({...prev, paperConsumption: parseFloat(e.target.value) || 0}))}
+                  data-testid="paper-consumption"
+                />
+              </div>
+              <div>
+                <Label className="text-sm font-medium">Water Consumption (liters/year)</Label>
+                <Input
+                  type="number"
+                  className="mt-1"
+                  value={scope3Data.waterConsumption || ''}
+                  onChange={(e) => setScope3Data(prev => ({...prev, waterConsumption: parseFloat(e.target.value) || 0}))}
+                  data-testid="water-consumption"
                 />
               </div>
             </div>
+
+            {/* Show journey planner summary if enabled */}
+            {useJourneyPlanner && journeyPlannerData && (
+              <Card className="bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800">
+                <CardContent className="p-3">
+                  <div className="text-sm">
+                    <span className="font-medium text-green-900 dark:text-green-100">
+                      Journey Planner Summary:
+                    </span>
+                    <span className="ml-2 text-green-700 dark:text-green-300">
+                      {journeyPlannerData.totalDistanceKm.toFixed(1)} km total distance, 
+                      {journeyPlannerData.totalCO2eTonnes.toFixed(3)} tCO2e emissions
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
             
             <Button 
               onClick={handleDetailedCalculation} 
               className="w-full bg-green-600 hover:bg-green-700"
               disabled={isLoading}
+              data-testid="calculate-carbon-footprint"
             >
               {isLoading ? (
                 <div className="flex items-center">

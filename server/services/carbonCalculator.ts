@@ -45,6 +45,91 @@ export interface CalculationResult {
   };
 }
 
+// Event-specific emission calculation interfaces
+export interface EventEmissionData {
+  eventType: string;
+  attendance: number;
+  duration: { days: number; hoursPerDay: number; };
+  venue: {
+    type: string;
+    capacity: number;
+    location: string;
+    isOutdoor: boolean;
+    hasExistingPower: boolean;
+  };
+  production: {
+    numberOfStages: number;
+    stageSize: string;
+    audioVisual: {
+      soundSystemSize: string;
+      lightingRig: string;
+      videoScreens: boolean;
+      livestreaming: boolean;
+    };
+    powerRequirements: {
+      generatorPower: boolean;
+      generatorSize?: string;
+      gridPowerUsage?: number;
+    };
+  };
+  staffing: {
+    totalStaff: number;
+    onSiteStaff: number;
+    crewSize: number;
+  };
+  transportation: {
+    audienceTravel: {
+      averageDistance: number;
+      internationalAttendees?: number;
+      domesticFlights?: number;
+    };
+    crewTransportation: {
+      method: string;
+      estimatedDistance: number;
+      numberOfVehicles: number;
+    };
+    equipmentTransportation: {
+      trucksRequired: number;
+      averageDistance: number;
+    };
+  };
+  catering: {
+    foodServiceType: string;
+    expectedMealsServed: number;
+    isLocallySourced: boolean;
+    alcoholServed: boolean;
+  };
+  waste: {
+    recyclingProgram: boolean;
+    wasteReductionMeasures: string[];
+  };
+}
+
+export interface EventCalculationResult {
+  venue: number;
+  transportation: number;
+  energy: number;
+  catering: number;
+  waste: number;
+  accommodation?: number;
+  production: number;
+  total: number;
+  breakdown: {
+    venueDetails: Record<string, number>;
+    transportationDetails: Record<string, number>;
+    energyDetails: Record<string, number>;
+    cateringDetails: Record<string, number>;
+    wasteDetails: Record<string, number>;
+    productionDetails: Record<string, number>;
+  };
+  emissionsPerAttendee: number;
+  benchmarkComparison: {
+    industryAverage: number;
+    percentile: number;
+    performance: string;
+  };
+}
+
 export class CarbonCalculatorService {
   // GHG Protocol 2025 compliant emission factors (kgCO2e per unit)
   private readonly emissionFactors = {
@@ -196,7 +281,21 @@ export class CarbonCalculatorService {
     const industryMultiplier = this.getIndustryMultiplier(industry);
     const sizeMultiplier = this.getSizeMultiplier(organizationSize);
 
-    if (data.businessTravel) {
+    // Prioritize detailed journey emissions for accuracy
+    if (data.journeyEmissions && data.journeyEmissions.totalCO2eTonnes > 0) {
+      // Use pre-calculated mode-specific emissions from Journey Planner
+      const emissions = data.journeyEmissions.totalCO2eTonnes * sizeMultiplier;
+      breakdown.businessTravel = emissions;
+      
+      // Add detailed breakdown for each transport mode
+      data.journeyEmissions.journeyBreakdown.forEach((journey, index) => {
+        const key = `businessTravel_${journey.transportMode}_${index + 1}`;
+        breakdown[key] = (journey.co2eTonnes * sizeMultiplier);
+      });
+      
+      total += emissions;
+    } else if (data.businessTravel) {
+      // Fallback to distance-based calculation for backward compatibility
       const emissions = (data.businessTravel * this.emissionFactors.businessTravel * sizeMultiplier) / 1000;
       breakdown.businessTravel = emissions;
       total += emissions;
@@ -364,6 +463,226 @@ export class CarbonCalculatorService {
       event: 0.3,
     };
     return multipliers[type] || 1.0;
+  }
+
+  // Event-specific emission calculation methods
+  async calculateEventEmissions(eventData: EventEmissionData): Promise<EventCalculationResult> {
+    // Calculate emissions for each category
+    const venueResults = this.calculateVenueEmissions(eventData);
+    const transportationResults = this.calculateEventTransportation(eventData);
+    const energyResults = this.calculateEventEnergy(eventData);
+    const cateringResults = this.calculateEventCatering(eventData);
+    const wasteResults = this.calculateEventWaste(eventData);
+    const productionResults = this.calculateEventProduction(eventData);
+
+    const total = venueResults.total + transportationResults.total + energyResults.total + 
+                 cateringResults.total + wasteResults.total + productionResults.total;
+
+    const emissionsPerAttendee = total / eventData.attendance;
+    const benchmarkComparison = this.getEventBenchmarkComparison(eventData.eventType, emissionsPerAttendee);
+
+    return {
+      venue: venueResults.total,
+      transportation: transportationResults.total,
+      energy: energyResults.total,
+      catering: cateringResults.total,
+      waste: wasteResults.total,
+      production: productionResults.total,
+      total,
+      breakdown: {
+        venueDetails: venueResults.breakdown,
+        transportationDetails: transportationResults.breakdown,
+        energyDetails: energyResults.breakdown,
+        cateringDetails: cateringResults.breakdown,
+        wasteDetails: wasteResults.breakdown,
+        productionDetails: productionResults.breakdown,
+      },
+      emissionsPerAttendee,
+      benchmarkComparison,
+    };
+  }
+
+  private calculateVenueEmissions(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    // Base venue emissions (heating, cooling, lighting)
+    const venueBaseEmissions = eventData.venue.capacity * 0.001 * eventData.duration.days; // tCO2e
+    breakdown.venueBase = venueBaseEmissions;
+    total += venueBaseEmissions;
+
+    // Outdoor venue additional emissions (temporary structures, security)
+    if (eventData.venue.isOutdoor) {
+      const outdoorMultiplier = 1.3;
+      const outdoorEmissions = venueBaseEmissions * 0.3;
+      breakdown.outdoorStructures = outdoorEmissions;
+      total += outdoorEmissions;
+    }
+
+    return { total, breakdown };
+  }
+
+  private calculateEventTransportation(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    // Audience travel emissions
+    const audienceEmissions = eventData.attendance * eventData.transportation.audienceTravel.averageDistance * 0.21 / 1000; // tCO2e
+    breakdown.audienceTravel = audienceEmissions;
+    total += audienceEmissions;
+
+    // International attendees (flights)
+    if (eventData.transportation.audienceTravel.internationalAttendees) {
+      const intlFlightEmissions = eventData.transportation.audienceTravel.internationalAttendees * 2.5; // avg international flight
+      breakdown.internationalFlights = intlFlightEmissions;
+      total += intlFlightEmissions;
+    }
+
+    // Crew transportation
+    const crewTransportEmissions = eventData.staffing.totalStaff * eventData.transportation.crewTransportation.estimatedDistance * 0.21 / 1000;
+    breakdown.crewTransport = crewTransportEmissions;
+    total += crewTransportEmissions;
+
+    // Equipment transportation
+    const equipmentEmissions = eventData.transportation.equipmentTransportation.trucksRequired * 
+                              eventData.transportation.equipmentTransportation.averageDistance * 0.85 / 1000; // Heavy truck factor
+    breakdown.equipmentShipping = equipmentEmissions;
+    total += equipmentEmissions;
+
+    return { total, breakdown };
+  }
+
+  private calculateEventEnergy(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    // Generator power emissions (if used)
+    if (eventData.production.powerRequirements.generatorPower) {
+      const generatorSizeMultipliers = { small: 50, medium: 150, large: 400, multiple: 800 }; // kW
+      const generatorSize = generatorSizeMultipliers[eventData.production.powerRequirements.generatorSize || 'medium'];
+      const generatorHours = eventData.duration.days * eventData.duration.hoursPerDay + 4; // Include setup
+      const generatorEmissions = generatorSize * generatorHours * 0.75 / 1000; // Diesel generator factor
+      breakdown.generatorPower = generatorEmissions;
+      total += generatorEmissions;
+    }
+
+    // Grid power usage
+    if (eventData.production.powerRequirements.gridPowerUsage) {
+      const gridEmissions = eventData.production.powerRequirements.gridPowerUsage * 0.475 / 1000; // Grid factor
+      breakdown.gridPower = gridEmissions;
+      total += gridEmissions;
+    }
+
+    return { total, breakdown };
+  }
+
+  private calculateEventCatering(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    if (eventData.catering.expectedMealsServed > 0) {
+      // Base catering emissions per meal
+      const baseEmissionPerMeal = eventData.catering.isLocallySourced ? 2.5 : 4.0; // kgCO2e per meal
+      const cateringEmissions = eventData.catering.expectedMealsServed * baseEmissionPerMeal / 1000;
+      breakdown.foodService = cateringEmissions;
+      total += cateringEmissions;
+
+      // Alcohol service additional emissions
+      if (eventData.catering.alcoholServed) {
+        const alcoholEmissions = eventData.attendance * 0.5 / 1000; // Additional alcohol transport/cooling
+        breakdown.alcoholService = alcoholEmissions;
+        total += alcoholEmissions;
+      }
+    }
+
+    return { total, breakdown };
+  }
+
+  private calculateEventWaste(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    // Base waste generation (kg per attendee per day)
+    const wastePerAttendeePerDay = 2.5;
+    const totalWaste = eventData.attendance * wastePerAttendeePerDay * eventData.duration.days;
+    
+    // Recycling program reduces emissions
+    const wasteEmissionFactor = eventData.waste.recyclingProgram ? 0.3 : 0.5; // kgCO2e per kg waste
+    const wasteEmissions = totalWaste * wasteEmissionFactor / 1000;
+    breakdown.wasteGeneration = wasteEmissions;
+    total += wasteEmissions;
+
+    return { total, breakdown };
+  }
+
+  private calculateEventProduction(eventData: EventEmissionData): { total: number; breakdown: Record<string, number> } {
+    const breakdown: Record<string, number> = {};
+    let total = 0;
+
+    // Audio/Visual equipment emissions
+    const soundSystemMultipliers = { small: 0.5, medium: 1.0, large: 2.0, festival: 4.0 };
+    const lightingMultipliers = { basic: 0.3, medium: 0.8, elaborate: 1.5, festival: 3.0 };
+    
+    const soundEmissions = soundSystemMultipliers[eventData.production.audioVisual.soundSystemSize] || 1.0;
+    const lightingEmissions = lightingMultipliers[eventData.production.audioVisual.lightingRig] || 0.8;
+    
+    breakdown.audioSystem = soundEmissions;
+    breakdown.lightingSystem = lightingEmissions;
+    total += soundEmissions + lightingEmissions;
+
+    // Video screens
+    if (eventData.production.audioVisual.videoScreens) {
+      const videoEmissions = 0.5 * eventData.duration.days;
+      breakdown.videoScreens = videoEmissions;
+      total += videoEmissions;
+    }
+
+    // Livestreaming additional equipment
+    if (eventData.production.audioVisual.livestreaming) {
+      const streamingEmissions = 0.3 * eventData.duration.days;
+      breakdown.livestreaming = streamingEmissions;
+      total += streamingEmissions;
+    }
+
+    return { total, breakdown };
+  }
+
+  private getEventBenchmarkComparison(eventType: string, emissionsPerAttendee: number): { industryAverage: number; percentile: number; performance: string } {
+    const benchmarks: Record<string, number> = {
+      concert: 0.012,
+      festival: 0.025,
+      conference: 0.008,
+      sports_event: 0.015,
+      theater_performance: 0.006,
+      wedding: 0.005,
+      corporate_event: 0.007,
+      trade_show: 0.010,
+      community_event: 0.004,
+      outdoor_event: 0.020,
+      other: 0.010
+    };
+
+    const industryAverage = benchmarks[eventType] || 0.010;
+    const ratio = emissionsPerAttendee / industryAverage;
+    
+    let percentile = 50;
+    let performance = "average";
+    
+    if (ratio <= 0.75) {
+      percentile = 25;
+      performance = "excellent";
+    } else if (ratio <= 1.0) {
+      percentile = 40;
+      performance = "good";
+    } else if (ratio <= 1.5) {
+      percentile = 75;
+      performance = "needs improvement";
+    } else {
+      percentile = 90;
+      performance = "poor";
+    }
+
+    return { industryAverage, percentile, performance };
   }
 
   async saveCalculation(

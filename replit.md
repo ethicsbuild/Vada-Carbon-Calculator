@@ -1,74 +1,114 @@
-# CarbonCoPilot
+# Carbon Footprint Calculator with Google Routes Integration
+
+A comprehensive carbon footprint calculator application with AI-powered co-pilot and Google Routes API integration for automatic distance and emission calculations.
 
 ## Overview
 
-CarbonCoPilot is an AI-powered carbon footprint calculation platform that provides GHG Protocol 2025 compliant emissions calculations with conversational AI guidance. The application features a React frontend with Express.js backend, PostgreSQL database via Drizzle ORM, and blockchain-ready architecture for carbon receipt verification. Key capabilities include Scope 1, 2, and 3 emissions calculations, intelligent data estimation, progress tracking with gamification elements, and comprehensive reporting with export capabilities.
+This application helps organizations calculate their carbon emissions across all three scopes (1, 2, and 3) in compliance with the GHG Protocol 2025 standards. The app features an AI co-pilot for guided calculations and Google Routes integration for automatic travel emission calculations.
+
+## Recent Changes (September 17, 2025)
+
+### Google Routes API Integration
+- **Added Google Routes API Service**: Complete service integration with distance calculation and emission estimates for different transportation modes
+- **Created Location Picker Component**: Smart search component for venues, locations, and addresses with Google Places integration
+- **Journey Planner Component**: Advanced component for planning multi-stop business travel with automatic emissions calculation
+- **Enhanced Scope 3 Calculations**: Integrated journey planner into Scope 3 business travel calculations with toggle between manual input and smart planning
+- **API Routes**: Added comprehensive API endpoints for location search, route calculation, and travel emission calculations
+
+### Features Added
+- **Smart Location Search**: Auto-complete search for businesses, venues, and addresses
+- **Multiple Transportation Modes**: Support for cars (petrol, diesel, hybrid, electric), flights (domestic/international), trains, buses, motorcycles
+- **Automatic Distance Calculation**: Uses Google Routes API to calculate accurate distances between locations
+- **Real-time Emission Estimates**: Calculates CO2e emissions automatically based on transport mode and distance
+- **Round-trip Support**: Option to calculate round-trip emissions
+- **Multi-stop Journeys**: Support for complex business trips with multiple destinations
+- **Journey Summary**: Visual summary of total distance and emissions for all planned journeys
+
+## Project Architecture
+
+### Backend Services
+- **Carbon Calculator Service**: Core emissions calculation engine with GHG Protocol compliance
+- **Google Routes Service**: Integration with Google Routes API for distance and emission calculations
+- **AI Co-Pilot Service**: OpenAI-powered assistant for guided carbon footprint calculations
+- **Report Generator Service**: Generates GHG Protocol reports, carbon receipts, and CSV exports
+
+### Frontend Components
+- **Location Picker**: Smart location search with Google Places integration
+- **Journey Planner**: Advanced trip planning with automatic emission calculations
+- **Calculation Form**: Enhanced with journey planner integration for Scope 3 calculations
+- **Carbon Dashboard**: Visualization of emissions across all scopes
+- **AI Co-Pilot Chat**: Interactive guidance through calculation process
+
+### API Integration
+- **Google Routes API**: For distance calculation and route optimization
+- **Google Places API**: For location search and address validation
+- **OpenAI API**: For AI-powered calculation assistance
+- **Replit Database**: PostgreSQL for data persistence
 
 ## User Preferences
 
-Preferred communication style: Simple, everyday language.
+### Development Guidelines
+- Always use TypeScript for type safety
+- Follow shadcn/ui design system patterns
+- Use TanStack Query for API state management
+- Implement proper data-testid attributes for all interactive elements
+- Follow GHG Protocol 2025 standards for emission calculations
+- Use Google Routes API for accurate travel distance calculations
+- Ensure proper error handling and loading states
 
-## System Architecture
+### API Key Management
+The application requires the following API keys to be configured as Replit secrets:
+- `GOOGLE_ROUTES_API_KEY`: For Google Routes API and Places API access
+- `OPENAI_API_KEY`: For AI co-pilot functionality
 
-### Frontend Architecture
-- **Framework**: React with TypeScript using Vite as the build tool
-- **Routing**: Wouter for client-side routing with pages for calculator, dashboard, reports, and home
-- **State Management**: TanStack Query for server state management and caching
-- **UI Components**: Radix UI primitives with Tailwind CSS using shadcn/ui component system
-- **Styling**: Tailwind CSS with custom CSS variables for theming and Inter font family
-- **Theme System**: Light/dark mode support with system preference detection
+## Setup Instructions
 
-### Backend Architecture
-- **Runtime**: Node.js with Express.js server framework using ES modules
-- **API Design**: RESTful API with organized route handlers for users, organizations, calculations, and AI conversations
-- **Middleware**: Request logging, error handling, and JSON/URL-encoded body parsing
-- **Development Setup**: Vite integration for development with HMR and static file serving
+### Google Routes API Setup
+1. Get a Google Cloud API key with the following APIs enabled:
+   - Routes API
+   - Places API (Text Search)
+2. Add the API key to Replit secrets as `GOOGLE_ROUTES_API_KEY`
 
-### Database Layer
-- **ORM**: Drizzle ORM with PostgreSQL dialect for type-safe database operations
-- **Database**: PostgreSQL via Supabase with standard node-postgres connection
-- **Schema**: Comprehensive schema covering users, organizations, carbon calculations, AI conversations, reports, achievements, and emission factors
-- **Migration**: Drizzle Kit for schema migrations with output to migrations directory
+### Database Setup
+Run the following command to push schema changes to the database:
+```bash
+npm run db:push
+```
 
-### Carbon Calculation Engine
-- **Compliance**: GHG Protocol 2025 standards with Scope 1, 2, and 3 calculations
-- **Methods**: Multiple calculation approaches (guided, estimation, detailed) based on user preference and data availability
-- **Emission Factors**: Built-in emission factors library with industry-specific coefficients
-- **Data Storage**: JSON-based storage for flexible scope data with decimal precision for emission results
+### Running the Application
+The application runs both frontend and backend on port 5000:
+```bash
+npm run dev
+```
 
-### AI Integration
-- **AI Service**: OpenAI GPT integration for conversational carbon footprint guidance
-- **Context Management**: Maintains conversation state and user organization context
-- **Features**: Intelligent data estimation, context-aware recommendations, and memory of previous interactions
-- **Session Management**: Persistent AI conversation sessions linked to user accounts
+## Key Features
 
-## External Dependencies
+### Smart Journey Planning
+- Search for any location using Google Places API
+- Calculate exact distances using Google Routes API
+- Automatic emission calculations for different vehicle types
+- Support for round trips and multi-stop journeys
+- Real-time CO2e emission estimates
 
-### Database Infrastructure
-- **Supabase Database**: PostgreSQL-as-a-Service with real-time capabilities
-- **Drizzle ORM**: TypeScript ORM for database operations and schema management
+### Transportation Modes Supported
+- **Cars**: Petrol, Diesel, Hybrid, Electric (with different emission factors)
+- **Flights**: Domestic and International (with appropriate factors)
+- **Public Transport**: Trains, Buses
+- **Other**: Motorcycles with specific emission factors
 
-### AI and ML Services
-- **OpenAI API**: GPT models for conversational AI copilot functionality
-- **Model**: Uses GPT-5 (latest model as of August 2025) for advanced carbon calculation guidance
+### Integration with Carbon Calculator
+- Seamless integration with existing Scope 3 calculations
+- Toggle between manual input and smart journey planning
+- Auto-population of business travel distances
+- Visual summary of journey emissions in calculation results
 
-### Third-party Integrations
-- **Notion API**: Document and knowledge base integration for organizational data
-- **Slack API**: Workspace integration for notifications and collaboration
-- **Blockchain Ready**: Architecture prepared for Hedera Guardian integration for carbon receipt NFTs
+## Current Status
+- ✅ Google Routes API service implementation completed
+- ✅ Location picker component with search functionality
+- ✅ Journey planner with multi-modal transport support
+- ✅ Integration with existing carbon calculator (Scope 3)
+- ✅ API routes for all Routes functionality
+- 🔄 API key management documentation (completed)
+- ⏳ Integration testing with sample locations (pending)
 
-### Development Tools
-- **Vite**: Build tool with React plugin and runtime error overlay
-- **TypeScript**: Full TypeScript support with strict configuration
-- **ESBuild**: Production build optimization for server bundle
-- **Replit Integration**: Development environment integration with cartographer plugin
-
-### UI and Components
-- **Radix UI**: Comprehensive primitive components for accessible UI
-- **Tailwind CSS**: Utility-first CSS framework with custom design system
-- **Lucide Icons**: Icon library for consistent visual elements
-- **React Hook Form**: Form management with Zod validation schemas
-
-### Query and State Management
-- **TanStack Query**: Server state management with caching and synchronization
-- **Wouter**: Lightweight routing solution for single-page application navigation
+The Google Routes integration significantly enhances the user experience by automatically calculating accurate travel distances and emissions, making it much easier for organizations to complete comprehensive Scope 3 calculations.
