@@ -16,7 +16,7 @@ import { JourneyPlanner, type JourneyPlannerResult } from './journey-planner';
 
 const organizationSchema = z.object({
   name: z.string().min(1, 'Organization name is required'),
-  type: z.enum(['corporate', 'government', 'ngo', 'university', 'event']),
+  type: z.enum(['corporate', 'government', 'ngo', 'university', 'music_festival', 'concert', 'film_screening', 'corporate_event', 'brand_activation', 'political_event', 'family_event', 'private_event', 'conference', 'trade_show']),
   size: z.enum(['1-10', '11-50', '51-200', '201-500', '501-1000', '1000+']),
   industry: z.string().min(1, 'Industry is required'),
   reportingYear: z.number().min(2020).max(2025),
@@ -156,7 +156,16 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                     <SelectItem value="government">Government Agency</SelectItem>
                     <SelectItem value="ngo">Non-Profit Organization</SelectItem>
                     <SelectItem value="university">University/Educational</SelectItem>
-                    <SelectItem value="event">Event/Conference</SelectItem>
+                    <SelectItem value="music_festival">🎵 Music Festival</SelectItem>
+                    <SelectItem value="concert">🎤 Concert/Live Performance</SelectItem>
+                    <SelectItem value="film_screening">🎬 Film Screening/Cinema Event</SelectItem>
+                    <SelectItem value="corporate_event">🏢 Corporate Event/Meeting</SelectItem>
+                    <SelectItem value="brand_activation">📢 Brand Activation/Marketing Event</SelectItem>
+                    <SelectItem value="political_event">🗳️ Political Event/Rally</SelectItem>
+                    <SelectItem value="family_event">👨‍👩‍👧‍👦 Family-Friendly Event</SelectItem>
+                    <SelectItem value="private_event">🎉 Private Event/Celebration</SelectItem>
+                    <SelectItem value="conference">💼 Conference/Summit</SelectItem>
+                    <SelectItem value="trade_show">🏪 Trade Show/Exhibition</SelectItem>
                   </SelectContent>
                 </Select>
                 {form.formState.errors.type && (
@@ -209,15 +218,18 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                     <SelectValue placeholder="Select industry..." />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="technology">Technology/Software</SelectItem>
-                    <SelectItem value="manufacturing">Manufacturing</SelectItem>
-                    <SelectItem value="retail">Retail/Consumer Goods</SelectItem>
-                    <SelectItem value="finance">Financial Services</SelectItem>
-                    <SelectItem value="healthcare">Healthcare</SelectItem>
-                    <SelectItem value="energy">Energy/Utilities</SelectItem>
-                    <SelectItem value="transportation">Transportation/Logistics</SelectItem>
-                    <SelectItem value="construction">Construction/Real Estate</SelectItem>
-                    <SelectItem value="agriculture">Agriculture/Food</SelectItem>
+                    <SelectItem value="entertainment">🎭 Entertainment & Events</SelectItem>
+                    <SelectItem value="music_industry">🎵 Music & Audio Production</SelectItem>
+                    <SelectItem value="film_tv">🎬 Film & Television Production</SelectItem>
+                    <SelectItem value="event_production">🎪 Event Production & Management</SelectItem>
+                    <SelectItem value="venue_management">🏟️ Venue & Facility Management</SelectItem>
+                    <SelectItem value="festival_production">🎊 Festival & Concert Production</SelectItem>
+                    <SelectItem value="marketing_events">📢 Marketing & Brand Events</SelectItem>
+                    <SelectItem value="corporate_meetings">💼 Corporate Events & Meetings</SelectItem>
+                    <SelectItem value="sports_events">⚽ Sports & Recreation Events</SelectItem>
+                    <SelectItem value="cultural_events">🎨 Cultural & Arts Events</SelectItem>
+                    <SelectItem value="food_beverage">🍽️ Food & Beverage Events</SelectItem>
+                    <SelectItem value="technology">💻 Technology/Software</SelectItem>
                     <SelectItem value="other">Other</SelectItem>
                   </SelectContent>
                 </Select>
