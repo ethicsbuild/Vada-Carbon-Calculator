@@ -1,12 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
-import { WebSocketServer } from "ws";
 import { storage } from "./storage";
 import { carbonCalculatorService } from "./services/carbonCalculator";
 import { aiCoPilotService } from "./services/aiCopilot";
 import { reportGeneratorService } from "./services/reportGenerator";
 import { insertOrganizationSchema, insertCarbonCalculationSchema } from "@shared/schema";
-import { handleChatWebSocket } from "./routes/chat";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -464,16 +462,5 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   const httpServer = createServer(app);
-
-  // Setup WebSocket server for Sage chat
-  const wss = new WebSocketServer({
-    server: httpServer,
-    path: '/api/chat'
-  });
-
-  wss.on('connection', (ws) => {
-    handleChatWebSocket(ws);
-  });
-
   return httpServer;
 }

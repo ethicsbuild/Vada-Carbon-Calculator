@@ -39,24 +39,31 @@ export const carbonCalculations = pgTable("carbon_calculations", {
   reportingYear: integer("reporting_year").notNull(),
   calculationMethod: text("calculation_method").notNull(), // guided, estimation, detailed
   status: text("status").default("in_progress"), // in_progress, completed, verified
-  
+
   // Emission scopes data
   scope1Data: jsonb("scope1_data"),
   scope2Data: jsonb("scope2_data"),
   scope3Data: jsonb("scope3_data"),
-  
+
   // Calculated results (in tCO2e)
   scope1Emissions: decimal("scope1_emissions", { precision: 10, scale: 3 }),
   scope2Emissions: decimal("scope2_emissions", { precision: 10, scale: 3 }),
   scope3Emissions: decimal("scope3_emissions", { precision: 10, scale: 3 }),
   totalEmissions: decimal("total_emissions", { precision: 10, scale: 3 }),
-  
+
   // Metadata
   ghgProtocolVersion: text("ghg_protocol_version").default("2025"),
   calculatedAt: timestamp("calculated_at"),
   verifiedAt: timestamp("verified_at"),
+
+  // Blockchain verification (Phase 4)
   blockchainHash: text("blockchain_hash"),
-  
+  blockchainTransactionId: text("blockchain_transaction_id"),
+  blockchainTimestamp: timestamp("blockchain_timestamp"),
+  blockchainNetwork: text("blockchain_network"), // mainnet, testnet, previewnet
+  blockchainExplorerUrl: text("blockchain_explorer_url"),
+  verificationStatus: text("verification_status").default("unverified"), // unverified, pending, verified, certified
+
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -117,6 +124,132 @@ export const emissionFactors = pgTable("emission_factors", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Suppliers table for supplier coordination
+export const suppliers = pgTable("suppliers", {
+  id: serial("id").primaryKey(),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  name: text("name").notNull(),
+  role: text("role").notNull(), // caterer, venue, av_company, staging, transportation, accommodation, other
+  contactInfo: text("contact_info"),
+  identifiedFrom: text("identified_from").default("user_mentioned"), // user_mentioned, ai_inferred, database_lookup
+  confidence: decimal("confidence", { precision: 3, scale: 2 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Supplier data requests table
+export const supplierRequests = pgTable("supplier_requests", {
+  id: serial("id").primaryKey(),
+  supplierId: integer("supplier_id").references(() => suppliers.id),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  requestType: jsonb("request_type").notNull(), // Array of data categories needed
+  draftMessage: text("draft_message").notNull(),
+  status: text("status").default("draft"), // draft, pending_approval, sent, responded, integrated, declined
+  sentAt: timestamp("sent_at"),
+  responseReceived: timestamp("response_received"),
+  responseData: jsonb("response_data"),
+  trackingLink: text("tracking_link"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Attendee profiles for gamification
+export const attendeeProfiles = pgTable("attendee_profiles", {
+  id: serial("id").primaryKey(),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  name: text("name"),
+  email: text("email"),
+  ticketId: text("ticket_id"),
+  totalFootprint: decimal("total_footprint", { precision: 10, scale: 6 }), // tCO2e
+  rank: integer("rank"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Attendee choices for tracking
+export const attendeeChoices = pgTable("attendee_choices", {
+  id: serial("id").primaryKey(),
+  attendeeId: integer("attendee_id").references(() => attendeeProfiles.id),
+  category: text("category").notNull(), // transportation, food, accommodation, waste, merchandise
+  choice: text("choice").notNull(),
+  emissions: decimal("emissions", { precision: 10, scale: 6 }), // tCO2e
+  comparedToAverage: decimal("compared_to_average", { precision: 5, scale: 2 }), // percentage
+  verified: boolean("verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Attendee achievements
+export const attendeeAchievements = pgTable("attendee_achievements", {
+  id: serial("id").primaryKey(),
+  attendeeId: integer("attendee_id").references(() => attendeeProfiles.id),
+  type: text("type").notNull(), // low_impact_travel, plant_based, zero_waste, etc.
+  title: text("title").notNull(),
+  description: text("description"),
+  icon: text("icon"),
+  footprintReduction: decimal("footprint_reduction", { precision: 10, scale: 6 }),
+  unlockedAt: timestamp("unlocked_at").defaultNow(),
+});
+
+// Attendee rewards
+export const attendeeRewards = pgTable("attendee_rewards", {
+  id: serial("id").primaryKey(),
+  attendeeId: integer("attendee_id").references(() => attendeeProfiles.id),
+  type: text("type").notNull(), // discount, upgrade, merchandise, access, recognition
+  title: text("title").notNull(),
+  description: text("description"),
+  value: decimal("value", { precision: 10, scale: 2 }),
+  code: text("code"),
+  expiresAt: timestamp("expires_at"),
+  redeemed: boolean("redeemed").default(false),
+  redeemedAt: timestamp("redeemed_at"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Blockchain records for verification
+export const blockchainRecords = pgTable("blockchain_records", {
+  id: serial("id").primaryKey(),
+  recordId: text("record_id").notNull().unique(),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  recordType: text("record_type").notNull(), // calculation, reduction, verification, offset, attendee_aggregate
+  dataHash: text("data_hash").notNull(),
+  transactionId: text("transaction_id"),
+  consensusTimestamp: text("consensus_timestamp"),
+  topicSequenceNumber: integer("topic_sequence_number"),
+  explorerUrl: text("explorer_url"),
+  data: jsonb("data").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Audit logs for compliance
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  logId: text("log_id").notNull().unique(),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  action: text("action").notNull(),
+  actor: text("actor").notNull(),
+  changes: jsonb("changes"),
+  hash: text("hash").notNull(),
+  previousHash: text("previous_hash"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Carbon certificates
+export const carbonCertificates = pgTable("carbon_certificates", {
+  id: serial("id").primaryKey(),
+  certificateId: text("certificate_id").notNull().unique(),
+  calculationId: integer("calculation_id").references(() => carbonCalculations.id),
+  eventName: text("event_name").notNull(),
+  organizationName: text("organization_name").notNull(),
+  totalEmissions: decimal("total_emissions", { precision: 10, scale: 3 }),
+  emissionBreakdown: jsonb("emission_breakdown"),
+  verificationStatus: text("verification_status").default("unverified"), // unverified, pending, verified, certified
+  blockchainHash: text("blockchain_hash").notNull(),
+  blockchainTimestamp: timestamp("blockchain_timestamp").notNull(),
+  certificateUrl: text("certificate_url"),
+  qrCode: text("qr_code"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const organizationsRelations = relations(organizations, ({ one, many }) => ({
   owner: one(users, { fields: [organizations.ownerId], references: [users.id] }),
@@ -142,6 +275,47 @@ export const carbonReportsRelations = relations(carbonReports, ({ one }) => ({
 
 export const userAchievementsRelations = relations(userAchievements, ({ one }) => ({
   user: one(users, { fields: [userAchievements.userId], references: [users.id] }),
+}));
+
+export const suppliersRelations = relations(suppliers, ({ one, many }) => ({
+  calculation: one(carbonCalculations, { fields: [suppliers.calculationId], references: [carbonCalculations.id] }),
+  requests: many(supplierRequests),
+}));
+
+export const supplierRequestsRelations = relations(supplierRequests, ({ one }) => ({
+  supplier: one(suppliers, { fields: [supplierRequests.supplierId], references: [suppliers.id] }),
+  calculation: one(carbonCalculations, { fields: [supplierRequests.calculationId], references: [carbonCalculations.id] }),
+}));
+
+export const attendeeProfilesRelations = relations(attendeeProfiles, ({ one, many }) => ({
+  calculation: one(carbonCalculations, { fields: [attendeeProfiles.calculationId], references: [carbonCalculations.id] }),
+  choices: many(attendeeChoices),
+  achievements: many(attendeeAchievements),
+  rewards: many(attendeeRewards),
+}));
+
+export const attendeeChoicesRelations = relations(attendeeChoices, ({ one }) => ({
+  attendee: one(attendeeProfiles, { fields: [attendeeChoices.attendeeId], references: [attendeeProfiles.id] }),
+}));
+
+export const attendeeAchievementsRelations = relations(attendeeAchievements, ({ one }) => ({
+  attendee: one(attendeeProfiles, { fields: [attendeeAchievements.attendeeId], references: [attendeeProfiles.id] }),
+}));
+
+export const attendeeRewardsRelations = relations(attendeeRewards, ({ one }) => ({
+  attendee: one(attendeeProfiles, { fields: [attendeeRewards.attendeeId], references: [attendeeProfiles.id] }),
+}));
+
+export const blockchainRecordsRelations = relations(blockchainRecords, ({ one }) => ({
+  calculation: one(carbonCalculations, { fields: [blockchainRecords.calculationId], references: [carbonCalculations.id] }),
+}));
+
+export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
+  calculation: one(carbonCalculations, { fields: [auditLogs.calculationId], references: [carbonCalculations.id] }),
+}));
+
+export const carbonCertificatesRelations = relations(carbonCertificates, ({ one }) => ({
+  calculation: one(carbonCalculations, { fields: [carbonCertificates.calculationId], references: [carbonCalculations.id] }),
 }));
 
 // Zod schemas
@@ -188,6 +362,54 @@ export const insertEmissionFactorSchema = createInsertSchema(emissionFactors).om
   createdAt: true,
 });
 
+export const insertSupplierSchema = createInsertSchema(suppliers).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertSupplierRequestSchema = createInsertSchema(supplierRequests).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAttendeeProfileSchema = createInsertSchema(attendeeProfiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertAttendeeChoiceSchema = createInsertSchema(attendeeChoices).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAttendeeAchievementSchema = createInsertSchema(attendeeAchievements).omit({
+  id: true,
+  unlockedAt: true,
+});
+
+export const insertAttendeeRewardSchema = createInsertSchema(attendeeRewards).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertBlockchainRecordSchema = createInsertSchema(blockchainRecords).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertAuditLogSchema = createInsertSchema(auditLogs).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertCarbonCertificateSchema = createInsertSchema(carbonCertificates).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -209,3 +431,30 @@ export type InsertUserAchievement = z.infer<typeof insertUserAchievementSchema>;
 
 export type EmissionFactor = typeof emissionFactors.$inferSelect;
 export type InsertEmissionFactor = z.infer<typeof insertEmissionFactorSchema>;
+
+export type Supplier = typeof suppliers.$inferSelect;
+export type InsertSupplier = z.infer<typeof insertSupplierSchema>;
+
+export type SupplierRequest = typeof supplierRequests.$inferSelect;
+export type InsertSupplierRequest = z.infer<typeof insertSupplierRequestSchema>;
+
+export type AttendeeProfile = typeof attendeeProfiles.$inferSelect;
+export type InsertAttendeeProfile = z.infer<typeof insertAttendeeProfileSchema>;
+
+export type AttendeeChoice = typeof attendeeChoices.$inferSelect;
+export type InsertAttendeeChoice = z.infer<typeof insertAttendeeChoiceSchema>;
+
+export type AttendeeAchievement = typeof attendeeAchievements.$inferSelect;
+export type InsertAttendeeAchievement = z.infer<typeof insertAttendeeAchievementSchema>;
+
+export type AttendeeReward = typeof attendeeRewards.$inferSelect;
+export type InsertAttendeeReward = z.infer<typeof insertAttendeeRewardSchema>;
+
+export type BlockchainRecord = typeof blockchainRecords.$inferSelect;
+export type InsertBlockchainRecord = z.infer<typeof insertBlockchainRecordSchema>;
+
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+
+export type CarbonCertificate = typeof carbonCertificates.$inferSelect;
+export type InsertCarbonCertificate = z.infer<typeof insertCarbonCertificateSchema>;

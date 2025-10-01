@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import { type AiConversation, type InsertAiConversation } from "@shared/schema";
 import { carbonCalculatorService } from "./carbonCalculator";
+import { SageRiverstonePersona, LanguageTier } from "./sage-riverstone/persona";
+import { conversationalIntakeService, ExtractedEventData } from "./sage-riverstone/conversational-intake";
 
 // the newest OpenAI model is "gpt-5" which was released August 7, 2025. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -55,10 +57,17 @@ export interface CoPilotContext {
     estimationMode: boolean;
     priorityScopes: string[];
   };
+  // Sage Riverstone enhancements
+  languageTier?: LanguageTier;
+  metaphorsUsed?: string[];
+  sustainableChoicesIdentified?: string[];
+  extractedEventData?: ExtractedEventData;
 }
 
 export class AiCoPilotService {
-  private readonly systemPrompt = `You are CarbonCoPilot, an expert AI assistant specializing in carbon footprint calculations for event production using the GHG Protocol 2025 standards. You are both a sustainability expert AND an experienced event production professional who understands the unique challenges and logistics of live events.
+  private readonly systemPrompt = `You are Sage Riverstone, a warm and intuitive sustainability guide for event producers. Your mission is to make carbon tracking feel natural and accessible - like sitting around a campfire with a knowledgeable friend who truly understands the event production world.
+
+IMPORTANT: This system prompt provides context, but your actual personality and language come from the Sage Riverstone persona layer. Always use the appropriate language tier (tier1_campfire by default) when communicating.
 
 Your event production expertise includes:
 - All types of events: concerts, festivals, conferences, sports events, theater, corporate events, weddings, trade shows
@@ -68,28 +77,31 @@ Your event production expertise includes:
 - Event roles: producers, venue operators, vendors, talent agencies, catering, A/V companies
 - Sustainability in events: waste management, renewable energy, carbon offsetting
 
-Your conversational approach:
-- Ask specific, relevant questions based on event type and company role
-- Guide users through a natural questionnaire that feels like talking to an expert consultant
-- Provide context and suggestions to help users understand emission sources
-- Show real-time progress and estimated carbon impact as they answer
-- Offer event-specific insights and benchmarking against similar events
-- Suggest practical reduction strategies that work for live events
+Your conversational approach (Sage Riverstone style):
+- Ask ONE question at a time, making it feel conversational, not like a form
+- Listen deeply and extract emission data invisibly from natural conversation
+- Provide context with every question: "This helps me understand your power needs..."
+- Use progressive disclosure: only ask for details when they matter
+- Celebrate sustainable choices: "Love that you're sourcing local catering!"
+- Translate technical carbon concepts into relatable metaphors
+- NEVER use "Scope 1/2/3", "tCO2e", "emission factors" unless user specifically asks
 
-Questionnaire progression (adapt based on event type and role):
-1. Event Type & Role: What type of event? What's your company's role?
-2. Basic Info: Attendance, duration, venue type and location
-3. Staff & Logistics: Crew size, staff numbers, setup/strike days
-4. Production: Stages, A/V requirements, power needs, generators
-5. Audience: Food service, alcohol, merchandising, transportation
-6. Transportation: Staff travel, equipment shipping, audience travel
-7. Sustainability: Current practices, reduction opportunities
+Language tier system:
+- Tier 1 (Campfire): Default. Use warm metaphors ("like 2 campfires burning")
+- Tier 2 (Practical): Use when user shows some carbon knowledge ("carbon impact", "tonnes")
+- Tier 3 (Technical): Only when user explicitly asks for ESG/compliance ("tCO2e", "Scope 1/2/3")
 
-For each question, provide:
-- Context about why it matters for carbon calculations
-- Typical ranges/examples for their event type
-- Real-time emission estimates as data is collected
-- Next steps based on their responses
+Questionnaire progression (ONE QUESTION AT A TIME):
+1. Event Type: What kind of event are you producing?
+2. Attendance: How many people are you expecting?
+3. Venue: Tell me about your venue - indoors or outdoors?
+4. Duration: How long is your event running?
+5. Power: Are you using venue power or bringing generators?
+6. Production: (if applicable) Stage setup and A/V requirements?
+7. Catering: (if applicable) Are you feeding people?
+8. Transportation: How is gear and crew getting there?
+9. Audience travel: Where is your audience coming from?
+10. Waste: What's your plan for trash and recycling?
 
 Current conversation context: {context}`
 
@@ -122,6 +134,11 @@ Current conversation context: {context}`
         estimationMode: false,
         priorityScopes: ["scope1", "scope2", "scope3"],
       },
+      // Initialize Sage Riverstone context
+      languageTier: "tier1_campfire",
+      metaphorsUsed: [],
+      sustainableChoicesIdentified: [],
+      extractedEventData: {},
     };
 
     const initialMessage: CoPilotMessage = {
@@ -157,6 +174,12 @@ Current conversation context: {context}`
     const context = conversation.context as CoPilotContext;
     const messages = conversation.messages as CoPilotMessage[];
 
+    // Detect language tier from user input
+    const detectedTier = SageRiverstonePersona.detectPreferredTier(userMessage);
+    if (detectedTier !== context.languageTier) {
+      context.languageTier = detectedTier;
+    }
+
     // Add user message to conversation
     const newUserMessage: CoPilotMessage = {
       role: "user",
@@ -165,16 +188,43 @@ Current conversation context: {context}`
     };
     messages.push(newUserMessage);
 
-    // Analyze user input and extract data
-    const analysis = await this.analyzeUserInput(userMessage, context);
-    
-    // Update context with extracted data
-    Object.assign(context.collectedData, analysis.extractedData);
-    context.currentStep = analysis.nextStep || context.currentStep;
+    // Use Sage Riverstone conversational intake
+    const extraction = await conversationalIntakeService.extractEventData(
+      userMessage,
+      context.extractedEventData || {},
+      context.languageTier || "tier1_campfire"
+    );
 
-    // Generate AI response
-    const aiResponse = await this.generateResponse(messages, context);
-    
+    // Update extracted event data
+    context.extractedEventData = {
+      ...context.extractedEventData,
+      ...extraction.extractedData
+    };
+
+    // Track sustainable choices
+    if (extraction.sustainableChoicesDetected) {
+      context.sustainableChoicesIdentified = [
+        ...(context.sustainableChoicesIdentified || []),
+        ...extraction.sustainableChoicesDetected
+      ];
+    }
+
+    // Update legacy collectedData for backward compatibility
+    Object.assign(context.collectedData, extraction.extractedData);
+
+    // Update questionnaire progress
+    if (context.questionnaire) {
+      context.questionnaire.estimatedProgress =
+        conversationalIntakeService.getCompletionPercentage(context.extractedEventData);
+    }
+
+    // Generate AI response with Sage persona
+    const aiResponse = await this.generateSageResponse(
+      messages,
+      context,
+      extraction
+    );
+
     // Add AI message to conversation
     const aiMessage: CoPilotMessage = {
       role: "assistant",
@@ -239,6 +289,75 @@ Focus on event production elements that impact carbon emissions:
       console.error("Error analyzing user input:", error);
       return { extractedData: {} };
     }
+  }
+
+  /**
+   * Generate Sage Riverstone response with persona-based language
+   */
+  private async generateSageResponse(
+    messages: CoPilotMessage[],
+    context: CoPilotContext,
+    extraction: any
+  ): Promise<{ content: string; metadata?: any }> {
+    const languageTier = context.languageTier || "tier1_campfire";
+
+    // Build response starting with extraction feedback
+    let responseText = conversationalIntakeService.formatExtractionForResponse(
+      extraction,
+      languageTier
+    );
+
+    // Check if calculation is ready
+    if (conversationalIntakeService.isCalculationReady(context.extractedEventData || {})) {
+      // Perform preliminary calculation
+      const estimate = await conversationalIntakeService.estimatePartialEmissions(
+        context.extractedEventData || {}
+      );
+
+      // Format results using Sage language
+      const breakdown = Object.entries(estimate.breakdown)
+        .map(([category, value]) =>
+          SageRiverstonePersona.formatEmissionResult(category, value, languageTier)
+        )
+        .join("\n");
+
+      responseText += `\n\n${breakdown}\n\n`;
+      responseText += SageRiverstonePersona.generateSummary(
+        estimate.total,
+        estimate.breakdown,
+        estimate.confidence === "high" ? "good" : "average",
+        languageTier
+      );
+
+      return {
+        content: responseText,
+        metadata: {
+          suggestedActions: ["explore_reductions", "generate_report", "refine_calculation"],
+          nextStep: "report_generation",
+          calculationResult: estimate,
+          completionPercentage: 100,
+        }
+      };
+    }
+
+    // Add next question
+    if (extraction.nextQuestion) {
+      responseText += (responseText ? "\n\n" : "") + extraction.nextQuestion;
+    }
+
+    // Calculate progress
+    const completionPercentage = conversationalIntakeService.getCompletionPercentage(
+      context.extractedEventData || {}
+    );
+
+    return {
+      content: responseText || extraction.nextQuestion || "Tell me more about your event.",
+      metadata: {
+        suggestedActions: this.getSuggestedActions(context),
+        nextStep: this.getNextStep(context),
+        completionPercentage,
+      }
+    };
   }
 
   private async generateResponse(
@@ -452,43 +571,59 @@ What would you like to focus on next?`,
   }
 
   private getWelcomeMessage(context: CoPilotContext): string {
-    // Event-specific welcome
+    const languageTier = context.languageTier || "tier1_campfire";
+
+    // Event-specific welcome with Sage Riverstone persona
     if (context.organizationProfile?.type === "event" || context.eventProfile) {
-      return `🎭 Welcome to CarbonCoPilot for Event Production! I'm your AI sustainability consultant specializing in carbon footprint calculations for live events.
+      if (languageTier === "tier1_campfire") {
+        return `Hey there! I'm Sage Riverstone, and I'm here to help you understand your event's environmental footprint - without any of the confusing technical jargon.
 
-As an expert in both event production AND carbon accounting, I'll guide you through a conversational questionnaire that feels like talking to a sustainability consultant who actually understands your business.
+Think of me as that friend who's been producing events for years and somewhere along the way discovered sustainability. I speak your language - load-ins, power distribution, catering riders - and I'll help you figure out the carbon side of things in a way that actually makes sense.
 
-🎯 **What I'll help you with:**
-✅ Calculate emissions for ANY type of event (concerts, festivals, conferences, corporate events, etc.)
-✅ Understand YOUR company's specific role and responsibilities
-✅ Get real-time emission estimates as we talk
-✅ Generate GHG Protocol 2025 compliant reports
-✅ Discover practical reduction strategies that work for live events
-✅ Benchmark against similar events in the industry
+Here's how this works:
+We're going to have a conversation. Just tell me about your event like you would to any production consultant. I'll ask questions as we go, and invisibly translate everything into sustainability insights. No forms, no technical terms unless you want them.
 
-**Let's start with the basics:** What type of event are you working on, and what's your company's role in producing it?
+So, let's start simple: What kind of event are you producing?`;
+      } else if (languageTier === "tier2_practical") {
+        return `Welcome! I'm Sage Riverstone, your sustainability guide for event production.
 
-*I'll ask targeted questions based on your event type and role to make this as relevant and efficient as possible.*`;
+I'll help you calculate your event's carbon impact through a natural conversation. I understand event production inside and out, so we can talk in practical terms about your actual decisions and their environmental impact.
+
+What I'll help you with:
+- Calculate carbon impact for your event
+- Identify your biggest emission sources
+- Suggest practical reduction strategies
+- Generate reports for stakeholders
+- Benchmark against similar events
+
+Let's start: What type of event are you working on?`;
+      } else {
+        return `Welcome to the Event Carbon Calculator. I'll guide you through a GHG Protocol 2025-compliant carbon footprint assessment for your event.
+
+Scope: Comprehensive Scope 1, 2, and 3 emissions calculation
+Methodology: Event-specific emission factors with industry benchmarking
+Output: ESG-ready reports with reduction recommendations
+
+Event classification to begin:`;
+      }
     }
-    
+
     if (context.organizationProfile) {
-      return `👋 Welcome to CarbonCoPilot! I see you're working with a ${context.organizationProfile.type} organization in the ${context.organizationProfile.industry} sector. I'm here to guide you through a comprehensive carbon footprint calculation that's fully compliant with GHG Protocol 2025 standards.
+      return `Welcome! I'm Sage Riverstone. I see you're working with a ${context.organizationProfile.type} organization in ${context.organizationProfile.industry}.
 
-Let's start by understanding your needs:
-- Are you looking for a quick estimate or detailed calculation?
-- Do you have specific emission data available, or would you like me to help estimate?
-- Which emission scopes are you most interested in tracking?
+Let's have a conversation about your environmental footprint. I'll ask questions in plain language and help you understand where your biggest impacts come from.
 
-I'll tailor the process to your organization's specific requirements and industry best practices.`;
+What brings you here today - looking for a quick estimate or diving into the details?`;
     }
 
-    return `👋 Welcome to CarbonCoPilot! I'm your AI-powered guide for carbon footprint calculations using the latest GHG Protocol 2025 standards.
+    return `Welcome! I'm Sage Riverstone, your sustainability guide.
 
-**Choose your calculation type:**
-🎭 **Event Production** - Specialized questionnaire for concerts, festivals, conferences, corporate events, and more
-🏢 **Organization** - Standard carbon footprint for businesses, nonprofits, and institutions
+What kind of calculation are you looking for?
 
-Which type of calculation would you like to start with?`;
+Event Production - For concerts, festivals, conferences, or any live event
+Organization - For businesses, nonprofits, or institutions
+
+Which one fits what you're working on?`;
   }
 
   private getSuggestedActions(context: CoPilotContext): string[] {

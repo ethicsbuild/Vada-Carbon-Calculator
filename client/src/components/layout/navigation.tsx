@@ -21,94 +21,62 @@ export function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigation = [
-    { name: 'Calculator', href: '/calculator', icon: Calculator },
     { name: 'Dashboard', href: '/dashboard', icon: BarChart3 },
-    { name: 'Reports', href: '/reports', icon: FileText },
-    { name: 'API', href: '/api', icon: Settings },
+    { name: 'Community', href: '/community', icon: FileText },
+    { name: 'Resources', href: '/resources', icon: Settings },
   ];
+
+  const carbonScore = 'B+'; // This will come from context/API later
 
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 border-b border-gray-200 dark:border-gray-700">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/">
-            <div className="flex items-center space-x-3 cursor-pointer">
-              <div className="w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center">
-                <Leaf className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white">
-                CarbonCoPilot
-              </h1>
-            </div>
+            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-emerald-500 to-violet-500 bg-clip-text text-transparent cursor-pointer tracking-tight">
+              VADA
+            </h1>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => {
-              const Icon = item.icon;
               const isActive = location === item.href;
-              
+
               return (
                 <Link key={item.name} href={item.href}>
-                  <div className={cn(
-                    "flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors cursor-pointer",
-                    isActive 
-                      ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20" 
-                      : "text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                  <span className={cn(
+                    "text-sm font-medium transition-colors cursor-pointer",
+                    isActive
+                      ? "text-white"
+                      : "text-slate-400 hover:text-white"
                   )}>
-                    <Icon className="w-4 h-4" />
-                    <span>{item.name}</span>
-                  </div>
+                    {item.name}
+                  </span>
                 </Link>
               );
             })}
+
+            {/* Carbon Score Badge */}
+            <div className="bg-slate-800 px-4 py-2 rounded-full border border-emerald-500/50">
+              <span className="text-sm text-slate-300">
+                Your Score: <span className="font-bold text-emerald-400">{carbonScore}</span>
+              </span>
+            </div>
           </nav>
 
-          {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="w-9 h-9 p-0"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </Button>
-            
-            <Button className="bg-green-600 hover:bg-green-700 text-white">
-              Get Started
-            </Button>
-          </div>
-
           {/* Mobile menu button */}
-          <div className="md:hidden flex items-center space-x-2">
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={toggleTheme}
-              className="w-9 h-9 p-0"
-            >
-              {theme === 'dark' ? (
-                <Sun className="w-4 h-4" />
-              ) : (
-                <Moon className="w-4 h-4" />
-              )}
-            </Button>
-            
+          <div className="md:hidden">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-9 h-9 p-0"
+              className="w-9 h-9 p-0 text-white hover:bg-slate-800"
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -121,34 +89,35 @@ export function Navigation() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200 dark:border-gray-700">
+          <div className="md:hidden py-4 border-t border-white/10">
             <div className="flex flex-col space-y-2">
               {navigation.map((item) => {
-                const Icon = item.icon;
                 const isActive = location === item.href;
-                
+
                 return (
                   <Link key={item.name} href={item.href}>
-                    <div 
+                    <div
                       className={cn(
-                        "flex items-center space-x-3 px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer",
-                        isActive 
-                          ? "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20" 
-                          : "text-gray-600 dark:text-gray-300 hover:text-green-600 dark:hover:text-green-400 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        "px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer",
+                        isActive
+                          ? "text-white bg-slate-800"
+                          : "text-slate-400 hover:text-white hover:bg-slate-800"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Icon className="w-5 h-5" />
-                      <span>{item.name}</span>
+                      {item.name}
                     </div>
                   </Link>
                 );
               })}
-              
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
-                <Button className="w-full bg-green-600 hover:bg-green-700 text-white">
-                  Get Started
-                </Button>
+
+              {/* Carbon Score Badge Mobile */}
+              <div className="mt-4 pt-4 border-t border-white/10">
+                <div className="bg-slate-800 px-4 py-2 rounded-lg border border-emerald-500/50 text-center">
+                  <span className="text-sm text-slate-300">
+                    Your Score: <span className="font-bold text-emerald-400">{carbonScore}</span>
+                  </span>
+                </div>
               </div>
             </div>
           </div>

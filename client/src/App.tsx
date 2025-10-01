@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { Navigation } from "@/components/layout/navigation";
-import { Footer } from "@/components/layout/footer";
 import Home from "@/pages/home";
 import Calculator from "@/pages/calculator";
 import Dashboard from "@/pages/dashboard";
@@ -14,7 +13,7 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-slate-950">
       <Navigation />
       <main className="flex-1">
         <Switch>
@@ -25,7 +24,6 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </main>
-      <Footer />
     </div>
   );
 }

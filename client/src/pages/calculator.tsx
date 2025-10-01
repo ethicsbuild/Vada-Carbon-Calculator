@@ -1,122 +1,98 @@
 import { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { CoPilotChat } from '@/components/calculator/co-pilot-chat';
-import { CalculationForm } from '@/components/calculator/calculation-form';
-import { ProgressTracker } from '@/components/calculator/progress-tracker';
-import { AchievementBadges } from '@/components/gamification/achievement-badges';
-import { useCarbonCalculation } from '@/hooks/use-carbon-calculation';
-import { Bot, TrendingUp, Zap } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { SageChat } from '@/components/sage/sage-chat';
+import { QuestionFlow } from '@/components/calculator/question-flow';
+import { LiveEmissionsDisplay } from '@/components/calculator/live-emissions-display';
 
 export default function Calculator() {
-  const {
-    progress,
-    estimateEmissions,
-    calculateEmissions,
-    isEstimating,
-    isCalculating,
-    estimationResult,
-    calculationResult
-  } = useCarbonCalculation();
+  const [showChat, setShowChat] = useState(true);
+  const [progress, setProgress] = useState(0);
+  const [currentQuestion, setCurrentQuestion] = useState(1);
+  const [emissions, setEmissions] = useState({
+    total: 0,
+    transport: 0,
+    energy: 0,
+    foodWaste: 0,
+    production: 0
+  });
+  const [selectedTransport, setSelectedTransport] = useState('driving');
+  const [extractedData, setExtractedData] = useState<any>(null);
+
+  const handleDataExtracted = (data: any) => {
+    setExtractedData(data);
+    // Update emissions based on extracted data
+    // This will be calculated by the backend
+  };
+
+  const achievements = [
+    { icon: '🌟', label: 'First Steps' },
+    { icon: '🚌', label: 'Transit Hero' },
+    { icon: '♻️', label: 'Waste Warrior' },
+    { icon: '🏆', label: 'Under Average' }
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <div className="flex items-center justify-center mb-4">
-            <Badge variant="outline" className="bg-green-600/10 border-green-600/20">
-              <Bot className="w-4 h-4 text-green-600 mr-2" />
-              <span className="text-green-600">AI-Powered Calculator</span>
-            </Badge>
-          </div>
-          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Interactive Carbon Calculator
-          </h1>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-2xl mx-auto">
-            Start your carbon footprint journey with our AI-powered co-pilot that guides you through GHG Protocol compliant calculations
-          </p>
-        </div>
-
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Calculator */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* AI Co-Pilot Chat */}
-            <CoPilotChat />
-            
-            {/* Calculation Form */}
-            <CalculationForm 
-              onEstimate={estimateEmissions}
-              onCalculate={calculateEmissions}
-              isLoading={isEstimating || isCalculating}
-              result={estimationResult || calculationResult}
-            />
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Sage Chat Column */}
+          <div>
+            <SageChat onDataExtracted={handleDataExtracted} />
           </div>
 
-          {/* Sidebar */}
+          {/* Calculator Results Column */}
           <div className="space-y-6">
-            {/* Progress Tracker */}
-            <ProgressTracker progress={progress} />
-            
-            {/* Achievement Badges */}
-            <AchievementBadges />
-            
-            {/* Quick Insights */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
-                  Quick Insights
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400 text-sm">Industry Average</span>
-                    <span className="font-semibold text-gray-900 dark:text-white">125 tCO2e</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400 text-sm">Your Estimate</span>
-                    <span className="font-semibold text-green-600">
-                      {estimationResult ? `${estimationResult.total.toFixed(1)} tCO2e` : '-- tCO2e'}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-gray-600 dark:text-gray-400 text-sm">Potential Savings</span>
-                    <span className="font-semibold text-orange-600">-15%</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+            {/* Live Emissions Display */}
+            {emissions.total > 0 && (
+              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Current Estimate</h3>
+                <LiveEmissionsDisplay
+                  emissions={emissions}
+                  percentBelowAverage={23}
+                />
+              </Card>
+            )}
 
-            {/* Quick Tips */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <Zap className="w-5 h-5 mr-2 text-blue-600" />
-                  Pro Tips
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3 text-sm">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                    <p className="text-blue-800 dark:text-blue-200">
-                      💡 Start with estimation mode for quick baseline results, then refine with detailed data.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-                    <p className="text-green-800 dark:text-green-200">
-                      🎯 Scope 3 is now mandatory per GHG Protocol 2025 updates - our AI helps estimate missing data.
-                    </p>
-                  </div>
-                  <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
-                    <p className="text-purple-800 dark:text-purple-200">
-                      🔗 Generate blockchain-verified carbon receipts for transparent offset verification.
-                    </p>
-                  </div>
+            {/* Achievements */}
+            {achievements.length > 0 && (
+              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold text-white mb-4">Achievements</h3>
+                <div className="flex gap-3 flex-wrap">
+                  {achievements.map((achievement, index) => (
+                    <div
+                      key={index}
+                      className="flex-1 min-w-[80px] text-center p-3 bg-gradient-to-br from-violet-500/10 to-violet-500/5 rounded-lg border border-violet-500/30"
+                    >
+                      <div className="text-2xl mb-1">{achievement.icon}</div>
+                      <p className="text-xs text-slate-400">{achievement.label}</p>
+                    </div>
+                  ))}
                 </div>
-              </CardContent>
-            </Card>
+              </Card>
+            )}
+
+            {/* Action Buttons */}
+            {extractedData && (
+              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+                <div className="space-y-3">
+                  <Button
+                    size="lg"
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+                  >
+                    Get Reduction Tips
+                  </Button>
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="w-full border-slate-600 text-slate-300 hover:bg-slate-800"
+                  >
+                    Save & Get Certificate
+                  </Button>
+                </div>
+              </Card>
+            )}
           </div>
         </div>
       </div>
