@@ -1,29 +1,43 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Users, MessageCircle, Trophy, Share2, BookOpen, Calendar } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Users, MessageCircle, Trophy, Share2, Calendar, CheckCircle2 } from 'lucide-react';
 
 export default function Community() {
+  const [interestForm, setInterestForm] = useState({ name: '', email: '', interest: '' });
+  const [formSubmitted, setFormSubmitted] = useState(false);
+
+  const handleInterestSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // In a real app, this would send to your backend
+    console.log('Interest form submitted:', interestForm);
+    setFormSubmitted(true);
+    setTimeout(() => {
+      setFormSubmitted(false);
+      setInterestForm({ name: '', email: '', interest: '' });
+    }, 3000);
+  };
+
   const communityFeatures = [
     {
       icon: Users,
       title: 'Event Organizer Network',
       description: 'Connect with other event organizers who are committed to reducing carbon footprints',
-      members: '2,400+',
-      action: 'Join Network'
+      members: '2,400+'
     },
     {
       icon: MessageCircle,
       title: 'Discussion Forums',
       description: 'Share experiences, ask questions, and learn from the community',
-      topics: '150+ topics',
-      action: 'Browse Forums'
+      topics: '150+ topics'
     },
     {
       icon: Trophy,
       title: 'Leaderboard & Challenges',
       description: 'Compete with peers and celebrate sustainability milestones',
-      active: '12 challenges',
-      action: 'View Challenges'
+      active: '12 challenges'
     }
   ];
 
@@ -92,15 +106,10 @@ export default function Community() {
                 </div>
                 <div className="flex-1">
                   <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-400 mb-3">{feature.description}</p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-emerald-400 font-medium">
-                      {feature.members || feature.topics || feature.active}
-                    </span>
-                    <Button size="sm" variant="outline" className="border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10">
-                      {feature.action}
-                    </Button>
-                  </div>
+                  <p className="text-sm text-slate-300 mb-3">{feature.description}</p>
+                  <span className="text-xs text-emerald-400 font-medium">
+                    {feature.members || feature.topics || feature.active}
+                  </span>
                 </div>
               </div>
             </Card>
@@ -138,9 +147,6 @@ export default function Community() {
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-4 bg-violet-500 hover:bg-violet-600 text-white">
-              View All Events
-            </Button>
           </Card>
 
           {/* Success Stories */}
@@ -161,29 +167,72 @@ export default function Community() {
                 </div>
               ))}
             </div>
-            <Button className="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 text-white">
-              Share Your Story
-            </Button>
           </Card>
         </div>
 
-        {/* Call to Action */}
-        <Card className="bg-gradient-to-r from-emerald-500/10 to-violet-500/10 border-emerald-500/30 backdrop-blur-sm p-8 mt-12 text-center">
-          <BookOpen className="w-12 h-12 text-emerald-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-white mb-3">
-            Ready to Make an Impact?
-          </h2>
-          <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-            Join thousands of event organizers who are leading the charge toward sustainable events. Share your journey, learn from others, and make a difference.
-          </p>
-          <div className="flex gap-4 justify-center">
-            <Button className="bg-emerald-500 hover:bg-emerald-600 text-white">
-              Join Community
-            </Button>
-            <Button variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-800">
-              Learn More
-            </Button>
+        {/* Interest Form */}
+        <Card className="bg-slate-800/70 border-slate-700/50 backdrop-blur-sm p-8 mt-12">
+          <div className="text-center mb-8">
+            <h2 className="text-3xl font-bold text-white mb-3">
+              Interested in Joining Our Community?
+            </h2>
+            <p className="text-slate-200 max-w-2xl mx-auto">
+              We're building a network of event organizers committed to sustainability. Share your interest and we'll keep you updated on launch details.
+            </p>
           </div>
+
+          {formSubmitted ? (
+            <div className="text-center py-12">
+              <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
+              <h3 className="text-2xl font-bold text-white mb-2">Thanks for Your Interest!</h3>
+              <p className="text-slate-300">We'll be in touch soon.</p>
+            </div>
+          ) : (
+            <form onSubmit={handleInterestSubmit} className="max-w-2xl mx-auto space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                    Name
+                  </label>
+                  <Input
+                    required
+                    value={interestForm.name}
+                    onChange={(e) => setInterestForm({ ...interestForm, name: e.target.value })}
+                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    placeholder="Your name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                    Email
+                  </label>
+                  <Input
+                    type="email"
+                    required
+                    value={interestForm.email}
+                    onChange={(e) => setInterestForm({ ...interestForm, email: e.target.value })}
+                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    placeholder="you@example.com"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-slate-200 mb-2">
+                  What are you most interested in?
+                </label>
+                <Textarea
+                  required
+                  value={interestForm.interest}
+                  onChange={(e) => setInterestForm({ ...interestForm, interest: e.target.value })}
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[100px]"
+                  placeholder="e.g., Networking with other organizers, accessing sustainability resources, etc."
+                />
+              </div>
+              <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg">
+                Express Interest
+              </Button>
+            </form>
+          )}
         </Card>
       </div>
     </div>
