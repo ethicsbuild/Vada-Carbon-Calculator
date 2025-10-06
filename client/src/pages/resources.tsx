@@ -7,7 +7,15 @@ import {
   ExternalLink,
   BookOpen,
   Send,
-  CheckCircle2
+  CheckCircle2,
+  FileText,
+  Video,
+  Lightbulb,
+  Calculator,
+  Leaf,
+  Users,
+  Zap,
+  Shield
 } from 'lucide-react';
 
 export default function Resources() {
@@ -24,6 +32,77 @@ export default function Resources() {
       setContactForm({ name: '', email: '', message: '' });
     }, 3000);
   };
+
+  const recommendedGuides = [
+    {
+      icon: BookOpen,
+      title: 'GHG Protocol Event Sector Guidance',
+      description: 'Comprehensive methodology for measuring event emissions across Scope 1, 2, and 3 categories',
+      type: 'Industry Standard'
+    },
+    {
+      icon: FileText,
+      title: 'ISO 20121 Event Sustainability',
+      description: 'International standard for sustainable event management systems and best practices',
+      type: 'Certification Guide'
+    },
+    {
+      icon: Lightbulb,
+      title: 'Carbon Reduction Strategies for Events',
+      description: '50+ proven tactics from leading festivals and conferences worldwide',
+      type: 'Best Practices'
+    },
+    {
+      icon: Calculator,
+      title: 'Event Emissions Factor Database',
+      description: 'Reference database of emission factors for venues, transport, catering, and production',
+      type: 'Reference Material'
+    }
+  ];
+
+  const educationalContent = [
+    {
+      title: 'Understanding Event Carbon Footprints',
+      duration: 'Guide',
+      description: 'Learn the basics of measuring and managing event emissions',
+      category: 'Getting Started'
+    },
+    {
+      title: 'Case Study: Carbon-Neutral Music Festivals',
+      duration: 'Article',
+      description: 'How major festivals achieved net-zero emissions',
+      category: 'Case Studies'
+    },
+    {
+      title: 'Vendor Sustainability Evaluation',
+      duration: 'Checklist',
+      description: 'Assess and select eco-conscious event suppliers',
+      category: 'Tools'
+    }
+  ];
+
+  const keyTopics = [
+    {
+      icon: Leaf,
+      title: 'Carbon Offsetting',
+      description: 'Understanding offset markets, credits, and verification standards for events'
+    },
+    {
+      icon: Users,
+      title: 'Stakeholder Engagement',
+      description: 'Communicating sustainability goals to attendees, vendors, and sponsors'
+    },
+    {
+      icon: Zap,
+      title: 'Energy Solutions',
+      description: 'Renewable energy options, power management, and efficiency strategies'
+    },
+    {
+      icon: Shield,
+      title: 'Compliance & Reporting',
+      description: 'Meeting environmental regulations and industry certification requirements'
+    }
+  ];
 
   const externalResources = [
     {
@@ -59,6 +138,64 @@ export default function Resources() {
           <p className="text-lg text-slate-300 max-w-2xl mx-auto">
             Essential links and information to help you measure and reduce your event's carbon footprint
           </p>
+        </div>
+
+        {/* Recommended Guides & Standards */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Industry Guides & Standards</h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {recommendedGuides.map((guide, index) => (
+              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+                <div className="flex gap-4">
+                  <div className="p-3 bg-emerald-500/10 rounded-lg h-fit">
+                    <guide.icon className="w-6 h-6 text-emerald-500" />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg font-semibold text-white mb-2">{guide.title}</h3>
+                    <p className="text-sm text-slate-300 mb-3">{guide.description}</p>
+                    <span className="inline-block text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
+                      {guide.type}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Educational Content */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Educational Resources</h2>
+          <div className="grid md:grid-cols-3 gap-6">
+            {educationalContent.map((content, index) => (
+              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+                <div className="mb-3">
+                  <span className="inline-block text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-3">
+                    {content.category}
+                  </span>
+                  <h3 className="text-white font-semibold mb-2">{content.title}</h3>
+                  <p className="text-sm text-slate-300 mb-3">{content.description}</p>
+                  <p className="text-xs text-slate-400">{content.duration}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Key Topics */}
+        <div className="mb-12">
+          <h2 className="text-2xl font-bold text-white mb-6">Key Sustainability Topics</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {keyTopics.map((topic, index) => (
+              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 text-center">
+                <div className="inline-flex p-4 bg-violet-500/10 rounded-full mb-4">
+                  <topic.icon className="w-8 h-8 text-violet-500" />
+                </div>
+                <h3 className="text-white font-semibold mb-2">{topic.title}</h3>
+                <p className="text-sm text-slate-300">{topic.description}</p>
+              </Card>
+            ))}
+          </div>
         </div>
 
         {/* External Resources */}
