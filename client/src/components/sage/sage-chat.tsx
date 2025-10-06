@@ -57,18 +57,27 @@ export function SageChat({ eventType, onDataExtracted }: SageChatProps) {
   };
 
   const toggleVoiceInput = () => {
-    console.log('toggleVoiceInput called, isRecording:', isRecording);
+    console.log('🎤 Microphone button clicked! isRecording:', isRecording);
 
     if (isRecording) {
       // Stop recording
+      console.log('Stopping recording...');
       if (recognitionRef.current) {
         recognitionRef.current.stop();
       }
       setIsRecording(false);
     } else {
-      // Start recording
-      if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-        console.log('Starting speech recognition...');
+      // Check browser support
+      const hasSupport = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+      console.log('Browser speech recognition support:', hasSupport);
+
+      if (!hasSupport) {
+        alert('⚠️ Speech recognition is not supported in this browser.\n\nPlease use:\n• Chrome\n• Edge\n• Safari');
+        return;
+      }
+
+      try {
+        console.log('Creating speech recognition instance...');
         const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
         const recognition = new SpeechRecognition();
 
@@ -77,31 +86,39 @@ export function SageChat({ eventType, onDataExtracted }: SageChatProps) {
         recognition.lang = 'en-US';
 
         recognition.onstart = () => {
-          console.log('Speech recognition started');
+          console.log('✅ Speech recognition started - speak now!');
           setIsRecording(true);
         };
 
         recognition.onresult = (event: any) => {
           const transcript = event.results[0][0].transcript;
-          console.log('Transcript:', transcript);
+          console.log('📝 Transcript received:', transcript);
           setInput(transcript);
         };
 
         recognition.onerror = (event: any) => {
-          console.error('Speech recognition error:', event.error);
+          console.error('❌ Speech recognition error:', event.error);
+          if (event.error === 'not-allowed') {
+            alert('🎤 Microphone access denied.\n\nPlease allow microphone access in your browser settings.');
+          } else if (event.error === 'no-speech') {
+            console.log('No speech detected');
+          } else {
+            alert(`Speech recognition error: ${event.error}`);
+          }
           setIsRecording(false);
         };
 
         recognition.onend = () => {
-          console.log('Speech recognition ended');
+          console.log('🛑 Speech recognition ended');
           setIsRecording(false);
         };
 
         recognitionRef.current = recognition;
+        console.log('Starting recognition...');
         recognition.start();
-      } else {
-        console.log('Speech recognition not supported');
-        alert('Speech recognition is not supported in this browser. Please try Chrome or Edge.');
+      } catch (error) {
+        console.error('Error creating speech recognition:', error);
+        alert('Failed to start speech recognition. Check console for details.');
       }
     }
   };

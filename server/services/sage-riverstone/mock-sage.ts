@@ -27,53 +27,105 @@ export class MockSageService {
     const lower = message.toLowerCase();
     const data = { ...existingData };
 
-    // Event type detection
+    console.log('🔍 Extracting data from:', message);
+    console.log('📊 Existing data:', JSON.stringify(existingData, null, 2));
+
+    // Event type detection - EXPANDED keywords
     if (!data.eventType) {
-      if (lower.includes('festival') || lower.includes('music')) data.eventType = 'festival';
-      else if (lower.includes('conference') || lower.includes('corporate')) data.eventType = 'conference';
-      else if (lower.includes('wedding')) data.eventType = 'wedding';
-      else if (lower.includes('concert') || lower.includes('show')) data.eventType = 'concert';
+      if (lower.match(/festival|music|concert|show|gig|performance/)) {
+        data.eventType = lower.includes('festival') ? 'festival' : 'concert';
+      } else if (lower.match(/conference|corporate|meeting|summit|seminar|workshop|convention/)) {
+        data.eventType = 'conference';
+      } else if (lower.match(/wedding|marriage|reception|ceremony/)) {
+        data.eventType = 'wedding';
+      }
+      if (data.eventType) console.log('✅ Extracted eventType:', data.eventType);
     }
 
-    // Attendance extraction
+    // Attendance extraction - IMPROVED patterns
     if (!data.attendance) {
-      const attendanceMatch = lower.match(/(\d+[\s,]*(?:people|attendees|guests|person))/);
+      // Try explicit patterns first
+      const attendanceMatch = lower.match(/(\d+[\s,]*(?:people|attendees|guests|person|ppl|folks|individuals))/);
       if (attendanceMatch) {
         const num = parseInt(attendanceMatch[0].replace(/[^\d]/g, ''));
-        if (num > 0) data.attendance = num;
+        if (num > 0) {
+          data.attendance = num;
+          console.log('✅ Extracted attendance:', data.attendance);
+        }
+      } else {
+        // Try standalone numbers (only if context suggests attendance)
+        const standaloneNum = lower.match(/\b(\d{2,5})\b/);
+        if (standaloneNum && !data.eventType) {
+          // Probably attendance if it's a reasonable event size
+          const num = parseInt(standaloneNum[1]);
+          if (num >= 10 && num <= 100000) {
+            data.attendance = num;
+            console.log('✅ Extracted attendance (standalone):', data.attendance);
+          }
+        }
       }
     }
 
-    // Duration extraction
+    // Duration extraction - IMPROVED patterns
     if (!data.duration) {
-      const dayMatch = lower.match(/(\d+)[\s-]*(day|days)/);
+      const dayMatch = lower.match(/(\d+)[\s-]*(day|days|night|nights)/);
       if (dayMatch) {
         data.duration = { days: parseInt(dayMatch[1]) };
+        console.log('✅ Extracted duration:', data.duration);
+      } else if (lower.match(/single[\s-]*day|one[\s-]*day|1[\s-]*day/)) {
+        data.duration = { days: 1 };
+        console.log('✅ Extracted duration (single day):', data.duration);
+      } else if (lower.match(/multi[\s-]*day|multiple[\s-]*day|several[\s-]*day/)) {
+        data.duration = { days: 2 }; // Default to 2 days
+        console.log('✅ Extracted duration (multi-day default):', data.duration);
       }
     }
 
-    // Venue type
+    // Venue type - GREATLY EXPANDED keywords
     if (!data.venue) {
-      if (lower.includes('outdoor') || lower.includes('field') || lower.includes('park')) {
+      // Outdoor keywords
+      const outdoorKeywords = /outdoor|outside|field|park|garden|lawn|beach|forest|amphitheater|open[\s-]*air|exterior|patio|terrace|courtyard|stadium|arena|fairground/;
+      // Indoor keywords
+      const indoorKeywords = /indoor|inside|building|hall|center|centre|venue|room|ballroom|auditorium|theater|theatre|facility|space|convention|hotel|church|barn|warehouse|gallery|museum/;
+
+      if (lower.match(outdoorKeywords)) {
         data.venue = { type: 'outdoor', isOutdoor: true };
-      } else if (lower.includes('indoor') || lower.includes('convention') || lower.includes('hall')) {
+        console.log('✅ Extracted venue: outdoor');
+      } else if (lower.match(indoorKeywords)) {
         data.venue = { type: 'indoor', isOutdoor: false };
+        console.log('✅ Extracted venue: indoor');
       }
     }
 
-    // Transportation
+    // Transportation - GREATLY EXPANDED keywords
     if (!data.transportation) {
-      if (lower.includes('flying') || lower.includes('flight') || lower.includes('plane')) {
+      // Flying keywords
+      const flyingKeywords = /fly|flying|flight|plane|airplane|aircraft|airport|air[\s-]*travel|jet/;
+      // Driving keywords
+      const drivingKeywords = /driv|car|auto|vehicle|parking|highway|road/;
+      // Transit keywords
+      const transitKeywords = /transit|bus|train|subway|metro|rail|public[\s-]*transport|light[\s-]*rail|tram|trolley/;
+      // Walking keywords
+      const walkingKeywords = /walk|walking|foot|bike|biking|bicycle|local|nearby|neighborhood|close[\s-]*by/;
+
+      if (lower.match(flyingKeywords)) {
         data.transportation = { primaryMode: 'flying' };
-      } else if (lower.includes('driving') || lower.includes('car')) {
-        data.transportation = { primaryMode: 'driving' };
-      } else if (lower.includes('transit') || lower.includes('bus') || lower.includes('train')) {
+        console.log('✅ Extracted transportation: flying');
+      } else if (lower.match(transitKeywords)) {
         data.transportation = { primaryMode: 'transit' };
+        console.log('✅ Extracted transportation: transit');
+      } else if (lower.match(walkingKeywords)) {
+        data.transportation = { primaryMode: 'walking' };
+        console.log('✅ Extracted transportation: walking');
+      } else if (lower.match(drivingKeywords)) {
+        data.transportation = { primaryMode: 'driving' };
+        console.log('✅ Extracted transportation: driving');
       }
     }
 
     data.hasData = !!(data.eventType || data.attendance || data.duration);
 
+    console.log('📦 Final extracted data:', JSON.stringify(data, null, 2));
     return data;
   }
 
@@ -82,6 +134,8 @@ export class MockSageService {
    */
   generateResponse(message: string, extractedData: ExtractedEventData): string {
     const { eventType, attendance, duration, venue, transportation } = extractedData;
+
+    console.log('🗣️ Generating response for state:', { eventType, attendance, duration, venue, transportation });
 
     // Greeting
     if (message.length < 20 && (message.toLowerCase().includes('hi') || message.toLowerCase().includes('hello'))) {
@@ -99,20 +153,46 @@ export class MockSageService {
       return eventResponses[eventType] || "Interesting! How many people are coming?";
     }
 
+    // Need event type still
+    if (!eventType && !attendance && !duration) {
+      return "I'd love to help! First, what type of event are you planning? (like a festival, conference, wedding, concert, etc.)";
+    }
+
     // Got attendance
     if (attendance && !duration) {
       return `${attendance.toLocaleString()} people - okay! Is this a single-day event, or does it span multiple days?`;
     }
 
+    // Need attendance
+    if (eventType && !attendance) {
+      return "Got it! And how many people are you expecting at this event?";
+    }
+
     // Got duration
     if (duration && !venue) {
       const days = duration.days === 1 ? "a single day" : `${duration.days} days`;
-      return `${days} event, got it. Is this happening indoors or outdoors?`;
+      return `Cool, ${days}. Is this happening indoors or outdoors?`;
+    }
+
+    // Need duration
+    if (attendance && !duration) {
+      return "Perfect! Is this a single-day event, or multiple days?";
     }
 
     // Got venue
     if (venue && !transportation) {
-      return "Perfect! One more thing - how are most people getting there? Driving, flying in, or taking public transit?";
+      const venueType = venue.isOutdoor ? 'outdoor' : 'indoor';
+      return `Nice, an ${venueType} event! Last question - how are most people getting there? (driving, flying, public transit, or walking/biking)`;
+    }
+
+    // Need venue
+    if (duration && !venue) {
+      return "Great! Is the venue indoors or outdoors?";
+    }
+
+    // Need transportation
+    if (venue && !transportation) {
+      return "Almost there! How are most attendees getting to the event? (driving, flying, transit, or local/walking)";
     }
 
     // Have complete data

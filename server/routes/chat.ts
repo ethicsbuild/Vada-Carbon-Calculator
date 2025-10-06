@@ -92,21 +92,44 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
 
       context.extractedData = extractedData;
     } else {
-      console.log('🤖 Using OpenAI API');
+      console.log('🤖 Trying OpenAI API for data extraction...');
 
-      // Use real conversational intake service
-      const { conversationalIntakeService } = await import('../services/sage-riverstone/conversational-intake');
-      const extraction = await conversationalIntakeService.extractEventData(
-        message.content,
-        context.extractedData,
-        context.languageTier
-      );
+      try {
+        // Use OpenAI ONLY for data extraction (not response generation)
+        const { conversationalIntakeService } = await import('../services/sage-riverstone/conversational-intake');
+        const extraction = await conversationalIntakeService.extractEventData(
+          message.content,
+          context.extractedData,
+          context.languageTier
+        );
 
-      response = extraction.response;
-      extractedData = extraction.extractedData;
-      completionPercentage = conversationalIntakeService.getCompletionPercentage(extraction.extractedData);
+        // Check if extraction actually worked (confidence > 0 means it worked)
+        if (extraction.confidence === 0 || Object.keys(extraction.extractedData).length === 0) {
+          throw new Error('OpenAI extraction returned empty data, falling back to mock mode');
+        }
 
-      context.extractedData = extractedData;
+        extractedData = extraction.extractedData;
+        completionPercentage = conversationalIntakeService.getCompletionPercentage(extraction.extractedData);
+
+        // Generate response using internal templates (NO API cost)
+        response = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
+
+        context.extractedData = extractedData;
+      } catch (apiError: any) {
+        // Fallback to mock mode if OpenAI fails
+        console.warn('⚠️ OpenAI API failed, falling back to MOCK mode:', apiError.message);
+        console.log('💰 Using MOCK mode fallback - $0 API cost');
+
+        extractedData = mockSageService.extractEventData(
+          message.content,
+          context.extractedData as ExtractedEventData
+        );
+
+        response = mockSageService.generateResponse(message.content, extractedData);
+        completionPercentage = mockSageService.getCompletionPercentage(extractedData);
+
+        context.extractedData = extractedData;
+      }
     }
 
     // Stream the response word by word
