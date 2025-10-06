@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,12 @@ interface SageChatProps {
   onDataExtracted?: (data: any) => void;
 }
 
-export function SageChat({ eventType, onDataExtracted }: SageChatProps) {
+export interface SageChatRef {
+  sendMessage: (message: string) => void;
+}
+
+export const SageChat = forwardRef<SageChatRef, SageChatProps>(
+  ({ eventType, onDataExtracted }, ref) => {
   const [input, setInput] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -40,6 +45,13 @@ export function SageChat({ eventType, onDataExtracted }: SageChatProps) {
       onDataExtracted(extractedData);
     }
   }, [extractedData, onDataExtracted]);
+
+  // Expose sendMessage to parent through ref
+  useImperativeHandle(ref, () => ({
+    sendMessage: async (message: string) => {
+      await sendMessage(message);
+    }
+  }));
 
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
@@ -238,4 +250,6 @@ export function SageChat({ eventType, onDataExtracted }: SageChatProps) {
       </div>
     </Card>
   );
-}
+});
+
+SageChat.displayName = 'SageChat';

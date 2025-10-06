@@ -215,7 +215,20 @@ Want to explore ways to reduce that?`;
 
       // Check if user is asking about reductions
       const lowerMsg = message.toLowerCase();
-      if (!extractedData.shownReductions && (lowerMsg.includes('reduce') || lowerMsg.includes('lower') || lowerMsg.includes('yes') || lowerMsg.includes('how') || lowerMsg.includes('way'))) {
+      if (!extractedData.shownReductions && (
+        lowerMsg.includes('reduce') ||
+        lowerMsg.includes('lower') ||
+        lowerMsg.includes('yes') ||
+        lowerMsg.includes('yeah') ||
+        lowerMsg.includes('sure') ||
+        lowerMsg.includes('ok') ||
+        lowerMsg.includes('okay') ||
+        lowerMsg.includes('please') ||
+        lowerMsg.includes('how') ||
+        lowerMsg.includes('way') ||
+        lowerMsg.includes('tip') ||
+        lowerMsg.includes('help')
+      )) {
         extractedData.shownReductions = true;
         return `Great! Here are your biggest opportunities to cut emissions:
 
@@ -238,7 +251,7 @@ Want me to draft messages to your caterer or venue about any of these?`;
       }
 
       // Handle vendor communication requests
-      if (lowerMsg.includes('draft') || lowerMsg.includes('message') || lowerMsg.includes('email') || lowerMsg.includes('caterer') || lowerMsg.includes('venue')) {
+      if (lowerMsg.match(/draft|message|email|caterer|venue|vendor|supplier|write/)) {
         return `Sure! Here's a draft message you can send to your vendors:
 
 **To Caterer:**
@@ -256,6 +269,59 @@ Thanks!"
 We're aiming to reduce our carbon footprint significantly."
 
 Would you like me to adjust these messages or help with anything else?`;
+      }
+
+      // Handle comparison requests
+      if (lowerMsg.match(/compare|similar|average|typical|benchmark|other/)) {
+        const avgEmissions = estimate.total * 1.3; // Mock: current is 30% below average
+        return `Your event is doing pretty well! Here's how you compare:
+
+**Your Event:** ${estimate.total.toFixed(1)} tons CO₂ (${estimate.perPerson.toFixed(3)} tons/person)
+**Similar Events Average:** ${avgEmissions.toFixed(1)} tons CO₂ (${(avgEmissions / attendance).toFixed(3)} tons/person)
+
+You're already **23% below average** for a ${eventType} of this size! 🎉
+
+The biggest difference-makers are usually:
+1. Transportation choices (you chose ${transportation.primaryMode})
+2. Energy sources
+3. Food & waste management
+
+Want specific tips to improve even more?`;
+      }
+
+      // Handle scenario/calculation requests
+      if (lowerMsg.match(/scenario|calculate|if|what[\s-]*if|different|change/)) {
+        return `I can help you model different scenarios! For example:
+
+**If you switched to public transit:**
+- Current emissions: ${estimate.total.toFixed(1)} tons
+- With 70% public transit: ~${(estimate.total * 0.65).toFixed(1)} tons (-35%)
+
+**If you added renewable energy:**
+- Current emissions: ${estimate.total.toFixed(1)} tons
+- With solar/wind power: ~${(estimate.total * 0.85).toFixed(1)} tons (-15%)
+
+Want me to calculate a specific scenario for you? Just describe what you'd like to change!`;
+      }
+
+      // Handle certificate/save requests
+      if (lowerMsg.match(/certificate|save|export|download|pdf|report/)) {
+        return `Perfect! I'll prepare a certificate for your ${eventType} with these details:
+
+📊 **Event Carbon Footprint Summary**
+- Event: ${eventType === 'festival' ? 'Music Festival' : eventType === 'conference' ? 'Corporate Conference' : eventType === 'wedding' ? 'Wedding' : 'Concert'}
+- Attendance: ${attendance.toLocaleString()} people
+- Duration: ${duration.days} day${duration.days > 1 ? 's' : ''}
+- Total Emissions: ${estimate.total.toFixed(1)} tons CO₂e
+- Per Person: ${estimate.perPerson.toFixed(3)} tons CO₂e
+
+🏆 **Performance:**
+- 23% below average for similar events
+- Breakdown: Transport (${estimate.transport.toFixed(1)}t), Energy (${estimate.energy.toFixed(1)}t), Food (${estimate.food.toFixed(1)}t)
+
+Your certificate is ready! In a full version, I would generate a PDF here with a unique verification code. For now, you can screenshot this summary to share with stakeholders.
+
+Want to explore more reduction opportunities before finalizing?`;
       }
 
       // General follow-up

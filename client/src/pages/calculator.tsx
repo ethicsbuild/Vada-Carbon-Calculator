@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -19,11 +19,24 @@ export default function Calculator() {
   });
   const [selectedTransport, setSelectedTransport] = useState('driving');
   const [extractedData, setExtractedData] = useState<any>(null);
+  const sageChatRef = useRef<{ sendMessage: (msg: string) => void } | null>(null);
 
   const handleDataExtracted = (data: any) => {
     setExtractedData(data);
     // Update emissions based on extracted data
     // This will be calculated by the backend
+  };
+
+  const handleGetReductionTips = () => {
+    if (sageChatRef.current) {
+      sageChatRef.current.sendMessage("Please show me reduction tips");
+    }
+  };
+
+  const handleSaveCertificate = () => {
+    if (sageChatRef.current) {
+      sageChatRef.current.sendMessage("I'd like to save my results and get a certificate");
+    }
   };
 
   const achievements = [
@@ -39,7 +52,7 @@ export default function Calculator() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Sage Chat Column */}
           <div>
-            <SageChat onDataExtracted={handleDataExtracted} />
+            <SageChat ref={sageChatRef} onDataExtracted={handleDataExtracted} />
           </div>
 
           {/* Calculator Results Column */}
@@ -78,12 +91,14 @@ export default function Calculator() {
               <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
                 <div className="space-y-3">
                   <Button
+                    onClick={handleGetReductionTips}
                     size="lg"
                     className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
                   >
                     Get Reduction Tips
                   </Button>
                   <Button
+                    onClick={handleSaveCertificate}
                     size="lg"
                     variant="outline"
                     className="w-full border-slate-600 text-slate-300 hover:bg-slate-800"
