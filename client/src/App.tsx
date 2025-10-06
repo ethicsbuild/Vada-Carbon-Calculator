@@ -9,6 +9,8 @@ import Home from "@/pages/home";
 import Calculator from "@/pages/calculator";
 import Dashboard from "@/pages/dashboard";
 import Reports from "@/pages/reports";
+import Community from "@/pages/community";
+import Resources from "@/pages/resources";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -21,6 +23,8 @@ function Router() {
           <Route path="/calculator" component={Calculator} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/reports" component={Reports} />
+          <Route path="/community" component={Community} />
+          <Route path="/resources" component={Resources} />
           <Route component={NotFound} />
         </Switch>
       </main>
