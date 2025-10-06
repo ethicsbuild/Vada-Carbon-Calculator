@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { X, ChevronUp } from 'lucide-react';
+import { X, ChevronUp, ChevronDown } from 'lucide-react';
 
 interface LeaderboardEntry {
   rank: number;
@@ -18,7 +18,7 @@ const mockLeaderboard: LeaderboardEntry[] = [
 
 export function LeaderboardWidget() {
   const [isOpen, setIsOpen] = useState(true);
-  const [isMinimized, setIsMinimized] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(true); // Start minimized by default
 
   if (!isOpen) return null;
 
@@ -30,10 +30,10 @@ export function LeaderboardWidget() {
         // Minimized state - just a compact button
         <button
           onClick={() => setIsMinimized(false)}
-          className="flex items-center gap-2 p-4 hover:bg-slate-700/30 transition-colors"
+          className="flex items-center gap-2 p-3 hover:bg-slate-700/30 transition-colors rounded-xl"
         >
-          <span className="text-2xl">🏆</span>
-          <span className="text-sm font-semibold text-white">Leaderboard</span>
+          <span className="text-xl">🏆</span>
+          <ChevronDown className="h-3 w-3 text-slate-400" />
         </button>
       ) : (
         // Expanded state
