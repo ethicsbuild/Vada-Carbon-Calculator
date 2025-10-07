@@ -10,6 +10,9 @@ export default function Calculator() {
 
   // Extract event type from URL parameter
   useEffect(() => {
+    // Scroll to top when page loads
+    window.scrollTo(0, 0);
+
     const params = new URLSearchParams(window.location.search);
     const type = params.get('type');
     if (type) {
@@ -22,6 +25,13 @@ export default function Calculator() {
       setShowOnboarding(false);
     }
   }, [location]);
+
+  // Scroll to top when transitioning from onboarding to calculator
+  useEffect(() => {
+    if (!showOnboarding) {
+      window.scrollTo(0, 0);
+    }
+  }, [showOnboarding]);
 
   const handleOnboardingComplete = () => {
     setShowOnboarding(false);
