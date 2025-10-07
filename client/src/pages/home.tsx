@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'wouter';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { SageGreeting } from '@/components/sage/sage-greeting';
 import { EventTypeCard } from '@/components/calculator/event-type-card';
 import { LeaderboardWidget } from '@/components/gamification/leaderboard-widget';
 
@@ -43,8 +42,15 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Sage Greeting */}
-        <SageGreeting />
+        {/* Header */}
+        <div className="text-center mb-12">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-emerald-400 via-emerald-300 to-violet-400 bg-clip-text text-transparent">
+            Calculate Your Event's Carbon Footprint
+          </h1>
+          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+            Choose your event type to get started with our GHG Protocol compliant calculator
+          </p>
+        </div>
 
         {/* Quick Start Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
@@ -75,10 +81,10 @@ export default function Home() {
         {/* Features Preview */}
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           <Card className="bg-slate-800/50 border-slate-700/50 p-6 backdrop-blur-sm">
-            <div className="text-3xl mb-3">🧠</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Conversational AI</h3>
+            <div className="text-3xl mb-3">📊</div>
+            <h3 className="text-xl font-semibold text-white mb-2">Easy Form Calculator</h3>
             <p className="text-slate-400 text-sm">
-              Sage guides you through calculations in plain language - no carbon expertise needed
+              Simple dropdowns and inputs for accurate calculations - no carbon expertise needed
             </p>
           </Card>
 
