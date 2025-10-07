@@ -63,12 +63,12 @@ export class MockSageService {
           console.log('✅ Extracted attendance:', data.attendance);
         }
       } else {
-        // Try standalone numbers (only if context suggests attendance)
-        const standaloneNum = lower.match(/\b(\d{2,5})\b/);
-        if (standaloneNum && !data.eventType) {
-          // Probably attendance if it's a reasonable event size
+        // Try standalone numbers - accept if eventType is known or number is reasonable
+        const standaloneNum = lower.match(/\b(\d{1,6})\b/);
+        if (standaloneNum) {
           const num = parseInt(standaloneNum[1]);
-          if (num >= 10 && num <= 100000) {
+          // Accept if we have eventType (context suggests this is attendance) OR if it's a reasonable event size
+          if ((data.eventType || (num >= 10 && num <= 100000)) && num > 0) {
             data.attendance = num;
             console.log('✅ Extracted attendance (standalone):', data.attendance);
           }

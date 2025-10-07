@@ -53,7 +53,7 @@ export default function Resources() {
       title: 'Carbon Reduction Strategies for Events',
       description: '50+ proven tactics from leading festivals and conferences worldwide',
       type: 'Best Practices',
-      url: 'https://agreenerfestival.com/resources/'
+      url: 'https://www.unep.org/resources/publication/greening-events-carbon-management-guide-festivals-and-major-events'
     },
     {
       icon: Calculator,
@@ -77,14 +77,14 @@ export default function Resources() {
       duration: 'Article',
       description: 'How major festivals achieved net-zero emissions',
       category: 'Case Studies',
-      url: 'https://agreenerfestival.com/festivals-going-greener/'
+      url: 'https://www.greenthemusic.org/resources'
     },
     {
       title: 'Vendor Sustainability Evaluation',
       duration: 'Checklist',
       description: 'Assess and select eco-conscious event suppliers',
       category: 'Tools',
-      url: 'https://www.iso.org/files/live/sites/isoorg/files/store/en/PUB100406.pdf'
+      url: 'https://www.greenbiz.com/article/how-evaluate-your-suppliers-sustainability-performance'
     }
   ];
 
