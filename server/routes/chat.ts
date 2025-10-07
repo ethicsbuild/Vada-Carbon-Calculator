@@ -136,6 +136,11 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
   // Update context with message data
   if (message.eventType) {
     context.eventType = message.eventType;
+    // Initialize extractedData with eventType if not already set
+    if (!context.extractedData.eventType) {
+      context.extractedData.eventType = message.eventType;
+      console.log('✨ Initialized conversation with event type:', message.eventType);
+    }
   }
   if (message.extractedData) {
     context.extractedData = { ...context.extractedData, ...message.extractedData };
@@ -148,6 +153,8 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
 
     if (USE_MOCK_MODE) {
       console.log('💰 Using MOCK mode - $0 API cost');
+      console.log('📋 Current context eventType:', context.eventType);
+      console.log('📋 Current extractedData:', context.extractedData);
 
       // Extract data using keyword matching (no API)
       extractedData = mockSageService.extractEventData(

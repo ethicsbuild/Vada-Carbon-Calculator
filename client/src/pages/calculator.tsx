@@ -1,4 +1,5 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import { useLocation } from 'wouter';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -7,6 +8,8 @@ import { QuestionFlow } from '@/components/calculator/question-flow';
 import { LiveEmissionsDisplay } from '@/components/calculator/live-emissions-display';
 
 export default function Calculator() {
+  const [location] = useLocation();
+  const [eventType, setEventType] = useState<string | undefined>(undefined);
   const [showChat, setShowChat] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(1);
@@ -20,6 +23,16 @@ export default function Calculator() {
   const [selectedTransport, setSelectedTransport] = useState('driving');
   const [extractedData, setExtractedData] = useState<any>(null);
   const sageChatRef = useRef<{ sendMessage: (msg: string) => void } | null>(null);
+
+  // Extract event type from URL parameter
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const type = params.get('type');
+    if (type) {
+      setEventType(type);
+      console.log('📍 Event type from URL:', type);
+    }
+  }, [location]);
 
   const handleDataExtracted = (data: any) => {
     setExtractedData(data);
@@ -52,7 +65,11 @@ export default function Calculator() {
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Sage Chat Column */}
           <div>
-            <SageChat ref={sageChatRef} onDataExtracted={handleDataExtracted} />
+            <SageChat
+              ref={sageChatRef}
+              eventType={eventType}
+              onDataExtracted={handleDataExtracted}
+            />
           </div>
 
           {/* Calculator Results Column */}
