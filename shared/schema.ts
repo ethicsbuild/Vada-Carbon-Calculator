@@ -291,6 +291,16 @@ export const savedEvents = pgTable("saved_events", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Contact submissions for the website contact form
+export const contactSubmissions = pgTable("contact_submissions", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull(),
+  email: text("email").notNull(),
+  message: text("message").notNull(),
+  status: text("status").default("new"), // new, read, replied, archived
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Relations
 export const organizationsRelations = relations(organizations, ({ one, many }) => ({
   owner: one(users, { fields: [organizations.ownerId], references: [users.id] }),
@@ -462,6 +472,11 @@ export const insertSavedEventSchema = createInsertSchema(savedEvents).omit({
   updatedAt: true,
 });
 
+export const insertContactSubmissionSchema = createInsertSchema(contactSubmissions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -513,3 +528,6 @@ export type InsertCarbonCertificate = z.infer<typeof insertCarbonCertificateSche
 
 export type SavedEvent = typeof savedEvents.$inferSelect;
 export type InsertSavedEvent = z.infer<typeof insertSavedEventSchema>;
+
+export type ContactSubmission = typeof contactSubmissions.$inferSelect;
+export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;

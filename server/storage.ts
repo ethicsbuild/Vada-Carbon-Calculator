@@ -1,13 +1,14 @@
 import {
   users, organizations, carbonCalculations, aiConversations,
-  carbonReports, userAchievements, emissionFactors, savedEvents,
+  carbonReports, userAchievements, emissionFactors, savedEvents, contactSubmissions,
   type User, type InsertUser, type Organization, type InsertOrganization,
   type CarbonCalculation, type InsertCarbonCalculation,
   type AiConversation, type InsertAiConversation,
   type CarbonReport, type InsertCarbonReport,
   type UserAchievement, type InsertUserAchievement,
   type EmissionFactor, type InsertEmissionFactor,
-  type SavedEvent, type InsertSavedEvent
+  type SavedEvent, type InsertSavedEvent,
+  type ContactSubmission, type InsertContactSubmission
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -62,6 +63,11 @@ export interface IStorage {
   getSavedEventsByNameAndYear(userId: number, eventName: string, eventYear: number): Promise<SavedEvent | undefined>;
   createSavedEvent(event: InsertSavedEvent): Promise<SavedEvent>;
   updateSavedEvent(id: number, event: Partial<InsertSavedEvent>): Promise<SavedEvent>;
+
+  // Contact submission operations
+  createContactSubmission(submission: InsertContactSubmission): Promise<ContactSubmission>;
+  getContactSubmissions(): Promise<ContactSubmission[]>;
+  getContactSubmission(id: number): Promise<ContactSubmission | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -295,6 +301,21 @@ export class DatabaseStorage implements IStorage {
       .where(eq(savedEvents.id, id))
       .returning();
     return event;
+  }
+
+  // Contact submission operations
+  async createContactSubmission(insertSubmission: InsertContactSubmission): Promise<ContactSubmission> {
+    const [submission] = await db.insert(contactSubmissions).values(insertSubmission).returning();
+    return submission;
+  }
+
+  async getContactSubmissions(): Promise<ContactSubmission[]> {
+    return db.select().from(contactSubmissions).orderBy(desc(contactSubmissions.createdAt));
+  }
+
+  async getContactSubmission(id: number): Promise<ContactSubmission | undefined> {
+    const [submission] = await db.select().from(contactSubmissions).where(eq(contactSubmissions.id, id));
+    return submission || undefined;
   }
 }
 

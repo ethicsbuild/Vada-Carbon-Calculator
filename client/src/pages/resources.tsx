@@ -21,16 +21,38 @@ import {
 export default function Resources() {
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
   const [formSubmitted, setFormSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleContactSubmit = (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would send to your backend
-    console.log('Contact form submitted:', contactForm);
-    setFormSubmitted(true);
-    setTimeout(() => {
-      setFormSubmitted(false);
-      setContactForm({ name: '', email: '', message: '' });
-    }, 3000);
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(contactForm),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to send message');
+      }
+
+      setFormSubmitted(true);
+      setTimeout(() => {
+        setFormSubmitted(false);
+        setContactForm({ name: '', email: '', message: '' });
+      }, 3000);
+    } catch (err) {
+      console.error('Contact form error:', err);
+      setError('Failed to send message. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const recommendedGuides = [
@@ -292,7 +314,13 @@ export default function Resources() {
               <p className="text-slate-300">We'll get back to you soon.</p>
             </div>
           ) : (
-            <form onSubmit={handleContactSubmit} className="max-w-2xl mx-auto space-y-6">
+            <>
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/50 rounded-lg p-4 mb-6">
+                  <p className="text-red-400 text-center">{error}</p>
+                </div>
+              )}
+              <form onSubmit={handleContactSubmit} className="max-w-2xl mx-auto space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-slate-200 mb-2">
@@ -332,11 +360,16 @@ export default function Resources() {
                   placeholder="Tell us how we can help..."
                 />
               </div>
-              <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
                 <Send className="w-5 h-5 mr-2" />
-                Send Message
+                {isSubmitting ? 'Sending...' : 'Send Message'}
               </Button>
             </form>
+            </>
           )}
         </Card>
       </div>

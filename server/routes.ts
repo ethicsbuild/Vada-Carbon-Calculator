@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { carbonCalculatorService } from "./services/carbonCalculator";
 import { aiCoPilotService } from "./services/aiCopilot";
 import { reportGeneratorService } from "./services/reportGenerator";
-import { insertOrganizationSchema, insertCarbonCalculationSchema, insertSavedEventSchema } from "@shared/schema";
+import { insertOrganizationSchema, insertCarbonCalculationSchema, insertSavedEventSchema, insertContactSubmissionSchema } from "@shared/schema";
 import { handleChatWebSocket } from "./routes/chat";
 import { z } from "zod";
 
@@ -633,6 +633,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error('Failed to fetch comparison:', error);
       res.status(500).json({ message: "Failed to fetch comparison data" });
+    }
+  });
+
+  // Contact form routes
+  app.post("/api/contact", async (req, res) => {
+    try {
+      const validatedData = insertContactSubmissionSchema.parse(req.body);
+      const submission = await storage.createContactSubmission(validatedData);
+
+      console.log('📧 Contact form submitted:', {
+        name: submission.name,
+        email: submission.email,
+        id: submission.id
+      });
+
+      res.status(201).json({
+        message: "Message sent successfully",
+        id: submission.id
+      });
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid contact data", errors: error.errors });
+      }
+      console.error('❌ Contact form error:', error);
+      res.status(500).json({ message: "Failed to send message" });
     }
   });
 
