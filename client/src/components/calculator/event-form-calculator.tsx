@@ -807,7 +807,14 @@ export function EventFormCalculator({ initialEventType }: EventFormCalculatorPro
 
       {/* Results */}
       {calculation && (
-        <CarbonResults calculation={calculation} />
+        <CarbonResults
+          calculation={calculation}
+          eventData={{
+            attendance: formData.attendance,
+            eventType: formData.eventType,
+            location: 'Unknown'
+          }}
+        />
       )}
     </div>
   );
