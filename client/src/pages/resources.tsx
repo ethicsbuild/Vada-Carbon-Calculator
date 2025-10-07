@@ -38,25 +38,29 @@ export default function Resources() {
       icon: BookOpen,
       title: 'GHG Protocol Event Sector Guidance',
       description: 'Comprehensive methodology for measuring event emissions across Scope 1, 2, and 3 categories',
-      type: 'Industry Standard'
+      type: 'Industry Standard',
+      url: 'https://ghgprotocol.org/corporate-standard'
     },
     {
       icon: FileText,
       title: 'ISO 20121 Event Sustainability',
       description: 'International standard for sustainable event management systems and best practices',
-      type: 'Certification Guide'
+      type: 'Certification Guide',
+      url: 'https://www.iso.org/iso-20121-sustainable-events.html'
     },
     {
       icon: Lightbulb,
       title: 'Carbon Reduction Strategies for Events',
       description: '50+ proven tactics from leading festivals and conferences worldwide',
-      type: 'Best Practices'
+      type: 'Best Practices',
+      url: 'https://agreenerfestival.com/resources/'
     },
     {
       icon: Calculator,
       title: 'Event Emissions Factor Database',
       description: 'Reference database of emission factors for venues, transport, catering, and production',
-      type: 'Reference Material'
+      type: 'Reference Material',
+      url: 'https://www.epa.gov/climateleadership/ghg-emission-factors-hub'
     }
   ];
 
@@ -65,19 +69,22 @@ export default function Resources() {
       title: 'Understanding Event Carbon Footprints',
       duration: 'Guide',
       description: 'Learn the basics of measuring and managing event emissions',
-      category: 'Getting Started'
+      category: 'Getting Started',
+      url: 'https://ghgprotocol.org/sites/default/files/standards/Corporate-Value-Chain-Accounting-Reporing-Standard_041613_2.pdf'
     },
     {
       title: 'Case Study: Carbon-Neutral Music Festivals',
       duration: 'Article',
       description: 'How major festivals achieved net-zero emissions',
-      category: 'Case Studies'
+      category: 'Case Studies',
+      url: 'https://agreenerfestival.com/festivals-going-greener/'
     },
     {
       title: 'Vendor Sustainability Evaluation',
       duration: 'Checklist',
       description: 'Assess and select eco-conscious event suppliers',
-      category: 'Tools'
+      category: 'Tools',
+      url: 'https://www.iso.org/files/live/sites/isoorg/files/store/en/PUB100406.pdf'
     }
   ];
 
@@ -85,22 +92,26 @@ export default function Resources() {
     {
       icon: Leaf,
       title: 'Carbon Offsetting',
-      description: 'Understanding offset markets, credits, and verification standards for events'
+      description: 'Understanding offset markets, credits, and verification standards for events',
+      url: 'https://www.goldstandard.org/'
     },
     {
       icon: Users,
       title: 'Stakeholder Engagement',
-      description: 'Communicating sustainability goals to attendees, vendors, and sponsors'
+      description: 'Communicating sustainability goals to attendees, vendors, and sponsors',
+      url: 'https://www.iso.org/standard/54552.html'
     },
     {
       icon: Zap,
       title: 'Energy Solutions',
-      description: 'Renewable energy options, power management, and efficiency strategies'
+      description: 'Renewable energy options, power management, and efficiency strategies',
+      url: 'https://www.epa.gov/greenpower'
     },
     {
       icon: Shield,
       title: 'Compliance & Reporting',
-      description: 'Meeting environmental regulations and industry certification requirements'
+      description: 'Meeting environmental regulations and industry certification requirements',
+      url: 'https://ghgprotocol.org/standards'
     }
   ];
 
@@ -145,20 +156,33 @@ export default function Resources() {
           <h2 className="text-2xl font-bold text-white mb-6">Industry Guides & Standards</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {recommendedGuides.map((guide, index) => (
-              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-                <div className="flex gap-4">
-                  <div className="p-3 bg-emerald-500/10 rounded-lg h-fit">
-                    <guide.icon className="w-6 h-6 text-emerald-500" />
+              <a
+                key={index}
+                href={guide.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+              >
+                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:bg-slate-800/70 hover:border-emerald-500/50 transition-all">
+                  <div className="flex gap-4">
+                    <div className="p-3 bg-emerald-500/10 rounded-lg h-fit group-hover:bg-emerald-500/20 transition-colors">
+                      <guide.icon className="w-6 h-6 text-emerald-500" />
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                          {guide.title}
+                        </h3>
+                        <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
+                      </div>
+                      <p className="text-sm text-slate-300 mb-3">{guide.description}</p>
+                      <span className="inline-block text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
+                        {guide.type}
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <h3 className="text-lg font-semibold text-white mb-2">{guide.title}</h3>
-                    <p className="text-sm text-slate-300 mb-3">{guide.description}</p>
-                    <span className="inline-block text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
-                      {guide.type}
-                    </span>
-                  </div>
-                </div>
-              </Card>
+                </Card>
+              </a>
             ))}
           </div>
         </div>
@@ -168,16 +192,29 @@ export default function Resources() {
           <h2 className="text-2xl font-bold text-white mb-6">Educational Resources</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {educationalContent.map((content, index) => (
-              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-                <div className="mb-3">
-                  <span className="inline-block text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-3">
-                    {content.category}
-                  </span>
-                  <h3 className="text-white font-semibold mb-2">{content.title}</h3>
-                  <p className="text-sm text-slate-300 mb-3">{content.description}</p>
-                  <p className="text-xs text-slate-400">{content.duration}</p>
-                </div>
-              </Card>
+              <a
+                key={index}
+                href={content.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+              >
+                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:bg-slate-800/70 hover:border-violet-500/50 transition-all h-full">
+                  <div className="mb-3">
+                    <span className="inline-block text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-3">
+                      {content.category}
+                    </span>
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="text-white font-semibold group-hover:text-violet-400 transition-colors flex-1">
+                        {content.title}
+                      </h3>
+                      <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-violet-400 transition-colors ml-2" />
+                    </div>
+                    <p className="text-sm text-slate-300 mb-3">{content.description}</p>
+                    <p className="text-xs text-slate-400">{content.duration}</p>
+                  </div>
+                </Card>
+              </a>
             ))}
           </div>
         </div>
@@ -187,13 +224,24 @@ export default function Resources() {
           <h2 className="text-2xl font-bold text-white mb-6">Key Sustainability Topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {keyTopics.map((topic, index) => (
-              <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 text-center">
-                <div className="inline-flex p-4 bg-violet-500/10 rounded-full mb-4">
-                  <topic.icon className="w-8 h-8 text-violet-500" />
-                </div>
-                <h3 className="text-white font-semibold mb-2">{topic.title}</h3>
-                <p className="text-sm text-slate-300">{topic.description}</p>
-              </Card>
+              <a
+                key={index}
+                href={topic.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block group"
+              >
+                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 text-center hover:bg-slate-800/70 hover:border-violet-500/50 transition-all h-full">
+                  <div className="inline-flex p-4 bg-violet-500/10 rounded-full mb-4 group-hover:bg-violet-500/20 transition-colors">
+                    <topic.icon className="w-8 h-8 text-violet-500" />
+                  </div>
+                  <h3 className="text-white font-semibold mb-2 group-hover:text-violet-400 transition-colors">
+                    {topic.title}
+                  </h3>
+                  <p className="text-sm text-slate-300 mb-3">{topic.description}</p>
+                  <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-violet-400 transition-colors mx-auto" />
+                </Card>
+              </a>
             ))}
           </div>
         </div>

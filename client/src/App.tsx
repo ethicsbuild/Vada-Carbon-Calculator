@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { Navigation } from "@/components/layout/navigation";
+import { FloatingSageChat } from "@/components/sage/floating-sage-chat";
 import Home from "@/pages/home";
 import Calculator from "@/pages/calculator";
 import Dashboard from "@/pages/dashboard";
@@ -28,6 +29,7 @@ function Router() {
           <Route component={NotFound} />
         </Switch>
       </main>
+      <FloatingSageChat />
     </div>
   );
 }
