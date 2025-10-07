@@ -240,6 +240,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
     }
 
     // Send completion message
+    console.log('📤 Sending completion with quickReplies:', quickReplies);
     ws.send(JSON.stringify({
       type: 'complete',
       extractedData,

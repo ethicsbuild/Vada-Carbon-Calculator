@@ -39,13 +39,16 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
-      const scrollElement = scrollRef.current;
-      // Use requestAnimationFrame to ensure DOM has updated
-      requestAnimationFrame(() => {
-        scrollElement.scrollTop = scrollElement.scrollHeight;
-      });
+      // ScrollArea component has a viewport child that's the actual scrollable element
+      const viewport = scrollRef.current.querySelector('[data-radix-scroll-area-viewport]') as HTMLElement;
+      if (viewport) {
+        // Use requestAnimationFrame to ensure DOM has updated
+        requestAnimationFrame(() => {
+          viewport.scrollTop = viewport.scrollHeight;
+        });
+      }
     }
-  }, [messages, isStreaming]);
+  }, [messages, isStreaming, carbonCalculation]);
 
   // Notify parent when data is extracted
   useEffect(() => {
@@ -53,6 +56,11 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
       onDataExtracted(extractedData);
     }
   }, [extractedData, onDataExtracted]);
+
+  // Debug: Log when quick replies change
+  useEffect(() => {
+    console.log('🔘 Quick Replies updated:', quickReplies);
+  }, [quickReplies]);
 
   // Expose sendMessage to parent through ref
   useImperativeHandle(ref, () => ({
@@ -93,22 +101,40 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
       return;
     }
 
+    // Check if running on HTTPS or localhost
+    const isSecureContext = window.isSecureContext;
+    console.log('Is secure context (HTTPS/localhost):', isSecureContext);
+
+    if (!isSecureContext) {
+      alert('🔒 Microphone access requires a secure connection (HTTPS).\n\nThis feature only works on:\n• HTTPS websites\n• localhost during development\n\nPlease use the text input or quick reply buttons instead.');
+      return;
+    }
+
     // Check browser support
     const hasSupport = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
     console.log('Browser speech recognition support:', hasSupport);
 
     if (!hasSupport) {
-      alert('⚠️ Speech recognition is not supported in this browser.\n\nPlease use:\n• Chrome\n• Edge\n• Safari');
+      alert('⚠️ Speech recognition is not supported in this browser.\n\nPlease use:\n• Chrome\n• Edge\n• Safari\n\nOr use the text input or quick reply buttons instead.');
       return;
     }
 
     try {
+      // Check if mediaDevices is available
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('🎤 Microphone access is not available in this context.\n\nPlease:\n• Make sure you\'re on HTTPS or localhost\n• Check browser permissions\n\nOr use the text input or quick reply buttons instead.');
+        return;
+      }
+
       // Request microphone permission first
       try {
         await navigator.mediaDevices.getUserMedia({ audio: true });
-      } catch (permError) {
+      } catch (permError: any) {
         console.error('Microphone permission denied:', permError);
-        alert('🎤 Microphone access is required.\n\nPlease allow microphone access and try again.');
+        const errorMsg = permError.name === 'NotAllowedError' || permError.message?.includes('not-allowed')
+          ? '🎤 Microphone access was denied.\n\nPlease:\n1. Click the lock icon in your browser\'s address bar\n2. Allow microphone access\n3. Refresh the page\n\nOr use the text input or quick reply buttons instead.'
+          : '🎤 Microphone access failed.\n\nPlease check your browser settings and try again, or use the text input or quick reply buttons instead.';
+        alert(errorMsg);
         return;
       }
 

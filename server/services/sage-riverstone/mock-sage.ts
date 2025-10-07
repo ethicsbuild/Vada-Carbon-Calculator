@@ -228,6 +228,7 @@ export class MockSageService {
     console.log('🗣️ Generating response for state:', { eventType, attendance, duration, venue, transportation });
 
     const quickReplies = this.getQuickReplies(extractedData);
+    console.log('🔘 Generated quick replies:', quickReplies);
 
     // Greeting
     if (message.length < 20 && (message.toLowerCase().includes('hi') || message.toLowerCase().includes('hello'))) {
