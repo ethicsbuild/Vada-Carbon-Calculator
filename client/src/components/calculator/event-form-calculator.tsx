@@ -374,7 +374,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
           </div>
 
           {/* Attendee/Guest Transportation */}
-          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
+          <div
+            className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50"
+            onFocus={() => onSectionChange?.('transportation')}
+          >
             <h3 className="text-lg font-semibold text-emerald-400">👥 Attendee Transportation</h3>
 
             <div className="space-y-2">
@@ -442,7 +445,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
           {/* Staff Transportation - Granular Groups */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('staff-transportation')}>
               <h3 className="text-lg font-semibold text-violet-400">👷 Staff Transportation</h3>
               <InfoTooltip content="Break down your staff by how they travel. E.g., 18 local staff driving + 2 flying in from out of state. Add as many groups as you need." />
             </div>
@@ -542,7 +545,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
           {/* Artist/Performer Transportation - Granular Groups */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('artist-transportation')}>
               <h3 className="text-lg font-semibold text-amber-400">🎤 Artist/Performer Transportation</h3>
               <InfoTooltip content="Break down performers by how they arrive. E.g., 5 artists flying commercially + 1 headliner on private jet. Each group can have different transport modes and distances." />
             </div>
@@ -643,7 +646,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
           {/* Equipment Transportation */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('equipment-transportation')}>
               <h3 className="text-lg font-semibold text-cyan-400">📦 Equipment Transportation</h3>
               <InfoTooltip content="Be realistic about production scale. Major festivals often need 20-100+ trucks for staging, sound, lighting, and vendor equipment. Small events might need 1-5 trucks." />
             </div>
@@ -713,7 +716,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
           {/* Catering - Granular Breakdown */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('food')}>
               <h3 className="text-lg font-semibold text-orange-400">🍽️ Food & Catering</h3>
               <InfoTooltip content="Break down meals by category: crew meals (breakfast/lunch/dinner for staff), attendee food service (concessions, food vendors), VIP catering (hospitality lounges), and talent catering (green room, artist meals)." />
             </div>

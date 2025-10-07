@@ -21,6 +21,13 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
   const [ws, setWs] = useState<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    containerRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
+  }, []);
 
   // Connect to Sage WebSocket
   useEffect(() => {
@@ -127,7 +134,7 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
   }, [messages]);
 
   return (
-    <div className="grid lg:grid-cols-2 gap-6 h-full">
+    <div ref={containerRef} className="grid lg:grid-cols-2 gap-6 h-full">
       {/* Sage's Guidance Column */}
       <div className="order-2 lg:order-1">
         <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm h-full flex flex-col">
@@ -185,7 +192,10 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
                 <p className="font-semibold text-emerald-400 mb-1">💡 Pro tip</p>
                 <p>
                   {currentSection === 'welcome' && "Start by filling out your event basics on the right. I'll explain each field as you go!"}
-                  {currentSection === 'transportation' && "Transportation is usually the biggest source of emissions. Every mile counts!"}
+                  {currentSection === 'transportation' && "Transportation is usually the biggest source of emissions—60-80% of your footprint. Focus here for maximum impact!"}
+                  {currentSection === 'staff-transportation' && "Break down staff by how they travel. Local crew driving vs. out-of-state crew flying makes a huge difference!"}
+                  {currentSection === 'artist-transportation' && "Artists often have the longest travel distances. Consider offering ground transport incentives for shorter trips."}
+                  {currentSection === 'equipment-transportation' && "Production trucks add up fast. Can you consolidate loads or source equipment locally?"}
                   {currentSection === 'energy' && "Solar + battery is the sweet spot. It's quieter AND cleaner than diesel generators."}
                   {currentSection === 'food' && "Local food can cut emissions by 30-60%. Plus, it tastes better and supports your community!"}
                   {currentSection === 'complete' && "Awesome work! You can save this calculation to track year-over-year progress."}
