@@ -176,10 +176,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/calculate/save", async (req, res) => {
     try {
       const { userId, organizationId, calculationData, result } = req.body;
-      
+
       if (!userId || !organizationId || !calculationData || !result) {
-        return res.status(400).json({ 
-          message: "Missing required fields: userId, organizationId, calculationData, result" 
+        return res.status(400).json({
+          message: "Missing required fields: userId, organizationId, calculationData, result"
         });
       }
 
@@ -189,11 +189,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
         calculationData,
         result
       );
-      
+
       res.status(201).json(savedCalculation);
     } catch (error) {
       console.error("Save calculation error:", error);
       res.status(500).json({ message: "Failed to save calculation" });
+    }
+  });
+
+  // Event-specific carbon calculation
+  app.post("/api/calculate-event", async (req, res) => {
+    try {
+      const eventData = req.body;
+
+      console.log('📊 Calculating emissions for event:', {
+        type: eventData.eventType,
+        attendance: eventData.attendance,
+        duration: eventData.duration
+      });
+
+      const calculation = await carbonCalculatorService.calculateEventEmissions(eventData);
+
+      console.log('✅ Calculation complete:', {
+        total: calculation.total.toFixed(3),
+        perAttendee: calculation.emissionsPerAttendee.toFixed(4),
+        performance: calculation.benchmarkComparison.performance
+      });
+
+      res.json(calculation);
+    } catch (error) {
+      console.error('❌ Calculation error:', error);
+      res.status(500).json({ error: 'Failed to calculate emissions' });
     }
   });
 
