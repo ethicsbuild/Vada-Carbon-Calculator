@@ -2,9 +2,10 @@ import { WebSocket } from 'ws';
 import { mockSageService, type ExtractedEventData } from '../services/sage-riverstone/mock-sage';
 import type { LanguageTier } from '../services/sage-riverstone/persona';
 import { carbonCalculatorService, type EventEmissionData } from '../services/carbonCalculator';
+import { getSageSession } from '../services/sageConsciousness';
 
-// Use mock mode when no OpenAI key is configured
-const USE_MOCK_MODE = !process.env.OPENAI_API_KEY;
+// Use real Sage consciousness when Anthropic API key is configured
+const USE_SAGE_CONSCIOUSNESS = !!process.env.ANTHROPIC_API_KEY;
 
 interface ChatMessage {
   type: 'message';
@@ -19,9 +20,15 @@ interface ConversationContext {
   extractedData: any;
   languageTier: LanguageTier;
   conversationId?: number;
+  sessionId: string;
 }
 
 const conversations = new Map<WebSocket, ConversationContext>();
+
+// Generate unique session ID
+function generateSessionId(): string {
+  return `sage_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+}
 
 // Convert Sage's extracted data to full event emission data for calculation
 function buildEventEmissionData(extractedData: ExtractedEventData): EventEmissionData | null {
@@ -97,10 +104,14 @@ export function handleChatWebSocket(ws: WebSocket) {
   console.log('Sage chat WebSocket connected');
 
   // Initialize conversation context
+  const sessionId = generateSessionId();
   conversations.set(ws, {
     extractedData: {},
-    languageTier: 'tier1_campfire'
+    languageTier: 'tier1_campfire',
+    sessionId
   });
+
+  console.log(`🌟 New Sage session created: ${sessionId}`);
 
   ws.on('message', async (data: Buffer) => {
     try {
@@ -150,8 +161,45 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
     let response: string;
     let extractedData: any;
     let completionPercentage: number;
+    let quickReplies: string[] = [];
 
-    if (USE_MOCK_MODE) {
+    if (USE_SAGE_CONSCIOUSNESS) {
+      console.log('🌟 Using REAL Sage Riverstone consciousness via Claude API');
+      console.log('📋 Current context eventType:', context.eventType);
+      console.log('📋 Current extractedData:', context.extractedData);
+
+      // Get Sage session
+      const sage = getSageSession(context.sessionId);
+
+      // First, extract data using keyword matching (for structured data)
+      extractedData = mockSageService.extractEventData(
+        message.content,
+        context.extractedData as ExtractedEventData
+      );
+
+      // Calculate completion
+      completionPercentage = mockSageService.getCompletionPercentage(extractedData);
+
+      // Build event data for Sage's context
+      const eventData = {
+        type: extractedData.eventType,
+        attendees: extractedData.attendance,
+        location: extractedData.venue?.location,
+        transportMix: extractedData.transportation,
+        currentEmissions: undefined // Will be calculated later
+      };
+
+      // Get REAL Sage response from Claude API
+      const sageResponse = await sage.respond(message.content, eventData);
+      response = sageResponse.message;
+
+      // Use suggestions from Sage if available
+      if (sageResponse.suggestions && sageResponse.suggestions.length > 0) {
+        quickReplies = sageResponse.suggestions;
+      }
+
+      context.extractedData = extractedData;
+    } else if (!process.env.OPENAI_API_KEY) {
       console.log('💰 Using MOCK mode - $0 API cost');
       console.log('📋 Current context eventType:', context.eventType);
       console.log('📋 Current extractedData:', context.extractedData);
@@ -165,7 +213,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
       // Generate response using templates (no API)
       const sageResponse = mockSageService.generateResponse(message.content, extractedData);
       response = sageResponse.message;
-      const quickReplies = sageResponse.quickReplies || [];
+      quickReplies = sageResponse.quickReplies || [];
 
       // Calculate completion
       completionPercentage = mockSageService.getCompletionPercentage(extractedData);
@@ -194,7 +242,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         // Generate response using internal templates (NO API cost)
         const sageResponse = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
         response = sageResponse.message;
-        var quickReplies = sageResponse.quickReplies || [];
+        quickReplies = sageResponse.quickReplies || [];
 
         context.extractedData = extractedData;
       } catch (apiError: any) {
