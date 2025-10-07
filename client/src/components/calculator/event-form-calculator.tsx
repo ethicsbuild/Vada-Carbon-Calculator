@@ -5,7 +5,31 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CarbonResults } from '@/components/sage/carbon-results';
-import { Calculator, Loader2 } from 'lucide-react';
+import { InfoTooltip } from '@/components/ui/info-tooltip';
+import { Calculator, Loader2, Plus, Trash2 } from 'lucide-react';
+
+interface StaffTransportGroup {
+  id: string;
+  count: number;
+  mode: string;
+  distance: number;
+  overnightStays: number;
+}
+
+interface ArtistTransportGroup {
+  id: string;
+  count: number;
+  mode: string;
+  distance: number;
+  tourBus: boolean;
+}
+
+interface MealBreakdown {
+  staffMeals: number;
+  attendeeFood: number;
+  vipCatering: number;
+  talentCatering: number;
+}
 
 interface EventFormData {
   eventType: string;
@@ -20,23 +44,17 @@ interface EventFormData {
   attendeeLocalPercentage: number;
   attendeeDomesticFlightPercentage: number;
   attendeeInternationalFlightPercentage: number;
-  // Staff Transportation
-  staffCount: number;
-  staffTransportMode: string;
-  staffTransportDistance: number;
-  staffOvernightStays: number;
-  // Artist/Performer Transportation
-  artistCount: number;
-  artistTransportMode: string;
-  artistTransportDistance: number;
-  artistTourBus: boolean;
+  // Staff Transportation (granular)
+  staffTransportGroups: StaffTransportGroup[];
+  // Artist/Performer Transportation (granular)
+  artistTransportGroups: ArtistTransportGroup[];
   // Equipment Transportation
   equipmentTrucksRequired: number;
   equipmentTransportDistance: number;
   equipmentFreightFlights: number;
   // Power and Food
   powerSource: string;
-  mealCount: number;
+  meals: MealBreakdown;
   localFood: boolean;
 }
 
@@ -58,32 +76,116 @@ export function EventFormCalculator({ initialEventType }: EventFormCalculatorPro
     attendeeLocalPercentage: 60,
     attendeeDomesticFlightPercentage: 30,
     attendeeInternationalFlightPercentage: 10,
-    // Staff Transportation
-    staffCount: 0,
-    staffTransportMode: 'driving',
-    staffTransportDistance: 50,
-    staffOvernightStays: 0,
-    // Artist/Performer Transportation
-    artistCount: 0,
-    artistTransportMode: 'driving',
-    artistTransportDistance: 200,
-    artistTourBus: false,
+    // Staff Transportation (granular groups)
+    staffTransportGroups: [],
+    // Artist/Performer Transportation (granular groups)
+    artistTransportGroups: [],
     // Equipment Transportation
     equipmentTrucksRequired: 0,
     equipmentTransportDistance: 200,
     equipmentFreightFlights: 0,
     // Power and Food
     powerSource: 'grid',
-    mealCount: 0,
+    meals: {
+      staffMeals: 0,
+      attendeeFood: 0,
+      vipCatering: 0,
+      talentCatering: 0,
+    },
     localFood: false,
   });
 
   const [calculation, setCalculation] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
 
+  // Helper functions for managing transport groups
+  const addStaffGroup = () => {
+    const newGroup: StaffTransportGroup = {
+      id: Date.now().toString(),
+      count: 1,
+      mode: 'driving',
+      distance: 50,
+      overnightStays: 0,
+    };
+    setFormData(prev => ({
+      ...prev,
+      staffTransportGroups: [...prev.staffTransportGroups, newGroup]
+    }));
+  };
+
+  const removeStaffGroup = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      staffTransportGroups: prev.staffTransportGroups.filter(g => g.id !== id)
+    }));
+  };
+
+  const updateStaffGroup = (id: string, field: keyof StaffTransportGroup, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      staffTransportGroups: prev.staffTransportGroups.map(g =>
+        g.id === id ? { ...g, [field]: value } : g
+      )
+    }));
+  };
+
+  const addArtistGroup = () => {
+    const newGroup: ArtistTransportGroup = {
+      id: Date.now().toString(),
+      count: 1,
+      mode: 'flying',
+      distance: 200,
+      tourBus: false,
+    };
+    setFormData(prev => ({
+      ...prev,
+      artistTransportGroups: [...prev.artistTransportGroups, newGroup]
+    }));
+  };
+
+  const removeArtistGroup = (id: string) => {
+    setFormData(prev => ({
+      ...prev,
+      artistTransportGroups: prev.artistTransportGroups.filter(g => g.id !== id)
+    }));
+  };
+
+  const updateArtistGroup = (id: string, field: keyof ArtistTransportGroup, value: any) => {
+    setFormData(prev => ({
+      ...prev,
+      artistTransportGroups: prev.artistTransportGroups.map(g =>
+        g.id === id ? { ...g, [field]: value } : g
+      )
+    }));
+  };
+
+  const updateMealField = (field: keyof MealBreakdown, value: number) => {
+    setFormData(prev => ({
+      ...prev,
+      meals: { ...prev.meals, [field]: value }
+    }));
+  };
+
   const calculateEmissions = async () => {
     setIsCalculating(true);
     try {
+      // Aggregate staff transport data from all groups
+      const totalStaffCount = formData.staffTransportGroups.reduce((sum, g) => sum + g.count, 0);
+      const avgStaffDistance = formData.staffTransportGroups.length > 0
+        ? formData.staffTransportGroups.reduce((sum, g) => sum + (g.distance * g.count), 0) / totalStaffCount
+        : 50;
+      const totalStaffOvernightStays = formData.staffTransportGroups.reduce((sum, g) => sum + g.overnightStays, 0);
+
+      // Aggregate artist transport data from all groups
+      const totalArtistCount = formData.artistTransportGroups.reduce((sum, g) => sum + g.count, 0);
+      const avgArtistDistance = formData.artistTransportGroups.length > 0
+        ? formData.artistTransportGroups.reduce((sum, g) => sum + (g.distance * g.count), 0) / totalArtistCount
+        : 200;
+
+      // Total meals served
+      const totalMealsServed = formData.meals.staffMeals + formData.meals.attendeeFood +
+                               formData.meals.vipCatering + formData.meals.talentCatering;
+
       const response = await fetch('/api/calculate-event', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -117,7 +219,7 @@ export function EventFormCalculator({ initialEventType }: EventFormCalculatorPro
             },
           },
           staffing: {
-            totalStaff: Math.ceil(formData.attendance / 50),
+            totalStaff: totalStaffCount || Math.ceil(formData.attendance / 50),
             onSiteStaff: Math.ceil(formData.attendance / 100),
             crewSize: Math.ceil(formData.attendance / 200),
           },
@@ -136,31 +238,37 @@ export function EventFormCalculator({ initialEventType }: EventFormCalculatorPro
                   ? formData.attendance : 0,
             },
             crewTransportation: {
-              method: formData.staffTransportMode,
-              estimatedDistance: formData.staffTransportDistance,
-              numberOfVehicles: formData.staffCount > 0
-                ? Math.ceil(formData.staffCount / (formData.staffTransportMode === 'carpool' ? 4 : 1))
+              method: formData.staffTransportGroups[0]?.mode || 'driving',
+              estimatedDistance: avgStaffDistance,
+              numberOfVehicles: totalStaffCount > 0
+                ? Math.ceil(totalStaffCount / 1)
                 : Math.ceil(formData.attendance / 100),
-              staffCount: formData.staffCount || Math.ceil(formData.attendance / 50),
-              overnightStays: formData.staffOvernightStays,
+              staffCount: totalStaffCount || Math.ceil(formData.attendance / 50),
+              overnightStays: totalStaffOvernightStays,
+              // Include granular groups for detailed calculation
+              staffGroups: formData.staffTransportGroups,
             },
             artistTransportation: {
-              artistCount: formData.artistCount,
-              method: formData.artistTransportMode,
-              distance: formData.artistTransportDistance,
-              tourBus: formData.artistTourBus,
+              artistCount: totalArtistCount,
+              method: formData.artistTransportGroups[0]?.mode || 'flying',
+              distance: avgArtistDistance,
+              tourBus: formData.artistTransportGroups.some(g => g.tourBus),
+              // Include granular groups for detailed calculation
+              artistGroups: formData.artistTransportGroups,
             },
             equipmentTransportation: {
-              trucksRequired: formData.equipmentTrucksRequired || (formData.attendance > 500 ? 3 : 1),
+              trucksRequired: formData.equipmentTrucksRequired,
               averageDistance: formData.equipmentTransportDistance,
               freightFlights: formData.equipmentFreightFlights,
             },
           },
           catering: {
             foodServiceType: 'buffet',
-            expectedMealsServed: formData.mealCount || formData.attendance * formData.durationDays,
+            expectedMealsServed: totalMealsServed || formData.attendance * formData.durationDays,
             isLocallySourced: formData.localFood,
             alcoholServed: formData.attendance > 100,
+            // Include meal breakdown for detailed calculation
+            mealBreakdown: formData.meals,
           },
           waste: {
             recyclingProgram: false,
@@ -331,201 +439,345 @@ export function EventFormCalculator({ initialEventType }: EventFormCalculatorPro
             </div>
           </div>
 
-          {/* Staff Transportation */}
+          {/* Staff Transportation - Granular Groups */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <h3 className="text-lg font-semibold text-violet-400">👷 Staff Transportation</h3>
-
-            <div className="space-y-2">
-              <Label className="text-slate-300">Number of Staff</Label>
-              <Input
-                type="number"
-                value={formData.staffCount || ''}
-                onChange={(e) => updateField('staffCount', parseInt(e.target.value) || 0)}
-                placeholder={`Suggested: ${Math.ceil(formData.attendance / 50)}`}
-                className="bg-slate-900/50 border-slate-700 text-white"
-              />
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-violet-400">👷 Staff Transportation</h3>
+              <InfoTooltip content="Break down your staff by how they travel. E.g., 18 local staff driving + 2 flying in from out of state. Add as many groups as you need." />
             </div>
 
-            {formData.staffCount > 0 && (
+            {formData.staffTransportGroups.length === 0 ? (
+              <div className="text-center p-6 border-2 border-dashed border-slate-600 rounded-lg">
+                <p className="text-slate-400 mb-3">No staff transport added yet</p>
+                <Button
+                  type="button"
+                  onClick={addStaffGroup}
+                  className="bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 border border-violet-500/50"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Staff Group
+                </Button>
+              </div>
+            ) : (
               <>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Staff Transport Mode</Label>
-                  <Select value={formData.staffTransportMode} onValueChange={(value) => updateField('staffTransportMode', value)}>
-                    <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                      <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
-                      <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying</SelectItem>
-                      <SelectItem value="transit" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚇 Public Transit</SelectItem>
-                      <SelectItem value="carpool" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚙 Carpool/Shuttle</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {formData.staffTransportGroups.map((group, index) => (
+                  <div key={group.id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-violet-300">Staff Group {index + 1}</span>
+                      <Button
+                        type="button"
+                        onClick={() => removeStaffGroup(group.id)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-slate-300">Avg Distance (km)</Label>
-                    <Input
-                      type="number"
-                      value={formData.staffTransportDistance || ''}
-                      onChange={(e) => updateField('staffTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                      placeholder="50"
-                      className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm"># of Staff</Label>
+                        <Input
+                          type="number"
+                          value={group.count || ''}
+                          onChange={(e) => updateStaffGroup(group.id, 'count', parseInt(e.target.value) || 0)}
+                          placeholder="e.g., 18"
+                          className="bg-slate-900/50 border-slate-700 text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm">Transport Mode</Label>
+                        <Select value={group.mode} onValueChange={(value) => updateStaffGroup(group.id, 'mode', value)}>
+                          <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-900 border-slate-700 text-white">
+                            <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
+                            <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying</SelectItem>
+                            <SelectItem value="transit" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚇 Public Transit</SelectItem>
+                            <SelectItem value="carpool" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚙 Carpool/Shuttle</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm">Distance (km)</Label>
+                        <Input
+                          type="number"
+                          value={group.distance || ''}
+                          onChange={(e) => updateStaffGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
+                          placeholder="e.g., 20"
+                          className="bg-slate-900/50 border-slate-700 text-white"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm">Overnight Stays</Label>
+                        <Input
+                          type="number"
+                          value={group.overnightStays || ''}
+                          onChange={(e) => updateStaffGroup(group.id, 'overnightStays', parseInt(e.target.value) || 0)}
+                          placeholder="0"
+                          className="bg-slate-900/50 border-slate-700 text-white"
+                        />
+                      </div>
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label className="text-slate-300">Overnight Stays</Label>
-                    <Input
-                      type="number"
-                      value={formData.staffOvernightStays || ''}
-                      onChange={(e) => updateField('staffOvernightStays', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                      placeholder="0"
-                      className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                    />
-                  </div>
-                </div>
+                ))}
+
+                <Button
+                  type="button"
+                  onClick={addStaffGroup}
+                  className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 border border-violet-500/50"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Another Staff Group
+                </Button>
               </>
             )}
           </div>
 
-          {/* Artist/Performer Transportation */}
+          {/* Artist/Performer Transportation - Granular Groups */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <h3 className="text-lg font-semibold text-amber-400">🎤 Artist/Performer Transportation</h3>
-
-            <div className="space-y-2">
-              <Label className="text-slate-300">Number of Artists/Performers</Label>
-              <Input
-                type="number"
-                value={formData.artistCount || ''}
-                onChange={(e) => updateField('artistCount', parseInt(e.target.value) || 0)}
-                placeholder="0 if none"
-                className="bg-slate-900/50 border-slate-700 text-white"
-              />
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-amber-400">🎤 Artist/Performer Transportation</h3>
+              <InfoTooltip content="Break down performers by how they arrive. E.g., 5 artists flying commercially + 1 headliner on private jet. Each group can have different transport modes and distances." />
             </div>
 
-            {formData.artistCount > 0 && (
+            {formData.artistTransportGroups.length === 0 ? (
+              <div className="text-center p-6 border-2 border-dashed border-slate-600 rounded-lg">
+                <p className="text-slate-400 mb-3">No artist transport added yet</p>
+                <Button
+                  type="button"
+                  onClick={addArtistGroup}
+                  className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Artist Group
+                </Button>
+              </div>
+            ) : (
               <>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Artist Transport Mode</Label>
-                  <Select value={formData.artistTransportMode} onValueChange={(value) => updateField('artistTransportMode', value)}>
-                    <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                      <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying</SelectItem>
-                      <SelectItem value="tour_bus" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚌 Tour Bus</SelectItem>
-                      <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
-                      <SelectItem value="private_jet" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🛩️ Private Jet</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+                {formData.artistTransportGroups.map((group, index) => (
+                  <div key={group.id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm font-semibold text-amber-300">Artist Group {index + 1}</span>
+                      <Button
+                        type="button"
+                        onClick={() => removeArtistGroup(group.id)}
+                        size="sm"
+                        variant="ghost"
+                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
 
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Travel Distance (km)</Label>
-                  <Input
-                    type="number"
-                    value={formData.artistTransportDistance || ''}
-                    onChange={(e) => updateField('artistTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    placeholder="200"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  />
-                </div>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm"># of Artists</Label>
+                        <Input
+                          type="number"
+                          value={group.count || ''}
+                          onChange={(e) => updateArtistGroup(group.id, 'count', parseInt(e.target.value) || 0)}
+                          placeholder="e.g., 5"
+                          className="bg-slate-900/50 border-slate-700 text-white"
+                        />
+                      </div>
 
-                {formData.artistTransportMode === 'tour_bus' && (
-                  <div className="flex items-center gap-2 p-3 bg-slate-800/50 rounded">
-                    <input
-                      type="checkbox"
-                      checked={formData.artistTourBus}
-                      onChange={(e) => updateField('artistTourBus', e.target.checked)}
-                      className="w-4 h-4"
-                    />
-                    <Label className="text-slate-300 text-sm">Overnight in tour bus (reduces hotel emissions)</Label>
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm">Transport Mode</Label>
+                        <Select value={group.mode} onValueChange={(value) => updateArtistGroup(group.id, 'mode', value)}>
+                          <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent className="bg-slate-900 border-slate-700 text-white">
+                            <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Commercial Flight</SelectItem>
+                            <SelectItem value="tour_bus" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚌 Tour Bus</SelectItem>
+                            <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
+                            <SelectItem value="private_jet" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🛩️ Private Jet</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-slate-300 text-sm">Distance (km)</Label>
+                        <Input
+                          type="number"
+                          value={group.distance || ''}
+                          onChange={(e) => updateArtistGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
+                          placeholder="e.g., 500"
+                          className="bg-slate-900/50 border-slate-700 text-white"
+                        />
+                      </div>
+
+                      {group.mode === 'tour_bus' && (
+                        <div className="flex items-center gap-2 p-2 bg-slate-900/30 rounded col-span-2">
+                          <input
+                            type="checkbox"
+                            checked={group.tourBus}
+                            onChange={(e) => updateArtistGroup(group.id, 'tourBus', e.target.checked)}
+                            className="w-4 h-4"
+                          />
+                          <Label className="text-slate-300 text-sm">Overnight in tour bus (reduces hotel emissions)</Label>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                ))}
+
+                <Button
+                  type="button"
+                  onClick={addArtistGroup}
+                  className="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50"
+                >
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add Another Artist Group
+                </Button>
               </>
             )}
           </div>
 
           {/* Equipment Transportation */}
           <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <h3 className="text-lg font-semibold text-cyan-400">📦 Equipment Transportation</h3>
-
-            <div className="space-y-2">
-              <Label className="text-slate-300">Number of Trucks Required</Label>
-              <Input
-                type="number"
-                value={formData.equipmentTrucksRequired || ''}
-                onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
-                placeholder={`Suggested: ${formData.attendance > 500 ? 3 : 1}`}
-                className="bg-slate-900/50 border-slate-700 text-white"
-              />
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-cyan-400">📦 Equipment Transportation</h3>
+              <InfoTooltip content="Be realistic about production scale. Major festivals often need 20-100+ trucks for staging, sound, lighting, and vendor equipment. Small events might need 1-5 trucks." />
             </div>
 
-            {formData.equipmentTrucksRequired > 0 && (
-              <>
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Equipment Transport Distance (km)</Label>
-                  <Input
-                    type="number"
-                    value={formData.equipmentTransportDistance || ''}
-                    onChange={(e) => updateField('equipmentTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    placeholder="200"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  />
-                </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-slate-300">Number of Trucks</Label>
+                <Input
+                  type="number"
+                  value={formData.equipmentTrucksRequired || ''}
+                  onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
+                  placeholder="Enter realistic number (1-100+)"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  min="0"
+                  max="500"
+                />
+              </div>
 
-                <div className="space-y-2">
-                  <Label className="text-slate-300">Freight Flights (if international)</Label>
-                  <Input
-                    type="number"
-                    value={formData.equipmentFreightFlights || ''}
-                    onChange={(e) => updateField('equipmentFreightFlights', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                    placeholder="0"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  />
-                </div>
-              </>
-            )}
+              <div className="space-y-2">
+                <Label className="text-slate-300">Avg Distance (km)</Label>
+                <Input
+                  type="number"
+                  value={formData.equipmentTransportDistance || ''}
+                  onChange={(e) => updateField('equipmentTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                  placeholder="200"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Label className="text-slate-300">Freight Flights (international shipping)</Label>
+                <InfoTooltip content="If equipment is flown in internationally (e.g., bringing gear from overseas for a touring artist), specify number of cargo flights." />
+              </div>
+              <Input
+                type="number"
+                value={formData.equipmentFreightFlights || ''}
+                onChange={(e) => updateField('equipmentFreightFlights', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                placeholder="0"
+                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+              />
+            </div>
           </div>
 
           {/* Power Source */}
           <div className="space-y-2">
-            <Label className="text-slate-300">Power Source</Label>
+            <div className="flex items-center gap-2">
+              <Label className="text-slate-300">Power Source</Label>
+              <InfoTooltip
+                title="Power Source Options"
+                content="Grid: Building's electrical service. Generator: Diesel/propane units for outdoor/remote events. Hybrid: Mix of grid + backup generators. Renewable: Solar panels, battery banks, biodiesel generators."
+              />
+            </div>
             <Select value={formData.powerSource} onValueChange={(value) => updateField('powerSource', value)}>
               <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="grid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚡ Grid Power</SelectItem>
-                <SelectItem value="generator" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⛽ Generator</SelectItem>
-                <SelectItem value="hybrid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔋 Hybrid</SelectItem>
-                <SelectItem value="renewable" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">♻️ Renewable</SelectItem>
+                <SelectItem value="grid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚡ Grid Power (venue electrical)</SelectItem>
+                <SelectItem value="generator" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⛽ Generator (diesel/propane)</SelectItem>
+                <SelectItem value="hybrid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔋 Hybrid (grid + backup)</SelectItem>
+                <SelectItem value="renewable" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">♻️ Renewable (solar/biodiesel)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Catering */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label className="text-slate-300">Meals Served</Label>
-              <Input
-                type="number"
-                value={formData.mealCount || ''}
-                onChange={(e) => updateField('mealCount', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                placeholder={`Default: ${formData.attendance * formData.durationDays}`}
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-              />
+          {/* Catering - Granular Breakdown */}
+          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-orange-400">🍽️ Food & Catering</h3>
+              <InfoTooltip content="Break down meals by category: crew meals (breakfast/lunch/dinner for staff), attendee food service (concessions, food vendors), VIP catering (hospitality lounges), and talent catering (green room, artist meals)." />
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-slate-300 text-sm">Staff/Crew Meals</Label>
+                <Input
+                  type="number"
+                  value={formData.meals.staffMeals || ''}
+                  onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 150 (50 staff × 3 meals)"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-slate-300 text-sm">Attendee Food Service</Label>
+                <Input
+                  type="number"
+                  value={formData.meals.attendeeFood || ''}
+                  onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 2000 (food vendors/concessions)"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-slate-300 text-sm">VIP Catering</Label>
+                <Input
+                  type="number"
+                  value={formData.meals.vipCatering || ''}
+                  onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 100 (VIP lounge meals)"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-slate-300 text-sm">Artist/Talent Catering</Label>
+                <Input
+                  type="number"
+                  value={formData.meals.talentCatering || ''}
+                  onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
+                  placeholder="e.g., 30 (green room/backstage)"
+                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                />
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label className="text-slate-300">Food Sourcing</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-slate-300">Food Sourcing</Label>
+                <InfoTooltip
+                  title="Food Sourcing Options"
+                  content="Standard: Commercial suppliers like Sysco, US Foods, GFS (bulk shipped from distribution centers). Local/Organic: Locally sourced from farms within 100 miles, organic/sustainable practices (lower transportation emissions)."
+                />
+              </div>
               <Select value={formData.localFood ? 'local' : 'standard'} onValueChange={(value) => updateField('localFood', value === 'local')}>
                 <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                  <SelectItem value="local" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌾 Local/Organic</SelectItem>
-                  <SelectItem value="standard" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🍽️ Standard</SelectItem>
+                  <SelectItem value="local" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌾 Local/Organic (from nearby farms)</SelectItem>
+                  <SelectItem value="standard" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🍽️ Standard (Sysco/US Foods/GFS)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
