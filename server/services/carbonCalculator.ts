@@ -506,8 +506,21 @@ export class CarbonCalculatorService {
     const breakdown: Record<string, number> = {};
     let total = 0;
 
+    // Defensive check for venue and duration data
+    if (!eventData.venue || !eventData.duration) {
+      // Fallback: Use attendance as proxy for venue capacity
+      const estimatedCapacity = eventData.attendance * 1.2;
+      const estimatedDays = typeof eventData.duration === 'number' ? eventData.duration : 1;
+      const venueBaseEmissions = estimatedCapacity * 0.001 * estimatedDays;
+      breakdown.venueBase = venueBaseEmissions;
+      total += venueBaseEmissions;
+      return { total, breakdown };
+    }
+
     // Base venue emissions (heating, cooling, lighting)
-    const venueBaseEmissions = eventData.venue.capacity * 0.001 * eventData.duration.days; // tCO2e
+    const capacity = eventData.venue.capacity || eventData.attendance * 1.2;
+    const days = eventData.duration.days || 1;
+    const venueBaseEmissions = capacity * 0.001 * days; // tCO2e
     breakdown.venueBase = venueBaseEmissions;
     total += venueBaseEmissions;
 
@@ -526,28 +539,45 @@ export class CarbonCalculatorService {
     const breakdown: Record<string, number> = {};
     let total = 0;
 
+    // Defensive check for transportation data
+    if (!eventData.transportation) {
+      // Minimal fallback based on attendance
+      const estimatedEmissions = eventData.attendance * 0.05; // Rough estimate
+      breakdown.estimatedTransport = estimatedEmissions;
+      total += estimatedEmissions;
+      return { total, breakdown };
+    }
+
     // Audience travel emissions
-    const audienceEmissions = eventData.attendance * eventData.transportation.audienceTravel.averageDistance * 0.21 / 1000; // tCO2e
+    const avgDistance = eventData.transportation.audienceTravel?.averageDistance || 50; // Default 50km
+    const audienceEmissions = eventData.attendance * avgDistance * 0.21 / 1000; // tCO2e
     breakdown.audienceTravel = audienceEmissions;
     total += audienceEmissions;
 
     // International attendees (flights)
-    if (eventData.transportation.audienceTravel.internationalAttendees) {
+    if (eventData.transportation.audienceTravel?.internationalAttendees) {
       const intlFlightEmissions = eventData.transportation.audienceTravel.internationalAttendees * 2.5; // avg international flight
       breakdown.internationalFlights = intlFlightEmissions;
       total += intlFlightEmissions;
     }
 
     // Crew transportation
-    const crewTransportEmissions = eventData.staffing.totalStaff * eventData.transportation.crewTransportation.estimatedDistance * 0.21 / 1000;
-    breakdown.crewTransport = crewTransportEmissions;
-    total += crewTransportEmissions;
+    if (eventData.staffing && eventData.transportation.crewTransportation) {
+      const totalStaff = eventData.staffing.totalStaff || Math.ceil(eventData.attendance / 50);
+      const crewDistance = eventData.transportation.crewTransportation.estimatedDistance || 30;
+      const crewTransportEmissions = totalStaff * crewDistance * 0.21 / 1000;
+      breakdown.crewTransport = crewTransportEmissions;
+      total += crewTransportEmissions;
+    }
 
     // Equipment transportation
-    const equipmentEmissions = eventData.transportation.equipmentTransportation.trucksRequired * 
-                              eventData.transportation.equipmentTransportation.averageDistance * 0.85 / 1000; // Heavy truck factor
-    breakdown.equipmentShipping = equipmentEmissions;
-    total += equipmentEmissions;
+    if (eventData.transportation.equipmentTransportation) {
+      const trucks = eventData.transportation.equipmentTransportation.trucksRequired || 0;
+      const distance = eventData.transportation.equipmentTransportation.averageDistance || 0;
+      const equipmentEmissions = trucks * distance * 0.85 / 1000; // Heavy truck factor
+      breakdown.equipmentShipping = equipmentEmissions;
+      total += equipmentEmissions;
+    }
 
     return { total, breakdown };
   }
@@ -556,11 +586,23 @@ export class CarbonCalculatorService {
     const breakdown: Record<string, number> = {};
     let total = 0;
 
+    // Defensive check for production data
+    if (!eventData.production || !eventData.production.powerRequirements) {
+      // Minimal fallback energy estimate
+      const days = eventData.duration?.days || (typeof eventData.duration === 'number' ? eventData.duration : 1);
+      const estimatedPower = eventData.attendance * 0.5 * days / 1000; // Rough estimate
+      breakdown.estimatedEnergy = estimatedPower;
+      total += estimatedPower;
+      return { total, breakdown };
+    }
+
     // Generator power emissions (if used)
     if (eventData.production.powerRequirements.generatorPower) {
       const generatorSizeMultipliers = { small: 50, medium: 150, large: 400, multiple: 800 }; // kW
       const generatorSize = generatorSizeMultipliers[eventData.production.powerRequirements.generatorSize || 'medium'];
-      const generatorHours = eventData.duration.days * eventData.duration.hoursPerDay + 4; // Include setup
+      const days = eventData.duration?.days || 1;
+      const hoursPerDay = eventData.duration?.hoursPerDay || 8;
+      const generatorHours = days * hoursPerDay + 4; // Include setup
       const generatorEmissions = generatorSize * generatorHours * 0.75 / 1000; // Diesel generator factor
       breakdown.generatorPower = generatorEmissions;
       total += generatorEmissions;
@@ -580,10 +622,22 @@ export class CarbonCalculatorService {
     const breakdown: Record<string, number> = {};
     let total = 0;
 
-    if (eventData.catering.expectedMealsServed > 0) {
+    // Defensive check for catering data
+    if (!eventData.catering) {
+      // Minimal fallback estimate
+      const days = eventData.duration?.days || (typeof eventData.duration === 'number' ? eventData.duration : 1);
+      const estimatedMeals = eventData.attendance * days;
+      const estimatedEmissions = estimatedMeals * 3.5 / 1000; // Mid-range estimate
+      breakdown.estimatedCatering = estimatedEmissions;
+      total += estimatedEmissions;
+      return { total, breakdown };
+    }
+
+    const mealsServed = eventData.catering.expectedMealsServed || 0;
+    if (mealsServed > 0) {
       // Base catering emissions per meal
       const baseEmissionPerMeal = eventData.catering.isLocallySourced ? 2.5 : 4.0; // kgCO2e per meal
-      const cateringEmissions = eventData.catering.expectedMealsServed * baseEmissionPerMeal / 1000;
+      const cateringEmissions = mealsServed * baseEmissionPerMeal / 1000;
       breakdown.foodService = cateringEmissions;
       total += cateringEmissions;
 
@@ -604,10 +658,12 @@ export class CarbonCalculatorService {
 
     // Base waste generation (kg per attendee per day)
     const wastePerAttendeePerDay = 2.5;
-    const totalWaste = eventData.attendance * wastePerAttendeePerDay * eventData.duration.days;
-    
+    const days = eventData.duration?.days || (typeof eventData.duration === 'number' ? eventData.duration : 1);
+    const totalWaste = eventData.attendance * wastePerAttendeePerDay * days;
+
     // Recycling program reduces emissions
-    const wasteEmissionFactor = eventData.waste.recyclingProgram ? 0.3 : 0.5; // kgCO2e per kg waste
+    const hasRecycling = eventData.waste?.recyclingProgram || false;
+    const wasteEmissionFactor = hasRecycling ? 0.3 : 0.5; // kgCO2e per kg waste
     const wasteEmissions = totalWaste * wasteEmissionFactor / 1000;
     breakdown.wasteGeneration = wasteEmissions;
     total += wasteEmissions;
@@ -619,27 +675,38 @@ export class CarbonCalculatorService {
     const breakdown: Record<string, number> = {};
     let total = 0;
 
+    // Defensive check for production data
+    if (!eventData.production || !eventData.production.audioVisual) {
+      // Minimal fallback estimate
+      const estimatedProduction = eventData.attendance * 0.01; // Rough estimate
+      breakdown.estimatedProduction = estimatedProduction;
+      total += estimatedProduction;
+      return { total, breakdown };
+    }
+
     // Audio/Visual equipment emissions
     const soundSystemMultipliers = { small: 0.5, medium: 1.0, large: 2.0, festival: 4.0 };
     const lightingMultipliers = { basic: 0.3, medium: 0.8, elaborate: 1.5, festival: 3.0 };
-    
+
     const soundEmissions = soundSystemMultipliers[eventData.production.audioVisual.soundSystemSize] || 1.0;
     const lightingEmissions = lightingMultipliers[eventData.production.audioVisual.lightingRig] || 0.8;
-    
+
     breakdown.audioSystem = soundEmissions;
     breakdown.lightingSystem = lightingEmissions;
     total += soundEmissions + lightingEmissions;
 
     // Video screens
     if (eventData.production.audioVisual.videoScreens) {
-      const videoEmissions = 0.5 * eventData.duration.days;
+      const days = eventData.duration?.days || 1;
+      const videoEmissions = 0.5 * days;
       breakdown.videoScreens = videoEmissions;
       total += videoEmissions;
     }
 
     // Livestreaming additional equipment
     if (eventData.production.audioVisual.livestreaming) {
-      const streamingEmissions = 0.3 * eventData.duration.days;
+      const days = eventData.duration?.days || 1;
+      const streamingEmissions = 0.3 * days;
       breakdown.livestreaming = streamingEmissions;
       total += streamingEmissions;
     }
