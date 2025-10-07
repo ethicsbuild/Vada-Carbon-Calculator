@@ -5,6 +5,11 @@
  * Uses keyword matching and templates to simulate Sage Riverstone AI
  */
 
+export interface QuickReply {
+  label: string;
+  value: string;
+}
+
 export interface ExtractedEventData {
   eventType?: string;
   attendance?: number;
@@ -15,6 +20,11 @@ export interface ExtractedEventData {
   hasData: boolean;
   shownInitialEstimate?: boolean;
   shownReductions?: boolean;
+}
+
+export interface SageResponse {
+  message: string;
+  quickReplies?: QuickReply[];
 }
 
 export class MockSageService {
@@ -130,16 +140,101 @@ export class MockSageService {
   }
 
   /**
+   * Generate quick reply options based on conversation state
+   */
+  getQuickReplies(extractedData: ExtractedEventData): QuickReply[] {
+    const { eventType, attendance, duration, venue, transportation } = extractedData;
+
+    // Event type selection
+    if (!eventType) {
+      return [
+        { label: '🎵 Music Festival', value: 'music festival' },
+        { label: '💼 Corporate Conference', value: 'corporate conference' },
+        { label: '💒 Wedding', value: 'wedding' },
+        { label: '🎤 Concert', value: 'concert' },
+      ];
+    }
+
+    // Attendance ranges
+    if (eventType && !attendance) {
+      return [
+        { label: '50-100 people', value: '75 people' },
+        { label: '100-500 people', value: '250 people' },
+        { label: '500-1,000 people', value: '750 people' },
+        { label: '1,000-5,000 people', value: '2500 people' },
+        { label: '5,000+ people', value: '7500 people' },
+      ];
+    }
+
+    // Duration
+    if (attendance && !duration) {
+      return [
+        { label: 'Single day event', value: 'single day' },
+        { label: '2-day event', value: '2 days' },
+        { label: '3-day event', value: '3 days' },
+        { label: 'Week-long event', value: '7 days' },
+      ];
+    }
+
+    // Venue type
+    if (duration && !venue) {
+      return [
+        { label: '🏛️ Indoor venue', value: 'indoor venue' },
+        { label: '🌳 Outdoor venue', value: 'outdoor venue' },
+      ];
+    }
+
+    // Transportation
+    if (venue && !transportation) {
+      return [
+        { label: '✈️ Most people flying', value: 'flying' },
+        { label: '🚗 Most people driving', value: 'driving' },
+        { label: '🚇 Public transit/train', value: 'public transit' },
+        { label: '🚶 Local/walking distance', value: 'walking' },
+      ];
+    }
+
+    // After complete data - reduction options
+    if (eventType && attendance && duration && venue && transportation) {
+      if (!extractedData.shownInitialEstimate) {
+        return [];
+      }
+
+      if (!extractedData.shownReductions) {
+        return [
+          { label: 'Yes, show me reduction tips', value: 'yes show me ways to reduce' },
+          { label: 'Compare to similar events', value: 'compare to similar events' },
+          { label: 'Calculate different scenarios', value: 'calculate different scenarios' },
+        ];
+      }
+
+      return [
+        { label: 'Draft vendor messages', value: 'draft messages to vendors' },
+        { label: 'Compare to similar events', value: 'compare to similar events' },
+        { label: 'Calculate scenarios', value: 'calculate different scenarios' },
+        { label: 'Generate certificate', value: 'save and generate certificate' },
+      ];
+    }
+
+    return [];
+  }
+
+  /**
    * Generate contextual response based on conversation state
    */
-  generateResponse(message: string, extractedData: ExtractedEventData): string {
+  generateResponse(message: string, extractedData: ExtractedEventData): SageResponse {
     const { eventType, attendance, duration, venue, transportation } = extractedData;
 
     console.log('🗣️ Generating response for state:', { eventType, attendance, duration, venue, transportation });
 
+    const quickReplies = this.getQuickReplies(extractedData);
+
     // Greeting
     if (message.length < 20 && (message.toLowerCase().includes('hi') || message.toLowerCase().includes('hello'))) {
-      return "Hey there! I'm here to help you figure out your event's carbon footprint. Tell me a bit about what you're planning - what kind of event is it?";
+      return {
+        message: "Hey there! I'm here to help you figure out your event's carbon footprint. Tell me a bit about what you're planning - what kind of event is it?",
+        quickReplies
+      };
     }
 
     // Just got event type
@@ -150,49 +245,76 @@ export class MockSageService {
         wedding: "A wedding celebration! How many guests will you have?",
         concert: "A concert - exciting! How many people do you expect?"
       };
-      return eventResponses[eventType] || "Interesting! How many people are coming?";
+      return {
+        message: eventResponses[eventType] || "Interesting! How many people are coming?",
+        quickReplies
+      };
     }
 
     // Need event type still
     if (!eventType && !attendance && !duration) {
-      return "I'd love to help! First, what type of event are you planning? (like a festival, conference, wedding, concert, etc.)";
+      return {
+        message: "I'd love to help! First, what type of event are you planning? (like a festival, conference, wedding, concert, etc.)",
+        quickReplies
+      };
     }
 
     // Got attendance
     if (attendance && !duration) {
-      return `${attendance.toLocaleString()} people - okay! Is this a single-day event, or does it span multiple days?`;
+      return {
+        message: `${attendance.toLocaleString()} people - okay! Is this a single-day event, or does it span multiple days?`,
+        quickReplies
+      };
     }
 
     // Need attendance
     if (eventType && !attendance) {
-      return "Got it! And how many people are you expecting at this event?";
+      return {
+        message: "Got it! And how many people are you expecting at this event?",
+        quickReplies
+      };
     }
 
     // Got duration
     if (duration && !venue) {
       const days = duration.days === 1 ? "a single day" : `${duration.days} days`;
-      return `Cool, ${days}. Is this happening indoors or outdoors?`;
+      return {
+        message: `Cool, ${days}. Is this happening indoors or outdoors?`,
+        quickReplies
+      };
     }
 
     // Need duration
     if (attendance && !duration) {
-      return "Perfect! Is this a single-day event, or multiple days?";
+      return {
+        message: "Perfect! Is this a single-day event, or multiple days?",
+        quickReplies
+      };
     }
 
     // Got venue
     if (venue && !transportation) {
       const venueType = venue.isOutdoor ? 'outdoor' : 'indoor';
-      return `Nice, an ${venueType} event! Last question - how are most people getting there? (driving, flying, public transit, or walking/biking)`;
+      return {
+        message: `Nice, an ${venueType} event! Last question - how are most people getting there? (driving, flying, public transit, or walking/biking)`,
+        quickReplies
+      };
     }
 
     // Need venue
     if (duration && !venue) {
-      return "Great! Is the venue indoors or outdoors?";
+      return {
+        message: "Great! Is the venue indoors or outdoors?",
+        quickReplies
+      };
     }
 
     // Need transportation
     if (venue && !transportation) {
-      return "Almost there! How are most attendees getting to the event? (driving, flying, transit, or local/walking)";
+      return {
+        message: "Almost there! How are most attendees getting to the event? (driving, flying, transit, or local/walking)",
+        quickReplies
+      };
     }
 
     // Have complete data
@@ -202,15 +324,20 @@ export class MockSageService {
       // If we haven't shown the initial estimate yet, show it
       if (!extractedData.shownInitialEstimate) {
         extractedData.shownInitialEstimate = true;
-        return `Alright, I've got a good picture! Based on what you've told me:
+        return {
+          message: `Alright, I've got a good picture! Based on what you've told me:
 
 - ${eventType === 'festival' ? 'Music festival' : eventType === 'conference' ? 'Corporate conference' : eventType === 'wedding' ? 'Wedding celebration' : 'Concert'} with ${attendance.toLocaleString()} attendees
 - ${duration.days}-day event, ${venue.isOutdoor ? 'outdoor' : 'indoor'} venue
 - Most people ${transportation.primaryMode === 'flying' ? 'flying in' : transportation.primaryMode === 'transit' ? 'using public transit' : 'driving'}
 
-Your estimated footprint is around **${estimate.total.toFixed(1)} tons CO₂**. That breaks down to about ${estimate.perPerson.toFixed(3)} tons per person.
+I've calculated your event's carbon footprint using **GHG Protocol compliant emission factors**. Check out the detailed breakdown showing total emissions, per-attendee impact, and how you compare to industry benchmarks!
 
-Want to explore ways to reduce that?`;
+The calculator analyzes venue energy, transportation (including international flights for large events), catering, waste, and production equipment emissions.
+
+Want to explore ways to reduce that footprint?`,
+          quickReplies
+        };
       }
 
       // Check if user is asking about reductions
@@ -230,7 +357,8 @@ Want to explore ways to reduce that?`;
         lowerMsg.includes('help')
       )) {
         extractedData.shownReductions = true;
-        return `Great! Here are your biggest opportunities to cut emissions:
+        return {
+          message: `Great! Here are your biggest opportunities to cut emissions:
 
 **Transport (${estimate.transport.toFixed(1)} tons)** - Your biggest impact! Try:
 - Shuttle buses from nearby cities
@@ -247,12 +375,15 @@ Want to explore ways to reduce that?`;
 - Local sourcing within 100 miles
 - Compostable everything
 
-Want me to draft messages to your caterer or venue about any of these?`;
+Want me to draft messages to your caterer or venue about any of these?`,
+          quickReplies
+        };
       }
 
       // Handle vendor communication requests
       if (lowerMsg.match(/draft|message|email|caterer|venue|vendor|supplier|write/)) {
-        return `Sure! Here's a draft message you can send to your vendors:
+        return {
+          message: `Sure! Here's a draft message you can send to your vendors:
 
 **To Caterer:**
 "Hi! We're planning a ${attendance}-person ${eventType} and want to minimize our environmental impact. Could you provide menu options with:
@@ -268,13 +399,16 @@ Thanks!"
 - Solar backup options?
 We're aiming to reduce our carbon footprint significantly."
 
-Would you like me to adjust these messages or help with anything else?`;
+Would you like me to adjust these messages or help with anything else?`,
+          quickReplies
+        };
       }
 
       // Handle comparison requests
       if (lowerMsg.match(/compare|similar|average|typical|benchmark|other/)) {
         const avgEmissions = estimate.total * 1.3; // Mock: current is 30% below average
-        return `Your event is doing pretty well! Here's how you compare:
+        return {
+          message: `Your event is doing pretty well! Here's how you compare:
 
 **Your Event:** ${estimate.total.toFixed(1)} tons CO₂ (${estimate.perPerson.toFixed(3)} tons/person)
 **Similar Events Average:** ${avgEmissions.toFixed(1)} tons CO₂ (${(avgEmissions / attendance).toFixed(3)} tons/person)
@@ -286,12 +420,15 @@ The biggest difference-makers are usually:
 2. Energy sources
 3. Food & waste management
 
-Want specific tips to improve even more?`;
+Want specific tips to improve even more?`,
+          quickReplies
+        };
       }
 
       // Handle scenario/calculation requests
       if (lowerMsg.match(/scenario|calculate|if|what[\s-]*if|different|change/)) {
-        return `I can help you model different scenarios! For example:
+        return {
+          message: `I can help you model different scenarios! For example:
 
 **If you switched to public transit:**
 - Current emissions: ${estimate.total.toFixed(1)} tons
@@ -301,12 +438,15 @@ Want specific tips to improve even more?`;
 - Current emissions: ${estimate.total.toFixed(1)} tons
 - With solar/wind power: ~${(estimate.total * 0.85).toFixed(1)} tons (-15%)
 
-Want me to calculate a specific scenario for you? Just describe what you'd like to change!`;
+Want me to calculate a specific scenario for you? Just describe what you'd like to change!`,
+          quickReplies
+        };
       }
 
       // Handle certificate/save requests
       if (lowerMsg.match(/certificate|save|export|download|pdf|report/)) {
-        return `Perfect! I'll prepare a certificate for your ${eventType} with these details:
+        return {
+          message: `Perfect! I'll prepare a certificate for your ${eventType} with these details:
 
 📊 **Event Carbon Footprint Summary**
 - Event: ${eventType === 'festival' ? 'Music Festival' : eventType === 'conference' ? 'Corporate Conference' : eventType === 'wedding' ? 'Wedding' : 'Concert'}
@@ -321,26 +461,40 @@ Want me to calculate a specific scenario for you? Just describe what you'd like 
 
 Your certificate is ready! In a full version, I would generate a PDF here with a unique verification code. For now, you can screenshot this summary to share with stakeholders.
 
-Want to explore more reduction opportunities before finalizing?`;
+Want to explore more reduction opportunities before finalizing?`,
+          quickReplies
+        };
       }
 
       // General conversational follow-up - avoid repeating the same prompt
       if (extractedData.shownReductions) {
         // After showing reductions, give helpful contextual responses
         if (lowerMsg.match(/thank|thanks|great|appreciate|awesome|perfect/)) {
-          return `You're welcome! Feel free to reach out if you need anything else as you plan your ${eventType}. Good luck making it a sustainable event!`;
+          return {
+            message: `You're welcome! Feel free to reach out if you need anything else as you plan your ${eventType}. Good luck making it a sustainable event!`,
+            quickReplies: []
+          };
         }
 
         // General question
-        return `Happy to help with that! Just let me know what you'd like to know more about - I can explain reduction strategies, help draft vendor messages, calculate different scenarios, or compare your event to similar ones.`;
+        return {
+          message: `Happy to help with that! Just let me know what you'd like to know more about - I can explain reduction strategies, help draft vendor messages, calculate different scenarios, or compare your event to similar ones.`,
+          quickReplies
+        };
       }
 
       // Haven't shown reductions yet, offer to show them
-      return `I've got all your event details. Would you like to see ways to reduce your carbon footprint?`;
+      return {
+        message: `I've got all your event details. Would you like to see ways to reduce your carbon footprint?`,
+        quickReplies
+      };
     }
 
     // Default follow-up
-    return "Tell me more about your event - any detail helps! How many people, how many days, indoor or outdoor?";
+    return {
+      message: "Tell me more about your event - any detail helps! How many people, how many days, indoor or outdoor?",
+      quickReplies
+    };
   }
 
   /**

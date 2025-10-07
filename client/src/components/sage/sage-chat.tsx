@@ -5,6 +5,8 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useSageConversation } from '@/hooks/use-sage-conversation';
 import { SageMessage } from './sage-message';
+import { SageQuickReplies } from './sage-quick-replies';
+import { CarbonResults } from './carbon-results';
 import { Send, Loader2, Mic, MicOff } from 'lucide-react';
 
 interface SageChatProps {
@@ -29,7 +31,9 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
     isStreaming,
     sendMessage,
     extractedData,
-    completionPercentage
+    completionPercentage,
+    quickReplies,
+    carbonCalculation
   } = useSageConversation(eventType);
 
   // Auto-scroll to bottom when new messages arrive
@@ -214,6 +218,13 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
               <Loader2 className="w-6 h-6 text-emerald-500 animate-spin" />
             </div>
           )}
+
+          {/* Carbon Calculation Results */}
+          {carbonCalculation && (
+            <div className="mt-6">
+              <CarbonResults calculation={carbonCalculation} />
+            </div>
+          )}
         </div>
       </ScrollArea>
 
@@ -255,6 +266,18 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
             )}
           </Button>
         </div>
+
+        {/* Quick Reply Options */}
+        {quickReplies && quickReplies.length > 0 && (
+          <SageQuickReplies
+            options={quickReplies}
+            onSelect={(value) => {
+              setInput(value);
+              sendMessage(value);
+            }}
+            disabled={isLoading}
+          />
+        )}
 
         {/* Quick Suggestions */}
         {messages.length === 0 && (

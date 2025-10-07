@@ -1,6 +1,7 @@
 import { WebSocket } from 'ws';
 import { mockSageService, type ExtractedEventData } from '../services/sage-riverstone/mock-sage';
 import type { LanguageTier } from '../services/sage-riverstone/persona';
+import { carbonCalculatorService, type EventEmissionData } from '../services/carbonCalculator';
 
 // Use mock mode when no OpenAI key is configured
 const USE_MOCK_MODE = !process.env.OPENAI_API_KEY;
@@ -21,6 +22,76 @@ interface ConversationContext {
 }
 
 const conversations = new Map<WebSocket, ConversationContext>();
+
+// Convert Sage's extracted data to full event emission data for calculation
+function buildEventEmissionData(extractedData: ExtractedEventData): EventEmissionData | null {
+  // Need minimum data to calculate
+  if (!extractedData.eventType || !extractedData.attendance || !extractedData.duration) {
+    return null;
+  }
+
+  // Build comprehensive event data with defaults for missing values
+  const eventData: EventEmissionData = {
+    eventType: extractedData.eventType,
+    attendance: extractedData.attendance,
+    duration: extractedData.duration,
+    venue: {
+      type: extractedData.venue?.type || 'mixed',
+      capacity: extractedData.attendance * 1.2, // 20% buffer
+      location: extractedData.venue?.location || 'Unknown',
+      isOutdoor: extractedData.venue?.isOutdoor || false,
+      hasExistingPower: !extractedData.venue?.isOutdoor,
+    },
+    production: {
+      numberOfStages: 1,
+      stageSize: extractedData.attendance > 1000 ? 'large' : extractedData.attendance > 200 ? 'medium' : 'small',
+      audioVisual: {
+        soundSystemSize: extractedData.attendance > 1000 ? 'large' : extractedData.attendance > 200 ? 'medium' : 'small',
+        lightingRig: extractedData.attendance > 500 ? 'elaborate' : 'medium',
+        videoScreens: extractedData.attendance > 500,
+        livestreaming: false,
+      },
+      powerRequirements: {
+        generatorPower: extractedData.power?.source === 'generator' || extractedData.power?.source === 'hybrid',
+        generatorSize: extractedData.attendance > 1000 ? 'large' : 'medium',
+        gridPowerUsage: extractedData.venue?.isOutdoor ? undefined : extractedData.attendance * extractedData.duration.hoursPerDay * 2, // 2kWh per person-hour estimate
+      },
+    },
+    staffing: {
+      totalStaff: Math.ceil(extractedData.attendance / 50), // 1 staff per 50 attendees
+      onSiteStaff: Math.ceil(extractedData.attendance / 100),
+      crewSize: Math.ceil(extractedData.attendance / 200),
+    },
+    transportation: {
+      audienceTravel: {
+        averageDistance: extractedData.transportation?.distance || 50, // Default 50km
+        internationalAttendees: extractedData.attendance > 1000 ? Math.ceil(extractedData.attendance * 0.1) : 0,
+        domesticFlights: extractedData.attendance > 500 ? Math.ceil(extractedData.attendance * 0.05) : 0,
+      },
+      crewTransportation: {
+        method: extractedData.transportation?.primaryMode || 'personal_vehicle',
+        estimatedDistance: 100,
+        numberOfVehicles: Math.ceil(extractedData.attendance / 100),
+      },
+      equipmentTransportation: {
+        trucksRequired: extractedData.attendance > 500 ? 3 : 1,
+        averageDistance: 200,
+      },
+    },
+    catering: {
+      foodServiceType: extractedData.catering?.style || 'buffet',
+      expectedMealsServed: extractedData.catering?.mealCount || extractedData.attendance * extractedData.duration.days,
+      isLocallySourced: false,
+      alcoholServed: extractedData.attendance > 100,
+    },
+    waste: {
+      recyclingProgram: false,
+      wasteReductionMeasures: [],
+    },
+  };
+
+  return eventData;
+}
 
 export function handleChatWebSocket(ws: WebSocket) {
   console.log('Sage chat WebSocket connected');
@@ -85,7 +156,9 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
       );
 
       // Generate response using templates (no API)
-      response = mockSageService.generateResponse(message.content, extractedData);
+      const sageResponse = mockSageService.generateResponse(message.content, extractedData);
+      response = sageResponse.message;
+      const quickReplies = sageResponse.quickReplies || [];
 
       // Calculate completion
       completionPercentage = mockSageService.getCompletionPercentage(extractedData);
@@ -112,7 +185,9 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         completionPercentage = conversationalIntakeService.getCompletionPercentage(extraction.extractedData);
 
         // Generate response using internal templates (NO API cost)
-        response = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
+        const sageResponse = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
+        response = sageResponse.message;
+        var quickReplies = sageResponse.quickReplies || [];
 
         context.extractedData = extractedData;
       } catch (apiError: any) {
@@ -125,7 +200,9 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
           context.extractedData as ExtractedEventData
         );
 
-        response = mockSageService.generateResponse(message.content, extractedData);
+        const sageResponse = mockSageService.generateResponse(message.content, extractedData);
+        response = sageResponse.message;
+        quickReplies = sageResponse.quickReplies || [];
         completionPercentage = mockSageService.getCompletionPercentage(extractedData);
 
         context.extractedData = extractedData;
@@ -144,12 +221,32 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
       await new Promise(resolve => setTimeout(resolve, 30));
     }
 
+    // Calculate carbon emissions if we have enough data
+    let carbonCalculation = null;
+    if (completionPercentage >= 60) { // Calculate when we have basic info
+      const eventEmissionData = buildEventEmissionData(extractedData);
+      if (eventEmissionData) {
+        try {
+          carbonCalculation = await carbonCalculatorService.calculateEventEmissions(eventEmissionData);
+          console.log('✅ Carbon calculation complete:', {
+            total: carbonCalculation.total.toFixed(3),
+            perAttendee: carbonCalculation.emissionsPerAttendee.toFixed(4),
+            performance: carbonCalculation.benchmarkComparison.performance
+          });
+        } catch (calcError) {
+          console.error('❌ Carbon calculation failed:', calcError);
+        }
+      }
+    }
+
     // Send completion message
     ws.send(JSON.stringify({
       type: 'complete',
       extractedData,
       completionPercentage,
-      conversationId: message.conversationId
+      conversationId: message.conversationId,
+      quickReplies,
+      carbonCalculation
     }));
 
   } catch (error) {

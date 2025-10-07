@@ -12,7 +12,7 @@ export function FloatingSageChat() {
       {/* Floating Chat Button */}
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-white z-50 flex items-center justify-center group transition-all hover:scale-110"
+        className="fixed bottom-24 right-6 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-white z-50 flex items-center justify-center group transition-all hover:scale-110"
         aria-label="Chat with Sage Riverstone"
       >
         <MessageCircle className="w-6 h-6" />

@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 
+export interface QuickReply {
+  label: string;
+  value: string;
+}
+
 interface Message {
   role: 'user' | 'assistant';
   content: string;
@@ -44,6 +49,8 @@ export function useSageConversation(eventType?: string) {
   const [extractedData, setExtractedData] = useState<ExtractedEventData | null>(null);
   const [completionPercentage, setCompletionPercentage] = useState(0);
   const [conversationId, setConversationId] = useState<number | null>(null);
+  const [quickReplies, setQuickReplies] = useState<QuickReply[]>([]);
+  const [carbonCalculation, setCarbonCalculation] = useState<any>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
 
@@ -52,8 +59,8 @@ export function useSageConversation(eventType?: string) {
     const welcomeMessage: Message = {
       role: 'assistant',
       content: eventType
-        ? `Hey! I see you're planning a ${eventType}. That's exciting! Let's figure out the carbon footprint together. Tell me a bit about it - how many people are you expecting?`
-        : "Hey friend, planning something special? Tell me about your event and I'll help you understand its carbon footprint with clarity and actionable steps.",
+        ? `Hey! I'm Sage Riverstone. I see you're planning a ${eventType}. That's exciting! Let's figure out the carbon footprint together. Tell me a bit about it - how many people are you expecting?`
+        : "Hey friend, I'm Sage Riverstone. Tell me about your event and I'll help you understand its carbon footprint with clarity and actionable steps.",
       timestamp: new Date()
     };
 
@@ -113,6 +120,13 @@ export function useSageConversation(eventType?: string) {
         if (data.conversationId) {
           setConversationId(data.conversationId);
         }
+        if (data.quickReplies) {
+          setQuickReplies(data.quickReplies);
+        }
+        if (data.carbonCalculation) {
+          setCarbonCalculation(data.carbonCalculation);
+          console.log('🌍 Carbon footprint calculated:', data.carbonCalculation);
+        }
 
         setIsLoading(false);
       } else if (data.type === 'error') {
@@ -147,6 +161,9 @@ export function useSageConversation(eventType?: string) {
   // Send message to Sage
   const sendMessage = useCallback(async (content: string) => {
     if (!content.trim()) return;
+
+    // Clear quick replies when user sends a message
+    setQuickReplies([]);
 
     // Add user message
     const userMessage: Message = {
@@ -193,6 +210,8 @@ export function useSageConversation(eventType?: string) {
     sendMessage,
     extractedData,
     completionPercentage,
-    conversationId
+    conversationId,
+    quickReplies,
+    carbonCalculation
   };
 }
