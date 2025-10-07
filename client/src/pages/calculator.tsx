@@ -7,12 +7,15 @@ import { SageChat } from '@/components/sage/sage-chat';
 import { EventFormCalculator } from '@/components/calculator/event-form-calculator';
 import { QuestionFlow } from '@/components/calculator/question-flow';
 import { LiveEmissionsDisplay } from '@/components/calculator/live-emissions-display';
+import { ProgressiveOnboarding } from '@/components/calculator/progressive-onboarding';
 import { MessageCircle, FileText } from 'lucide-react';
 
 export default function Calculator() {
   const [location] = useLocation();
   const [eventType, setEventType] = useState<string | undefined>(undefined);
   const [calculatorMode, setCalculatorMode] = useState<'form' | 'chat'>('form');
+  const [showOnboarding, setShowOnboarding] = useState(true);
+  const [useAdvancedForm, setUseAdvancedForm] = useState(true);
   const [progress, setProgress] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(1);
   const [emissions, setEmissions] = useState({
@@ -34,7 +37,18 @@ export default function Calculator() {
       setEventType(type);
       console.log('📍 Event type from URL:', type);
     }
+    // Check if user has completed onboarding before
+    const hasCompletedOnboarding = localStorage.getItem('vada_onboarding_complete');
+    if (hasCompletedOnboarding) {
+      setShowOnboarding(false);
+    }
   }, [location]);
+
+  const handleOnboardingComplete = (shouldShowAdvanced: boolean) => {
+    setUseAdvancedForm(shouldShowAdvanced);
+    setShowOnboarding(false);
+    localStorage.setItem('vada_onboarding_complete', 'true');
+  };
 
   const handleDataExtracted = (data: any) => {
     setExtractedData(data);
@@ -64,42 +78,50 @@ export default function Calculator() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Mode Toggle */}
-        <div className="flex justify-center mb-8">
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-2 inline-flex gap-2">
-            <Button
-              onClick={() => setCalculatorMode('form')}
-              variant={calculatorMode === 'form' ? 'default' : 'ghost'}
-              className={calculatorMode === 'form'
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
-                : 'text-slate-300 hover:text-white'
-              }
-            >
-              <FileText className="w-4 h-4 mr-2" />
-              Manual Form
-            </Button>
-            <Button
-              onClick={() => setCalculatorMode('chat')}
-              variant={calculatorMode === 'chat' ? 'default' : 'ghost'}
-              className={calculatorMode === 'chat'
-                ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
-                : 'text-slate-300 hover:text-white'
-              }
-            >
-              <MessageCircle className="w-4 h-4 mr-2" />
-              AI Chat
-            </Button>
-          </Card>
-        </div>
-
-        {calculatorMode === 'form' ? (
-          /* Form Calculator */
-          <div className="max-w-4xl mx-auto">
-            <EventFormCalculator initialEventType={eventType} />
-          </div>
+        {/* Show Onboarding First */}
+        {showOnboarding ? (
+          <ProgressiveOnboarding
+            onComplete={handleOnboardingComplete}
+            eventType={eventType}
+          />
         ) : (
-          /* Chat Mode */
-          <div className="grid lg:grid-cols-2 gap-8">
+          <>
+            {/* Mode Toggle */}
+            <div className="flex justify-center mb-8">
+              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-2 inline-flex gap-2">
+                <Button
+                  onClick={() => setCalculatorMode('form')}
+                  variant={calculatorMode === 'form' ? 'default' : 'ghost'}
+                  className={calculatorMode === 'form'
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                    : 'text-slate-300 hover:text-white'
+                  }
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  {useAdvancedForm ? 'Detailed Form' : 'Quick Form'}
+                </Button>
+                <Button
+                  onClick={() => setCalculatorMode('chat')}
+                  variant={calculatorMode === 'chat' ? 'default' : 'ghost'}
+                  className={calculatorMode === 'chat'
+                    ? 'bg-gradient-to-r from-emerald-500 to-emerald-600 text-white'
+                    : 'text-slate-300 hover:text-white'
+                  }
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Chat with Sage
+                </Button>
+              </Card>
+            </div>
+
+            {calculatorMode === 'form' ? (
+              /* Form Calculator */
+              <div className="max-w-4xl mx-auto">
+                <EventFormCalculator initialEventType={eventType} />
+              </div>
+            ) : (
+              /* Chat Mode */
+              <div className="grid lg:grid-cols-2 gap-8">
             {/* Sage Chat Column */}
             <div>
               <SageChat
@@ -164,6 +186,8 @@ export default function Calculator() {
             )}
           </div>
         </div>
+            )}
+          </>
         )}
       </div>
     </div>

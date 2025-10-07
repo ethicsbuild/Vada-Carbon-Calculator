@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { EventTypeCard } from '@/components/calculator/event-type-card';
 import { LeaderboardWidget } from '@/components/gamification/leaderboard-widget';
+import { CaseStudies } from '@/components/homepage/case-studies';
 
 const eventTypes = [
   {
@@ -104,6 +105,9 @@ export default function Home() {
             </p>
           </Card>
         </div>
+
+        {/* Case Studies Section */}
+        <CaseStudies />
       </div>
 
       {/* Leaderboard Widget - Fixed position */}
