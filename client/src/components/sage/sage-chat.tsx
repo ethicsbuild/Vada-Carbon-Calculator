@@ -35,9 +35,13 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+      const scrollElement = scrollRef.current;
+      // Use requestAnimationFrame to ensure DOM has updated
+      requestAnimationFrame(() => {
+        scrollElement.scrollTop = scrollElement.scrollHeight;
+      });
     }
-  }, [messages]);
+  }, [messages, isStreaming]);
 
   // Notify parent when data is extracted
   useEffect(() => {
@@ -68,70 +72,98 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
     }
   };
 
-  const toggleVoiceInput = () => {
+  const toggleVoiceInput = async () => {
     console.log('🎤 Microphone button clicked! isRecording:', isRecording);
 
     if (isRecording) {
       // Stop recording
       console.log('Stopping recording...');
       if (recognitionRef.current) {
-        recognitionRef.current.stop();
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          console.error('Error stopping recognition:', e);
+        }
       }
       setIsRecording(false);
-    } else {
-      // Check browser support
-      const hasSupport = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
-      console.log('Browser speech recognition support:', hasSupport);
+      return;
+    }
 
-      if (!hasSupport) {
-        alert('⚠️ Speech recognition is not supported in this browser.\n\nPlease use:\n• Chrome\n• Edge\n• Safari');
+    // Check browser support
+    const hasSupport = 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+    console.log('Browser speech recognition support:', hasSupport);
+
+    if (!hasSupport) {
+      alert('⚠️ Speech recognition is not supported in this browser.\n\nPlease use:\n• Chrome\n• Edge\n• Safari');
+      return;
+    }
+
+    try {
+      // Request microphone permission first
+      try {
+        await navigator.mediaDevices.getUserMedia({ audio: true });
+      } catch (permError) {
+        console.error('Microphone permission denied:', permError);
+        alert('🎤 Microphone access is required.\n\nPlease allow microphone access and try again.');
         return;
       }
 
-      try {
-        console.log('Creating speech recognition instance...');
-        const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-        const recognition = new SpeechRecognition();
+      console.log('Creating speech recognition instance...');
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recognition = new SpeechRecognition();
 
-        recognition.continuous = false;
-        recognition.interimResults = false;
-        recognition.lang = 'en-US';
+      recognition.continuous = false;
+      recognition.interimResults = true;
+      recognition.lang = 'en-US';
+      recognition.maxAlternatives = 1;
 
-        recognition.onstart = () => {
-          console.log('✅ Speech recognition started - speak now!');
-          setIsRecording(true);
-        };
+      recognition.onstart = () => {
+        console.log('✅ Speech recognition started - speak now!');
+        setIsRecording(true);
+      };
 
-        recognition.onresult = (event: any) => {
-          const transcript = event.results[0][0].transcript;
-          console.log('📝 Transcript received:', transcript);
-          setInput(transcript);
-        };
+      recognition.onresult = (event: any) => {
+        const results = event.results;
+        const lastResult = results[results.length - 1];
+        const transcript = lastResult[0].transcript;
+        console.log('📝 Transcript received:', transcript, 'Final:', lastResult.isFinal);
 
-        recognition.onerror = (event: any) => {
-          console.error('❌ Speech recognition error:', event.error);
-          if (event.error === 'not-allowed') {
-            alert('🎤 Microphone access denied.\n\nPlease allow microphone access in your browser settings.');
-          } else if (event.error === 'no-speech') {
-            console.log('No speech detected');
-          } else {
-            alert(`Speech recognition error: ${event.error}`);
-          }
-          setIsRecording(false);
-        };
+        // Update input with transcript
+        setInput(transcript);
 
-        recognition.onend = () => {
-          console.log('🛑 Speech recognition ended');
-          setIsRecording(false);
-        };
+        // If final result, stop automatically
+        if (lastResult.isFinal) {
+          recognition.stop();
+        }
+      };
 
-        recognitionRef.current = recognition;
-        console.log('Starting recognition...');
-        recognition.start();
-      } catch (error) {
-        console.error('Error creating speech recognition:', error);
-        alert('Failed to start speech recognition. Check console for details.');
-      }
+      recognition.onerror = (event: any) => {
+        console.error('❌ Speech recognition error:', event.error);
+        setIsRecording(false);
+
+        if (event.error === 'not-allowed' || event.error === 'permission-denied') {
+          alert('🎤 Microphone access denied.\n\nPlease allow microphone access in your browser settings and try again.');
+        } else if (event.error === 'no-speech') {
+          console.log('No speech detected - automatically stopped');
+        } else if (event.error === 'aborted') {
+          console.log('Recognition aborted');
+        } else {
+          alert(`Speech recognition error: ${event.error}\n\nPlease try again.`);
+        }
+      };
+
+      recognition.onend = () => {
+        console.log('🛑 Speech recognition ended');
+        setIsRecording(false);
+      };
+
+      recognitionRef.current = recognition;
+      console.log('Starting recognition...');
+      recognition.start();
+    } catch (error) {
+      console.error('Error creating speech recognition:', error);
+      setIsRecording(false);
+      alert('Failed to start speech recognition.\n\nPlease make sure you\'re using Chrome, Edge, or Safari and try again.');
     }
   };
 

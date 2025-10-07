@@ -20,7 +20,7 @@ export function SageGreeting() {
         </h1>
 
         <p className="text-slate-400 text-lg">
-          I'm Sage. Let's figure out your event's carbon footprint together - no judgment, just clarity and actionable steps.
+          I'm Sage. Let's figure out your event's carbon footprint together with clarity and actionable steps.
         </p>
       </div>
     </Card>

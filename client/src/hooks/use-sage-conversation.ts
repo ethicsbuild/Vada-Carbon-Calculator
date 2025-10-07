@@ -53,7 +53,7 @@ export function useSageConversation(eventType?: string) {
       role: 'assistant',
       content: eventType
         ? `Hey! I see you're planning a ${eventType}. That's exciting! Let's figure out the carbon footprint together. Tell me a bit about it - how many people are you expecting?`
-        : "Hey friend, planning something special? Tell me about your event and I'll help you understand its carbon footprint. No judgment, just clarity and actionable steps.",
+        : "Hey friend, planning something special? Tell me about your event and I'll help you understand its carbon footprint with clarity and actionable steps.",
       timestamp: new Date()
     };
 

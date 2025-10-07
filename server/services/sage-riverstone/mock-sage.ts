@@ -324,14 +324,19 @@ Your certificate is ready! In a full version, I would generate a PDF here with a
 Want to explore more reduction opportunities before finalizing?`;
       }
 
-      // General follow-up
-      return `I'm here to help! You can ask me to:
-- Explain any of the reduction strategies in more detail
-- Draft messages to your vendors
-- Calculate different scenarios (like changing transport modes)
-- Compare your event to similar ones
+      // General conversational follow-up - avoid repeating the same prompt
+      if (extractedData.shownReductions) {
+        // After showing reductions, give helpful contextual responses
+        if (lowerMsg.match(/thank|thanks|great|appreciate|awesome|perfect/)) {
+          return `You're welcome! Feel free to reach out if you need anything else as you plan your ${eventType}. Good luck making it a sustainable event!`;
+        }
 
-What would you like to explore?`;
+        // General question
+        return `Happy to help with that! Just let me know what you'd like to know more about - I can explain reduction strategies, help draft vendor messages, calculate different scenarios, or compare your event to similar ones.`;
+      }
+
+      // Haven't shown reductions yet, offer to show them
+      return `I've got all your event details. Would you like to see ways to reduce your carbon footprint?`;
     }
 
     // Default follow-up
