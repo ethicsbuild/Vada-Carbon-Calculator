@@ -136,8 +136,8 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
   return (
     <div ref={containerRef} className="grid lg:grid-cols-2 gap-6 h-full">
       {/* Sage's Guidance Column */}
-      <div className="order-2 lg:order-1">
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm h-full flex flex-col">
+      <div className="order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start">
+        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm flex flex-col lg:max-h-[calc(100vh-2rem)]">
           {/* Header */}
           <div className="p-4 border-b border-slate-700/50">
             <div className="flex items-center gap-3">
