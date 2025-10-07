@@ -1,12 +1,13 @@
-import { 
-  users, organizations, carbonCalculations, aiConversations, 
-  carbonReports, userAchievements, emissionFactors,
+import {
+  users, organizations, carbonCalculations, aiConversations,
+  carbonReports, userAchievements, emissionFactors, savedEvents,
   type User, type InsertUser, type Organization, type InsertOrganization,
   type CarbonCalculation, type InsertCarbonCalculation,
   type AiConversation, type InsertAiConversation,
   type CarbonReport, type InsertCarbonReport,
   type UserAchievement, type InsertUserAchievement,
-  type EmissionFactor, type InsertEmissionFactor
+  type EmissionFactor, type InsertEmissionFactor,
+  type SavedEvent, type InsertSavedEvent
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -54,6 +55,13 @@ export interface IStorage {
   getEmissionFactors(): Promise<EmissionFactor[]>;
   getEmissionFactorsByCategory(category: string): Promise<EmissionFactor[]>;
   createEmissionFactor(factor: InsertEmissionFactor): Promise<EmissionFactor>;
+
+  // Saved event operations
+  getSavedEvent(id: number): Promise<SavedEvent | undefined>;
+  getSavedEventsByUser(userId: number): Promise<SavedEvent[]>;
+  getSavedEventsByNameAndYear(userId: number, eventName: string, eventYear: number): Promise<SavedEvent | undefined>;
+  createSavedEvent(event: InsertSavedEvent): Promise<SavedEvent>;
+  updateSavedEvent(id: number, event: Partial<InsertSavedEvent>): Promise<SavedEvent>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -245,6 +253,48 @@ export class DatabaseStorage implements IStorage {
   async createEmissionFactor(insertFactor: InsertEmissionFactor): Promise<EmissionFactor> {
     const [factor] = await db.insert(emissionFactors).values(insertFactor).returning();
     return factor;
+  }
+
+  // Saved event operations
+  async getSavedEvent(id: number): Promise<SavedEvent | undefined> {
+    const [event] = await db.select().from(savedEvents).where(eq(savedEvents.id, id));
+    return event || undefined;
+  }
+
+  async getSavedEventsByUser(userId: number): Promise<SavedEvent[]> {
+    return await db
+      .select()
+      .from(savedEvents)
+      .where(eq(savedEvents.userId, userId))
+      .orderBy(desc(savedEvents.eventYear), desc(savedEvents.eventDate));
+  }
+
+  async getSavedEventsByNameAndYear(userId: number, eventName: string, eventYear: number): Promise<SavedEvent | undefined> {
+    const [event] = await db
+      .select()
+      .from(savedEvents)
+      .where(
+        and(
+          eq(savedEvents.userId, userId),
+          eq(savedEvents.eventName, eventName),
+          eq(savedEvents.eventYear, eventYear)
+        )
+      );
+    return event || undefined;
+  }
+
+  async createSavedEvent(insertEvent: InsertSavedEvent): Promise<SavedEvent> {
+    const [event] = await db.insert(savedEvents).values(insertEvent).returning();
+    return event;
+  }
+
+  async updateSavedEvent(id: number, updateData: Partial<InsertSavedEvent>): Promise<SavedEvent> {
+    const [event] = await db
+      .update(savedEvents)
+      .set({ ...updateData, updatedAt: new Date() })
+      .where(eq(savedEvents.id, id))
+      .returning();
+    return event;
   }
 }
 

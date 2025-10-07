@@ -5,7 +5,7 @@ import { storage } from "./storage";
 import { carbonCalculatorService } from "./services/carbonCalculator";
 import { aiCoPilotService } from "./services/aiCopilot";
 import { reportGeneratorService } from "./services/reportGenerator";
-import { insertOrganizationSchema, insertCarbonCalculationSchema } from "@shared/schema";
+import { insertOrganizationSchema, insertCarbonCalculationSchema, insertSavedEventSchema } from "@shared/schema";
 import { handleChatWebSocket } from "./routes/chat";
 import { z } from "zod";
 
@@ -480,12 +480,159 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/emission-factors", async (req, res) => {
     try {
       const { category } = req.query;
-      const factors = category 
+      const factors = category
         ? await storage.getEmissionFactorsByCategory(category as string)
         : await storage.getEmissionFactors();
       res.json(factors);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch emission factors" });
+    }
+  });
+
+  // Saved events routes
+  app.post("/api/events/save", async (req, res) => {
+    try {
+      const eventData = req.body;
+
+      // Check if this event already exists (same name + year for user)
+      if (eventData.userId && eventData.eventName && eventData.eventYear) {
+        const existingEvent = await storage.getSavedEventsByNameAndYear(
+          eventData.userId,
+          eventData.eventName,
+          eventData.eventYear
+        );
+
+        // If exists and they want to track year-over-year, link to previous
+        if (existingEvent) {
+          // Update existing event instead of creating new
+          const updatedEvent = await storage.updateSavedEvent(existingEvent.id, eventData);
+          return res.json(updatedEvent);
+        }
+      }
+
+      // Look for previous year's event for comparison
+      if (eventData.userId && eventData.eventName && eventData.eventYear) {
+        const previousYear = eventData.eventYear - 1;
+        const previousEvent = await storage.getSavedEventsByNameAndYear(
+          eventData.userId,
+          eventData.eventName,
+          previousYear
+        );
+
+        if (previousEvent && previousEvent.totalEmissions && eventData.totalEmissions) {
+          const currentEmissions = parseFloat(eventData.totalEmissions);
+          const previousEmissions = parseFloat(previousEvent.totalEmissions);
+          const change = ((currentEmissions - previousEmissions) / previousEmissions) * 100;
+
+          eventData.previousEventId = previousEvent.id;
+          eventData.emissionsChange = change.toFixed(2);
+        }
+      }
+
+      const validatedData = insertSavedEventSchema.parse(eventData);
+      const savedEvent = await storage.createSavedEvent(validatedData);
+
+      console.log('💾 Event saved:', {
+        name: savedEvent.eventName,
+        year: savedEvent.eventYear,
+        total: savedEvent.totalEmissions
+      });
+
+      res.status(201).json(savedEvent);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid event data", errors: error.errors });
+      }
+      console.error('❌ Save event error:', error);
+      res.status(500).json({ message: "Failed to save event" });
+    }
+  });
+
+  app.get("/api/events/user/:userId", async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      const events = await storage.getSavedEventsByUser(userId);
+      res.json(events);
+    } catch (error) {
+      console.error('Failed to fetch user events:', error);
+      res.status(500).json({ message: "Failed to fetch user events" });
+    }
+  });
+
+  app.get("/api/events/:id", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const event = await storage.getSavedEvent(eventId);
+      if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+      res.json(event);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch event" });
+    }
+  });
+
+  app.put("/api/events/:id", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const updateData = req.body;
+      const updatedEvent = await storage.updateSavedEvent(eventId, updateData);
+
+      console.log('📝 Event updated:', {
+        id: eventId,
+        updates: Object.keys(updateData)
+      });
+
+      res.json(updatedEvent);
+    } catch (error) {
+      console.error('Failed to update event:', error);
+      res.status(500).json({ message: "Failed to update event" });
+    }
+  });
+
+  app.get("/api/events/comparison/:id", async (req, res) => {
+    try {
+      const eventId = parseInt(req.params.id);
+      const event = await storage.getSavedEvent(eventId);
+
+      if (!event) {
+        return res.status(404).json({ message: "Event not found" });
+      }
+
+      // Get previous event if linked
+      let previousEvent = null;
+      if (event.previousEventId) {
+        previousEvent = await storage.getSavedEvent(event.previousEventId);
+      }
+
+      // Get all events with same name for this user (historical trend)
+      const userId = event.userId;
+      const eventName = event.eventName;
+
+      if (userId) {
+        const allUserEvents = await storage.getSavedEventsByUser(userId);
+        const historicalEvents = allUserEvents.filter(e => e.eventName === eventName);
+
+        res.json({
+          currentEvent: event,
+          previousEvent,
+          historicalTrend: historicalEvents.map(e => ({
+            year: e.eventYear,
+            totalEmissions: e.totalEmissions,
+            emissionsPerAttendee: e.emissionsPerAttendee,
+            performance: e.performance
+          }))
+        });
+      } else {
+        res.json({
+          currentEvent: event,
+          previousEvent,
+          historicalTrend: []
+        });
+      }
+    } catch (error) {
+      console.error('Failed to fetch comparison:', error);
+      res.status(500).json({ message: "Failed to fetch comparison data" });
     }
   });
 

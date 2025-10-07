@@ -250,6 +250,47 @@ export const carbonCertificates = pgTable("carbon_certificates", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Saved Events for tracking over time
+export const savedEvents = pgTable("saved_events", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id),
+  eventName: text("event_name").notNull(),
+  eventType: text("event_type").notNull(), // festival, conference, wedding, concert, etc.
+  eventYear: integer("event_year").notNull(),
+  eventDate: timestamp("event_date"),
+  attendance: integer("attendance").notNull(),
+  location: text("location"),
+
+  // Form data stored as JSON for flexibility
+  formData: jsonb("form_data").notNull(),
+
+  // Calculated emissions results
+  totalEmissions: decimal("total_emissions", { precision: 10, scale: 3 }),
+  transportationEmissions: decimal("transportation_emissions", { precision: 10, scale: 3 }),
+  energyEmissions: decimal("energy_emissions", { precision: 10, scale: 3 }),
+  cateringEmissions: decimal("catering_emissions", { precision: 10, scale: 3 }),
+  wasteEmissions: decimal("waste_emissions", { precision: 10, scale: 3 }),
+  productionEmissions: decimal("production_emissions", { precision: 10, scale: 3 }),
+  venueEmissions: decimal("venue_emissions", { precision: 10, scale: 3 }),
+  emissionsPerAttendee: decimal("emissions_per_attendee", { precision: 10, scale: 6 }),
+
+  // Benchmarking
+  industryAverage: decimal("industry_average", { precision: 10, scale: 6 }),
+  percentile: integer("percentile"),
+  performance: text("performance"), // excellent, good, average, needs improvement, poor
+
+  // Improvements tracking
+  notes: text("notes"),
+  improvementsImplemented: jsonb("improvements_implemented"), // Array of implemented recommendations
+
+  // Comparison with previous year
+  previousEventId: integer("previous_event_id").references(() => savedEvents.id),
+  emissionsChange: decimal("emissions_change", { precision: 5, scale: 2 }), // percentage change from previous
+
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Relations
 export const organizationsRelations = relations(organizations, ({ one, many }) => ({
   owner: one(users, { fields: [organizations.ownerId], references: [users.id] }),
@@ -316,6 +357,11 @@ export const auditLogsRelations = relations(auditLogs, ({ one }) => ({
 
 export const carbonCertificatesRelations = relations(carbonCertificates, ({ one }) => ({
   calculation: one(carbonCalculations, { fields: [carbonCertificates.calculationId], references: [carbonCalculations.id] }),
+}));
+
+export const savedEventsRelations = relations(savedEvents, ({ one }) => ({
+  user: one(users, { fields: [savedEvents.userId], references: [users.id] }),
+  previousEvent: one(savedEvents, { fields: [savedEvents.previousEventId], references: [savedEvents.id] }),
 }));
 
 // Zod schemas
@@ -410,6 +456,12 @@ export const insertCarbonCertificateSchema = createInsertSchema(carbonCertificat
   createdAt: true,
 });
 
+export const insertSavedEventSchema = createInsertSchema(savedEvents).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -458,3 +510,6 @@ export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 
 export type CarbonCertificate = typeof carbonCertificates.$inferSelect;
 export type InsertCarbonCertificate = z.infer<typeof insertCarbonCertificateSchema>;
+
+export type SavedEvent = typeof savedEvents.$inferSelect;
+export type InsertSavedEvent = z.infer<typeof insertSavedEventSchema>;
