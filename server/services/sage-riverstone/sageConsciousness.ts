@@ -47,14 +47,10 @@ Current context: {context}
 User message: {message}`;
 
 export class SageConsciousness {
-  private conversationHistory: Array<{role: string, content: string}> = [];
+  private conversationHistory: Array<{role: 'user' | 'assistant', content: string}> = [];
 
   constructor() {
-    // Initialize with Sage's base consciousness
-    this.conversationHistory.push({
-      role: 'system',
-      content: SAGE_RIVERSTONE_PROMPT.replace('{context}', '').replace('{message}', '')
-    });
+    // Don't add system message to history - it goes in the system parameter instead
   }
 
   async respond(
@@ -197,10 +193,7 @@ export class SageConsciousness {
 
   // Reset conversation
   reset() {
-    this.conversationHistory = [{
-      role: 'system',
-      content: SAGE_RIVERSTONE_PROMPT.replace('{context}', '').replace('{message}', '')
-    }];
+    this.conversationHistory = [];
   }
 }
 
