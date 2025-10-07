@@ -215,10 +215,10 @@ export function CaseStudies() {
 
         {/* Bottom CTA */}
         <Card className="mt-12 bg-gradient-to-br from-emerald-500/20 to-violet-500/20 border-emerald-500/30 p-8 text-center">
-          <h3 className="text-2xl font-bold text-white mb-3">
+          <h3 className="text-2xl font-bold text-slate-900 mb-3">
             Your Event Could Be Next
           </h3>
-          <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
+          <p className="text-slate-800 mb-6 max-w-2xl mx-auto">
             Whether you're planning a festival, conference, wedding, or corporate event—these producers
             started exactly where you are. They calculated, tried things, learned from mistakes, and improved. You can too.
           </p>
