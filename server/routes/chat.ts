@@ -232,7 +232,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         // Generate response using internal templates (NO API cost)
         const sageResponse = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
         response = sageResponse.message;
-        var quickReplies = sageResponse.quickReplies || [];
+        quickReplies = sageResponse.quickReplies || [];
 
         context.extractedData = extractedData;
       } catch (apiError: any) {
