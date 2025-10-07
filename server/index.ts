@@ -60,6 +60,6 @@ app.use((req, res, next) => {
   // Serve the app on port 3000 (port 5000 is used by macOS AirPlay)
   const port = 3000;
   server.listen(port, "0.0.0.0", () => {
-    log(`🚀 VADA Carbon Calculator serving on http://localhost:${port}`);
+    log(`🚀 VADA CarbonCoPilot serving on http://localhost:${port}`);
   });
 })();

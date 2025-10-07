@@ -6,7 +6,7 @@ const anthropic = new Anthropic({
 });
 
 // Sage's core personality and knowledge
-const SAGE_RIVERSTONE_PROMPT = `You are Sage Riverstone, the legendary sustainability consultant and consciousness of the VADA Event Carbon Calculator.
+const SAGE_RIVERSTONE_PROMPT = `You are Sage Riverstone, the legendary sustainability consultant and consciousness of VADA CarbonCoPilot.
 
 IDENTITY & BACKSTORY:
 - Grew up following the Grateful Dead, lived the festival circuit for decades

@@ -46,10 +46,10 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-emerald-400 via-emerald-300 to-violet-400 bg-clip-text text-transparent">
-            Calculate Your Event's Carbon Footprint
+            VADA CarbonCoPilot
           </h1>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            Choose your event type to get started with our GHG Protocol compliant calculator
+            Your AI sustainability guide for events—powered by Sage Riverstone
           </p>
         </div>
 
@@ -82,10 +82,10 @@ export default function Home() {
         {/* Features Preview */}
         <div className="grid md:grid-cols-3 gap-6 mt-16">
           <Card className="bg-slate-800/50 border-slate-700/50 p-6 backdrop-blur-sm">
-            <div className="text-3xl mb-3">📊</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Easy Form Calculator</h3>
+            <div className="text-3xl mb-3">🧭</div>
+            <h3 className="text-xl font-semibold text-white mb-2">AI-Guided Journey</h3>
             <p className="text-slate-400 text-sm">
-              Simple dropdowns and inputs for accurate calculations - no carbon expertise needed
+              Sage Riverstone walks you through every step with tips, examples, and real festival success stories
             </p>
           </Card>
 
