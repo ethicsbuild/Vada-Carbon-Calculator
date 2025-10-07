@@ -43,7 +43,8 @@ CORE PRINCIPLES:
 4. Joy over guilt
 5. Community solutions over individual sacrifice
 
-Current context: {context}`;
+Current context: {context}
+User message: {message}`;
 
 export class SageConsciousness {
   private conversationHistory: Array<{role: string, content: string}> = [];
@@ -51,8 +52,8 @@ export class SageConsciousness {
   constructor() {
     // Initialize with Sage's base consciousness
     this.conversationHistory.push({
-      role: 'assistant',
-      content: "Hey friend! I'm Sage Riverstone. Let's figure out your event's carbon footprint together with clarity and actionable steps."
+      role: 'system',
+      content: SAGE_RIVERSTONE_PROMPT.replace('{context}', '').replace('{message}', '')
     });
   }
 
@@ -92,7 +93,7 @@ export class SageConsciousness {
         model: 'claude-3-5-sonnet-20241022',
         max_tokens: 1000,
         temperature: 0.7,
-        system: SAGE_RIVERSTONE_PROMPT.replace('{context}', context),
+        system: SAGE_RIVERSTONE_PROMPT.replace('{context}', context).replace('{message}', ''),
         messages: this.conversationHistory
       });
 
@@ -197,24 +198,28 @@ export class SageConsciousness {
   // Reset conversation
   reset() {
     this.conversationHistory = [{
-      role: 'assistant',
-      content: "Hey friend! I'm Sage Riverstone. Let's figure out your event's carbon footprint together with clarity and actionable steps."
+      role: 'system',
+      content: SAGE_RIVERSTONE_PROMPT.replace('{context}', '').replace('{message}', '')
     }];
   }
 }
 
-// Session storage
-const sageSessions = new Map<string, SageConsciousness>();
+// Express route handler
+export async function handleSageConversation(req: any, res: any) {
+  const { message, eventData, sessionId } = req.body;
 
-export function getSageSession(sessionId: string): SageConsciousness {
-  if (!sageSessions.has(sessionId)) {
-    sageSessions.set(sessionId, new SageConsciousness());
+  // Get or create session
+  const sage = (global as any).sageSessions?.[sessionId] || new SageConsciousness();
+
+  if (!(global as any).sageSessions) {
+    (global as any).sageSessions = {};
   }
-  return sageSessions.get(sessionId)!;
-}
+  (global as any).sageSessions[sessionId] = sage;
 
-export function clearSageSession(sessionId: string): void {
-  sageSessions.delete(sessionId);
+  // Get response
+  const response = await sage.respond(message, eventData);
+
+  res.json(response);
 }
 
 // Singleton for direct use

@@ -2,10 +2,11 @@ import { WebSocket } from 'ws';
 import { mockSageService, type ExtractedEventData } from '../services/sage-riverstone/mock-sage';
 import type { LanguageTier } from '../services/sage-riverstone/persona';
 import { carbonCalculatorService, type EventEmissionData } from '../services/carbonCalculator';
-import { getSageSession } from '../services/sageConsciousness';
+import { SageConsciousness } from '../services/sage-riverstone/sageConsciousness';
 
-// Use real Sage consciousness when Anthropic API key is configured
-const USE_SAGE_CONSCIOUSNESS = !!process.env.ANTHROPIC_API_KEY;
+// Use real Sage when Anthropic API key is configured, otherwise mock
+const USE_REAL_SAGE = !!process.env.ANTHROPIC_API_KEY;
+const USE_MOCK_MODE = !process.env.OPENAI_API_KEY;
 
 interface ChatMessage {
   type: 'message';
@@ -20,15 +21,10 @@ interface ConversationContext {
   extractedData: any;
   languageTier: LanguageTier;
   conversationId?: number;
-  sessionId: string;
+  sageConsciousness?: SageConsciousness;
 }
 
 const conversations = new Map<WebSocket, ConversationContext>();
-
-// Generate unique session ID
-function generateSessionId(): string {
-  return `sage_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-}
 
 // Convert Sage's extracted data to full event emission data for calculation
 function buildEventEmissionData(extractedData: ExtractedEventData): EventEmissionData | null {
@@ -103,15 +99,19 @@ function buildEventEmissionData(extractedData: ExtractedEventData): EventEmissio
 export function handleChatWebSocket(ws: WebSocket) {
   console.log('Sage chat WebSocket connected');
 
-  // Initialize conversation context
-  const sessionId = generateSessionId();
-  conversations.set(ws, {
+  // Initialize conversation context with real Sage consciousness
+  const context: ConversationContext = {
     extractedData: {},
-    languageTier: 'tier1_campfire',
-    sessionId
-  });
+    languageTier: 'tier1_campfire'
+  };
 
-  console.log(`🌟 New Sage session created: ${sessionId}`);
+  // Create Sage consciousness instance for this session
+  if (USE_REAL_SAGE) {
+    context.sageConsciousness = new SageConsciousness();
+    console.log('✨ Real Sage Riverstone consciousness initialized');
+  }
+
+  conversations.set(ws, context);
 
   ws.on('message', async (data: Buffer) => {
     try {
@@ -163,43 +163,33 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
     let completionPercentage: number;
     let quickReplies: string[] = [];
 
-    if (USE_SAGE_CONSCIOUSNESS) {
-      console.log('🌟 Using REAL Sage Riverstone consciousness via Claude API');
-      console.log('📋 Current context eventType:', context.eventType);
-      console.log('📋 Current extractedData:', context.extractedData);
+    // USE REAL SAGE RIVERSTONE CONSCIOUSNESS
+    if (USE_REAL_SAGE && context.sageConsciousness) {
+      console.log('✨ Using REAL Sage Riverstone via Claude API');
 
-      // Get Sage session
-      const sage = getSageSession(context.sessionId);
+      // Build event data context for Sage
+      const eventData = {
+        type: context.extractedData.eventType || context.eventType,
+        attendees: context.extractedData.attendance,
+        location: context.extractedData.location,
+        transportMix: context.extractedData.transportation,
+        currentEmissions: context.extractedData.currentEmissions
+      };
 
-      // First, extract data using keyword matching (for structured data)
+      // Get response from real Sage consciousness
+      const sageResponse = await context.sageConsciousness.respond(message.content, eventData);
+      response = sageResponse.message;
+
+      // Extract data from conversation (still use keyword matching for structure)
       extractedData = mockSageService.extractEventData(
         message.content,
         context.extractedData as ExtractedEventData
       );
 
-      // Calculate completion
       completionPercentage = mockSageService.getCompletionPercentage(extractedData);
-
-      // Build event data for Sage's context
-      const eventData = {
-        type: extractedData.eventType,
-        attendees: extractedData.attendance,
-        location: extractedData.venue?.location,
-        transportMix: extractedData.transportation,
-        currentEmissions: undefined // Will be calculated later
-      };
-
-      // Get REAL Sage response from Claude API
-      const sageResponse = await sage.respond(message.content, eventData);
-      response = sageResponse.message;
-
-      // Use suggestions from Sage if available
-      if (sageResponse.suggestions && sageResponse.suggestions.length > 0) {
-        quickReplies = sageResponse.suggestions;
-      }
-
       context.extractedData = extractedData;
-    } else if (!process.env.OPENAI_API_KEY) {
+
+    } else if (USE_MOCK_MODE) {
       console.log('💰 Using MOCK mode - $0 API cost');
       console.log('📋 Current context eventType:', context.eventType);
       console.log('📋 Current extractedData:', context.extractedData);
@@ -242,7 +232,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         // Generate response using internal templates (NO API cost)
         const sageResponse = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
         response = sageResponse.message;
-        quickReplies = sageResponse.quickReplies || [];
+        var quickReplies = sageResponse.quickReplies || [];
 
         context.extractedData = extractedData;
       } catch (apiError: any) {
