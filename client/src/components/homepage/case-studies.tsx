@@ -1,13 +1,15 @@
 import { Card } from '@/components/ui/card';
-import { TrendingDown, Award, Users } from 'lucide-react';
+import { TrendingDown, TrendingUp, Award, Users, AlertTriangle } from 'lucide-react';
 
 const caseStudies = [
   {
     festival: "Symbiosis Gathering",
+    type: "Festival",
     year: "2019",
     location: "California",
     icon: "🌞",
     attendees: "10,000",
+    outcome: "success",
     challenge: "100% diesel generators costing $60k, massive carbon footprint",
     solution: "Switched to 90% solar panels + battery banks, 10% biodiesel backup",
     results: [
@@ -19,11 +21,67 @@ const caseStudies = [
     author: "Jason Sweeney, Production Director"
   },
   {
+    festival: "Tech Summit 2022",
+    type: "Conference",
+    year: "2022",
+    location: "Austin, TX",
+    icon: "💼",
+    attendees: "5,000",
+    outcome: "failure",
+    challenge: "Promised carbon-neutral conference with compostable serviceware and local catering",
+    solution: "Bought compostable cups/plates but venue had no composting infrastructure—everything went to landfill",
+    results: [
+      { metric: "Carbon Increase", value: "+12%", icon: TrendingUp },
+      { metric: "Wasted Investment", value: "$18k", icon: AlertTriangle },
+      { metric: "Attendee Trust", value: "Damaged", icon: AlertTriangle }
+    ],
+    quote: "We learned the hard way: compostables mean nothing without composting. Now we verify infrastructure BEFORE buying serviceware. Lesson learned.",
+    author: "Rachel Kim, Event Director"
+  },
+  {
+    festival: "Bonnaroo Music Festival",
+    type: "Festival",
+    year: "2017-Present",
+    location: "Tennessee",
+    icon: "🌾",
+    attendees: "80,000",
+    outcome: "success",
+    challenge: "Food from national distributors trucked in from hundreds of miles away",
+    solution: "'Farm to Festival' program requiring vendors to source 50%+ from local farms",
+    results: [
+      { metric: "Food Miles Reduced", value: "62%", icon: TrendingDown },
+      { metric: "Local Economy Impact", value: "$2.3M", icon: Award },
+      { metric: "Food Quality Rating", value: "+28%", icon: Users }
+    ],
+    quote: "Attendees didn't just taste the difference—they felt connected to the region. Local farms became part of our story.",
+    author: "Dave Ewers, Sustainability Team"
+  },
+  {
+    festival: "Sarah & Michael's Wedding",
+    type: "Wedding",
+    year: "2023",
+    location: "Vermont",
+    icon: "💍",
+    attendees: "150",
+    outcome: "success",
+    challenge: "Guests flying in from 12 different states, huge transportation footprint",
+    solution: "Chose venue walking distance from hotel, arranged shuttle service, sent carpool matching list 2 months early",
+    results: [
+      { metric: "Solo Drivers", value: "-68%", icon: TrendingDown },
+      { metric: "Guest Connections", value: "Amazing", icon: Award },
+      { metric: "Carbon per Guest", value: "-41%", icon: TrendingDown }
+    ],
+    quote: "Our carpool matching turned strangers into friends. Three couples who shared rides are now close friends. Sustainability brought our community together.",
+    author: "Sarah Martinez, Bride"
+  },
+  {
     festival: "Lightning in a Bottle",
+    type: "Festival",
     year: "2018",
     location: "California",
     icon: "🚌",
     attendees: "20,000",
+    outcome: "success",
     challenge: "Attendees driving individually from SF/LA, massive parking and emissions",
     solution: "Partnered with charter bus companies, offered ticket discounts for bus riders",
     results: [
@@ -35,20 +93,22 @@ const caseStudies = [
     author: "Dede Flemming, Sustainability Coordinator"
   },
   {
-    festival: "Bonnaroo Music Festival",
-    year: "2017-Present",
-    location: "Tennessee",
-    icon: "🌾",
-    attendees: "80,000",
-    challenge: "Food from national distributors trucked in from hundreds of miles away",
-    solution: "'Farm to Festival' program requiring vendors to source 50%+ from local farms",
+    festival: "Corporate Annual Meeting",
+    type: "Corporate Event",
+    year: "2021",
+    location: "Chicago",
+    icon: "🏢",
+    attendees: "800",
+    outcome: "mixed",
+    challenge: "International team flying to HQ for 3-day annual meeting, 400+ flights",
+    solution: "Made it hybrid—half virtual, half in-person. Flew only senior leadership and regional reps.",
     results: [
-      { metric: "Food Miles Reduced", value: "62%", icon: TrendingDown },
-      { metric: "Local Economy Impact", value: "$2.3M", icon: Award },
-      { metric: "Food Quality Rating", value: "+28%", icon: Users }
+      { metric: "Flights Reduced", value: "71%", icon: TrendingDown },
+      { metric: "Engagement Drop", value: "-23%", icon: AlertTriangle },
+      { metric: "Cost Savings", value: "$340k", icon: Award }
     ],
-    quote: "Attendees didn't just taste the difference—they felt connected to the region. Local farms became part of our story.",
-    author: "Dave Ewers, Sustainability Team"
+    quote: "Carbon wins, engagement loss. Next year we're doing regional hubs with virtual connections instead of pure hybrid. Finding the right balance takes iteration.",
+    author: "Marcus Johnson, Chief Sustainability Officer"
   }
 ];
 
@@ -59,11 +119,11 @@ export function CaseStudies() {
         {/* Header */}
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Real Festivals. Real Results.
+            Real Events. Real Results.
           </h2>
           <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-            These aren't hypotheticals—they're proven strategies from festivals that succeeded.
-            Learn from their wins (and mistakes).
+            These aren't hypotheticals—they're real stories from event producers who tried, succeeded,
+            and sometimes failed. Learn from both the wins and the mistakes.
           </p>
         </div>
 
@@ -79,6 +139,13 @@ export function CaseStudies() {
                     <div>
                       <h3 className="text-2xl font-bold text-white mb-1">{study.festival}</h3>
                       <div className="flex items-center gap-3 text-sm text-slate-400">
+                        <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
+                          study.outcome === 'success' ? 'bg-emerald-500/20 text-emerald-400' :
+                          study.outcome === 'failure' ? 'bg-red-500/20 text-red-400' :
+                          'bg-yellow-500/20 text-yellow-400'
+                        }`}>
+                          {study.type}
+                        </span>
                         <span>{study.location}</span>
                         <span>•</span>
                         <span>{study.year}</span>
@@ -96,7 +163,15 @@ export function CaseStudies() {
                     <p className="text-slate-300 text-sm">{study.challenge}</p>
                   </div>
                   <div className="bg-slate-900/50 rounded-lg p-4">
-                    <div className="text-xs font-semibold text-emerald-400 mb-2">💡 THE SOLUTION</div>
+                    <div className={`text-xs font-semibold mb-2 ${
+                      study.outcome === 'success' ? 'text-emerald-400' :
+                      study.outcome === 'failure' ? 'text-orange-400' :
+                      'text-yellow-400'
+                    }`}>
+                      {study.outcome === 'success' ? '💡 THE SOLUTION' :
+                       study.outcome === 'failure' ? '⚠️ WHAT HAPPENED' :
+                       '🔄 WHAT THEY TRIED'}
+                    </div>
                     <p className="text-slate-300 text-sm">{study.solution}</p>
                   </div>
                 </div>
@@ -105,20 +180,31 @@ export function CaseStudies() {
                 <div className="grid md:grid-cols-3 gap-4 mb-6">
                   {study.results.map((result, i) => {
                     const Icon = result.icon;
+                    const isNegative = result.icon === TrendingUp || result.icon === AlertTriangle;
                     return (
-                      <div key={i} className="bg-gradient-to-br from-emerald-500/10 to-violet-500/10 border border-emerald-500/20 rounded-lg p-4">
+                      <div key={i} className={`bg-gradient-to-br ${
+                        isNegative
+                          ? 'from-red-500/10 to-orange-500/10 border-red-500/20'
+                          : 'from-emerald-500/10 to-violet-500/10 border-emerald-500/20'
+                      } border rounded-lg p-4`}>
                         <div className="flex items-center gap-2 mb-2">
-                          <Icon className="w-4 h-4 text-emerald-400" />
+                          <Icon className={`w-4 h-4 ${isNegative ? 'text-orange-400' : 'text-emerald-400'}`} />
                           <div className="text-xs font-semibold text-slate-400">{result.metric}</div>
                         </div>
-                        <div className="text-2xl font-bold text-white">{result.value}</div>
+                        <div className={`text-2xl font-bold ${isNegative ? 'text-orange-300' : 'text-white'}`}>
+                          {result.value}
+                        </div>
                       </div>
                     );
                   })}
                 </div>
 
                 {/* Quote */}
-                <div className="border-l-4 border-emerald-500/50 pl-4 py-2 bg-slate-900/30 rounded-r-lg">
+                <div className={`border-l-4 pl-4 py-2 bg-slate-900/30 rounded-r-lg ${
+                  study.outcome === 'success' ? 'border-emerald-500/50' :
+                  study.outcome === 'failure' ? 'border-orange-500/50' :
+                  'border-yellow-500/50'
+                }`}>
                   <p className="text-slate-300 italic mb-2">"{study.quote}"</p>
                   <p className="text-sm text-slate-500">— {study.author}</p>
                 </div>
@@ -130,11 +216,11 @@ export function CaseStudies() {
         {/* Bottom CTA */}
         <Card className="mt-12 bg-gradient-to-br from-emerald-500/20 to-violet-500/20 border-emerald-500/30 p-8 text-center">
           <h3 className="text-2xl font-bold text-white mb-3">
-            Your Festival Could Be Next
+            Your Event Could Be Next
           </h3>
           <p className="text-slate-300 mb-6 max-w-2xl mx-auto">
-            These festivals started exactly where you are now. They calculated their footprint,
-            picked 2-3 high-impact actions, and made it happen. You can too.
+            Whether you're planning a festival, conference, wedding, or corporate event—these producers
+            started exactly where you are. They calculated, tried things, learned from mistakes, and improved. You can too.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="/calculator">
