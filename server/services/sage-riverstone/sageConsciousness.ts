@@ -90,7 +90,7 @@ export class SageConsciousness {
 
     try {
       const response = await anthropic.messages.create({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20250219',
         max_tokens: 1000,
         temperature: 0.7,
         system: SAGE_RIVERSTONE_PROMPT.replace('{context}', context).replace('{message}', ''),
