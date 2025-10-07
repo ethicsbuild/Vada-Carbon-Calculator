@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, TrendingUp, Award, AlertTriangle } from 'lucide-react';
+import { TrendingDown, TrendingUp, Award, AlertTriangle, Save, History } from 'lucide-react';
 import { HumanScaleComparisons } from './human-scale-comparisons';
 import { ActionableRecommendations } from './actionable-recommendations';
+import { SaveEventDialog } from '../events/save-event-dialog';
 
 interface CarbonResultsProps {
   calculation: {
@@ -29,6 +32,7 @@ interface CarbonResultsProps {
 
 export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
   const { total, emissionsPerAttendee, benchmarkComparison } = calculation;
+  const [saveDialogOpen, setSaveDialogOpen] = useState(false);
 
   // Determine if below or above average
   const percentDiff = ((emissionsPerAttendee - benchmarkComparison.industryAverage) / benchmarkComparison.industryAverage) * 100;
@@ -132,6 +136,25 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
             </p>
           </div>
 
+          {/* Action Buttons */}
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setSaveDialogOpen(true)}
+              className="flex-1 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+            >
+              <Save className="w-4 h-4 mr-2" />
+              Save This Event
+            </Button>
+            <Button
+              variant="outline"
+              className="border-slate-600 text-slate-300 hover:bg-slate-700"
+              onClick={() => window.location.href = '/history'}
+            >
+              <History className="w-4 h-4 mr-2" />
+              View History
+            </Button>
+          </div>
+
           {/* Emissions Breakdown */}
           <div>
             <h4 className="text-slate-300 font-medium mb-3">Emissions Breakdown</h4>
@@ -186,6 +209,18 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
           />
         </TabsContent>
       </Tabs>
+
+      {/* Save Event Dialog */}
+      <SaveEventDialog
+        open={saveDialogOpen}
+        onOpenChange={setSaveDialogOpen}
+        calculation={calculation}
+        eventData={eventData || {}}
+        onSaveSuccess={() => {
+          // Could show a success toast here
+          console.log('Event saved successfully!');
+        }}
+      />
     </div>
   );
 }
