@@ -60,9 +60,10 @@ interface EventFormData {
 
 interface EventFormCalculatorProps {
   initialEventType?: string;
+  onSectionChange?: (section: string) => void;
 }
 
-export function EventFormCalculator({ initialEventType }: EventFormCalculatorProps) {
+export function EventFormCalculator({ initialEventType, onSectionChange }: EventFormCalculatorProps) {
   const [formData, setFormData] = useState<EventFormData>({
     eventType: initialEventType || '',
     attendance: 0,

@@ -9,11 +9,16 @@ const USE_REAL_SAGE = !!process.env.ANTHROPIC_API_KEY;
 const USE_MOCK_MODE = !process.env.OPENAI_API_KEY;
 
 interface ChatMessage {
-  type: 'message';
-  content: string;
+  type: 'message' | 'context' | 'context-update';
+  content?: string;
+  message?: string;
   conversationId?: number;
   eventType?: string;
   extractedData?: any;
+  mode?: string;
+  section?: string;
+  action?: string;
+  data?: any;
 }
 
 interface ConversationContext {
@@ -117,8 +122,10 @@ export function handleChatWebSocket(ws: WebSocket) {
     try {
       const message: ChatMessage = JSON.parse(data.toString());
 
-      if (message.type === 'message') {
+      if (message.type === 'message' || message.type === 'context') {
         await handleMessage(ws, message);
+      } else if (message.type === 'context-update') {
+        await handleContextUpdate(ws, message);
       }
     } catch (error) {
       console.error('Error handling chat message:', error);
@@ -140,9 +147,36 @@ export function handleChatWebSocket(ws: WebSocket) {
   });
 }
 
+// Handle contextual guidance based on form section
+async function handleContextUpdate(ws: WebSocket, message: ChatMessage) {
+  const context = conversations.get(ws);
+  if (!context) return;
+
+  const section = message.section || 'unknown';
+  const action = message.action || 'entered';
+
+  // Provide contextual tips based on section
+  const contextualTips: Record<string, string> = {
+    'transportation': "Transportation is usually the biggest carbon source—every mile matters! Consider charter buses from major cities or carpooling incentives. I've seen Lightning in a Bottle cut vehicle emissions by 35% with SF and LA bus charters.",
+    'energy': "Power is critical! Solar + battery systems are the sweet spot—quieter, cleaner, and often cheaper than diesel generators. Symbiosis saved $50k/year switching to 90% solar.",
+    'food': "Food sourcing makes a huge impact. Local food can cut emissions by 30-60% AND tastes better. Bonnaroo's 'Farm to Festival' program reduced food miles by 62% while boosting the local economy by $2.3M.",
+    'welcome': "Let's calculate your event's carbon footprint together! Fill out the basics on the right, and I'll guide you through each section with tips and real examples from festivals I've worked with."
+  };
+
+  const tip = contextualTips[section] || "Looking good! Keep filling out the details, and I'll help you optimize as we go.";
+
+  ws.send(JSON.stringify({
+    type: 'response',
+    response: tip
+  }));
+}
+
 async function handleMessage(ws: WebSocket, message: ChatMessage) {
   const context = conversations.get(ws);
   if (!context) return;
+
+  // Get message content
+  const userMessage = message.content || message.message || '';
 
   // Update context with message data
   if (message.eventType) {
@@ -178,12 +212,12 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         };
 
         // Get response from real Sage consciousness
-        const sageResponse = await context.sageConsciousness.respond(message.content, eventData);
+        const sageResponse = await context.sageConsciousness.respond(userMessage, eventData);
         response = sageResponse.message;
 
         // Extract data from conversation (still use keyword matching for structure)
         extractedData = mockSageService.extractEventData(
-          message.content,
+          userMessage,
           context.extractedData as ExtractedEventData
         );
 
@@ -194,11 +228,11 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         console.warn('⚠️ Real Sage failed, falling back to MOCK mode:', sageError.message);
 
         extractedData = mockSageService.extractEventData(
-          message.content,
+          userMessage,
           context.extractedData as ExtractedEventData
         );
 
-        const mockResponse = mockSageService.generateResponse(message.content, extractedData);
+        const mockResponse = mockSageService.generateResponse(userMessage, extractedData);
         response = mockResponse.message;
         quickReplies = mockResponse.quickReplies || [];
         completionPercentage = mockSageService.getCompletionPercentage(extractedData);
@@ -212,12 +246,12 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
 
       // Extract data using keyword matching (no API)
       extractedData = mockSageService.extractEventData(
-        message.content,
+        userMessage,
         context.extractedData as ExtractedEventData
       );
 
       // Generate response using templates (no API)
-      const sageResponse = mockSageService.generateResponse(message.content, extractedData);
+      const sageResponse = mockSageService.generateResponse(userMessage, extractedData);
       response = sageResponse.message;
       quickReplies = sageResponse.quickReplies || [];
 
@@ -232,7 +266,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         // Use OpenAI ONLY for data extraction (not response generation)
         const { conversationalIntakeService } = await import('../services/sage-riverstone/conversational-intake');
         const extraction = await conversationalIntakeService.extractEventData(
-          message.content,
+          userMessage,
           context.extractedData,
           context.languageTier
         );
@@ -246,7 +280,7 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
         completionPercentage = conversationalIntakeService.getCompletionPercentage(extraction.extractedData);
 
         // Generate response using internal templates (NO API cost)
-        const sageResponse = mockSageService.generateResponse(message.content, extractedData as ExtractedEventData);
+        const sageResponse = mockSageService.generateResponse(userMessage, extractedData as ExtractedEventData);
         response = sageResponse.message;
         quickReplies = sageResponse.quickReplies || [];
 

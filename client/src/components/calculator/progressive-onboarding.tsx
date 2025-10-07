@@ -5,7 +5,7 @@ import { Progress } from '@/components/ui/progress';
 import { ChevronRight, ChevronLeft, Sparkles } from 'lucide-react';
 
 interface ProgressiveOnboardingProps {
-  onComplete: (shouldShowAdvanced: boolean) => void;
+  onComplete: () => void;
   eventType?: string;
 }
 
@@ -18,10 +18,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
   const progress = (step / totalSteps) * 100;
 
   const handleComplete = () => {
-    // If user is experienced or needs detailed, show advanced form
-    // Otherwise, show simplified quick form
-    const showAdvanced = userType === 'experienced' || needsLevel === 'detailed';
-    onComplete(showAdvanced);
+    onComplete();
   };
 
   return (
@@ -182,10 +179,8 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                 Perfect! You're all set.
               </h2>
               <p className="text-slate-300 text-lg mb-6">
-                {needsLevel === 'quick'
-                  ? "We'll keep it simple with just the essentials. You can always add more detail later."
-                  : "We'll show you all the granular controls for maximum accuracy. You can always skip sections if you don't have the data yet."
-                }
+                Sage Riverstone will be your guide throughout the calculation. She'll explain each field,
+                provide tips, and help you make informed decisions. Let's get started!
               </p>
 
               {eventType && (
@@ -214,9 +209,8 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                 <div className="bg-gradient-to-r from-violet-500/10 to-emerald-500/10 border border-violet-500/20 rounded-lg p-4 text-left">
                   <div className="text-sm font-semibold text-violet-400 mb-2">🎯 Nice!</div>
                   <p className="text-slate-300 text-sm">
-                    Since you're experienced, you'll get access to advanced features like transport groups,
-                    meal breakdowns, and equipment scaling. The results will include detailed recommendations
-                    with vendor contacts.
+                    Perfect! Sage will guide you through a comprehensive calculation with all the granular details.
+                    You'll get detailed recommendations with vendor contacts at the end.
                   </p>
                 </div>
               )}
