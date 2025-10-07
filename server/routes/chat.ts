@@ -165,29 +165,45 @@ async function handleMessage(ws: WebSocket, message: ChatMessage) {
 
     // USE REAL SAGE RIVERSTONE CONSCIOUSNESS
     if (USE_REAL_SAGE && context.sageConsciousness) {
-      console.log('✨ Using REAL Sage Riverstone via Claude API');
+      try {
+        console.log('✨ Using REAL Sage Riverstone via Claude API');
 
-      // Build event data context for Sage
-      const eventData = {
-        type: context.extractedData.eventType || context.eventType,
-        attendees: context.extractedData.attendance,
-        location: context.extractedData.location,
-        transportMix: context.extractedData.transportation,
-        currentEmissions: context.extractedData.currentEmissions
-      };
+        // Build event data context for Sage
+        const eventData = {
+          type: context.extractedData.eventType || context.eventType,
+          attendees: context.extractedData.attendance,
+          location: context.extractedData.location,
+          transportMix: context.extractedData.transportation,
+          currentEmissions: context.extractedData.currentEmissions
+        };
 
-      // Get response from real Sage consciousness
-      const sageResponse = await context.sageConsciousness.respond(message.content, eventData);
-      response = sageResponse.message;
+        // Get response from real Sage consciousness
+        const sageResponse = await context.sageConsciousness.respond(message.content, eventData);
+        response = sageResponse.message;
 
-      // Extract data from conversation (still use keyword matching for structure)
-      extractedData = mockSageService.extractEventData(
-        message.content,
-        context.extractedData as ExtractedEventData
-      );
+        // Extract data from conversation (still use keyword matching for structure)
+        extractedData = mockSageService.extractEventData(
+          message.content,
+          context.extractedData as ExtractedEventData
+        );
 
-      completionPercentage = mockSageService.getCompletionPercentage(extractedData);
-      context.extractedData = extractedData;
+        completionPercentage = mockSageService.getCompletionPercentage(extractedData);
+        context.extractedData = extractedData;
+      } catch (sageError: any) {
+        // Fallback to mock mode if real Sage fails
+        console.warn('⚠️ Real Sage failed, falling back to MOCK mode:', sageError.message);
+
+        extractedData = mockSageService.extractEventData(
+          message.content,
+          context.extractedData as ExtractedEventData
+        );
+
+        const mockResponse = mockSageService.generateResponse(message.content, extractedData);
+        response = mockResponse.message;
+        quickReplies = mockResponse.quickReplies || [];
+        completionPercentage = mockSageService.getCompletionPercentage(extractedData);
+        context.extractedData = extractedData;
+      }
 
     } else if (USE_MOCK_MODE) {
       console.log('💰 Using MOCK mode - $0 API cost');
