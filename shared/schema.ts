@@ -531,3 +531,39 @@ export type InsertSavedEvent = z.infer<typeof insertSavedEventSchema>;
 
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
+
+// Event calculation validation schema
+export const eventCalculationSchema = z.object({
+  eventType: z.string().min(1).max(50),
+  attendance: z.number().int().positive().max(10000000),
+  duration: z.union([
+    z.number().positive().max(365),
+    z.object({
+      days: z.number().int().positive().max(365),
+      hoursPerDay: z.number().positive().max(24),
+    })
+  ]),
+  location: z.string().max(500).optional(),
+  transportMode: z.string().max(50).optional(),
+  venueType: z.string().max(50).optional(),
+  powerSource: z.string().max(50).optional(),
+  localPercentage: z.number().min(0).max(100).optional(),
+  accommodation: z.boolean().optional(),
+  isOutdoor: z.boolean().optional(),
+}).strict(); // Reject any extra fields
+
+// Contact form validation with strict sanitization
+export const contactFormSchema = z.object({
+  name: z.string()
+    .min(1, "Name is required")
+    .max(100, "Name too long")
+    .regex(/^[^<>{}[\]\\]+$/, "Name contains invalid characters"), // Block script injection chars but allow unicode
+  email: z.string()
+    .email("Invalid email format")
+    .max(255, "Email too long")
+    .regex(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, "Invalid email format"),
+  message: z.string()
+    .min(1, "Message is required")
+    .max(5000, "Message too long")
+    .regex(/^[^<>{}[\]\\]*$/, "Message contains invalid characters"), // Block script injection chars but allow unicode
+}).strict();

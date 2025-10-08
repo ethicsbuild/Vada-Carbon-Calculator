@@ -1,15 +1,47 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { WebSocketServer } from "ws";
+import rateLimit from "express-rate-limit";
 import { storage } from "./storage";
 import { carbonCalculatorService } from "./services/carbonCalculator";
 import { aiCoPilotService } from "./services/aiCopilot";
 import { reportGeneratorService } from "./services/reportGenerator";
-import { insertOrganizationSchema, insertCarbonCalculationSchema, insertSavedEventSchema, insertContactSubmissionSchema } from "@shared/schema";
+import {
+  insertOrganizationSchema,
+  insertCarbonCalculationSchema,
+  insertSavedEventSchema,
+  insertContactSubmissionSchema,
+  eventCalculationSchema,
+  contactFormSchema
+} from "@shared/schema";
 import { handleChatWebSocket } from "./routes/chat";
 import { z } from "zod";
 
+// Rate limiting configurations
+const strictRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: { error: 'Too many requests from this IP, please try again later.' },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+const eventCalculationRateLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  max: 20, // 20 calculations per minute per IP
+  message: { error: 'Too many calculation requests. Please wait a moment before trying again.' },
+});
+
+const contactFormRateLimit = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 contact form submissions per 15 minutes
+  message: { error: 'Too many contact form submissions. Please try again later.' },
+});
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Apply general rate limiting to all API routes
+  app.use('/api/', strictRateLimit);
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
@@ -198,17 +230,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Event-specific carbon calculation
-  app.post("/api/calculate-event", async (req, res) => {
+  app.post("/api/calculate-event", eventCalculationRateLimit, async (req, res) => {
     try {
-      const eventData = req.body;
+      // Validate input with strict schema
+      const validatedData = eventCalculationSchema.parse(req.body);
 
       console.log('📊 Calculating emissions for event:', {
-        type: eventData.eventType,
-        attendance: eventData.attendance,
-        duration: eventData.duration
+        type: validatedData.eventType,
+        attendance: validatedData.attendance,
+        duration: validatedData.duration
       });
 
-      const calculation = await carbonCalculatorService.calculateEventEmissions(eventData);
+      const calculation = await carbonCalculatorService.calculateEventEmissions(validatedData as any);
 
       console.log('✅ Calculation complete:', {
         total: calculation.total.toFixed(3),
@@ -218,6 +251,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(calculation);
     } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: 'Invalid event data',
+          details: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       console.error('❌ Calculation error:', error);
       res.status(500).json({ error: 'Failed to calculate emissions' });
     }
@@ -637,9 +679,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Contact form routes
-  app.post("/api/contact", async (req, res) => {
+  app.post("/api/contact", contactFormRateLimit, async (req, res) => {
     try {
-      const validatedData = insertContactSubmissionSchema.parse(req.body);
+      // Use strict contact form schema with sanitization
+      const validatedData = contactFormSchema.parse(req.body);
       const submission = await storage.createContactSubmission(validatedData);
 
       console.log('📧 Contact form submitted:', {
@@ -654,7 +697,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
-        return res.status(400).json({ message: "Invalid contact data", errors: error.errors });
+        return res.status(400).json({
+          error: "Invalid contact data",
+          details: error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        });
       }
       console.error('❌ Contact form error:', error);
       res.status(500).json({ message: "Failed to send message" });
