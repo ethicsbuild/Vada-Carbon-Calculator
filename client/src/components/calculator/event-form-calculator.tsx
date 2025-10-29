@@ -6,7 +6,9 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CarbonResults } from '@/components/sage/carbon-results';
 import { InfoTooltip } from '@/components/ui/info-tooltip';
-import { Calculator, Loader2, Plus, Trash2 } from 'lucide-react';
+import { Calculator, Loader2, Plus, Trash2, AlertCircle, Download } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
+import jsPDF from 'jspdf';
 
 interface StaffTransportGroup {
   id: string;
@@ -61,9 +63,10 @@ interface EventFormData {
 interface EventFormCalculatorProps {
   initialEventType?: string;
   onSectionChange?: (section: string) => void;
+  onCalculationComplete?: (data: EventFormData, result: any) => void;
 }
 
-export function EventFormCalculator({ initialEventType, onSectionChange }: EventFormCalculatorProps) {
+export function EventFormCalculator({ initialEventType, onSectionChange, onCalculationComplete }: EventFormCalculatorProps) {
   const [formData, setFormData] = useState<EventFormData>({
     eventType: initialEventType || '',
     attendance: 0,
@@ -98,6 +101,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
   const [calculation, setCalculation] = useState<any>(null);
   const [isCalculating, setIsCalculating] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [currentSection, setCurrentSection] = useState('event-details');
+  const { toast } = useToast();
 
   // Helper functions for managing transport groups
   const addStaffGroup = () => {
@@ -167,8 +173,44 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
     }));
   };
 
+  // Validation function
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    if (!formData.eventType) {
+      errors.eventType = 'Event type is required';
+    }
+    
+    if (!formData.attendance || formData.attendance <= 0) {
+      errors.attendance = 'Attendance is required and must be greater than 0';
+    }
+    
+    if (!formData.durationDays || formData.durationDays <= 0) {
+      errors.durationDays = 'Duration days is required and must be greater than 0';
+    }
+    
+    if (!formData.durationHours || formData.durationHours <= 0) {
+      errors.durationHours = 'Hours per day is required and must be greater than 0';
+    }
+    
+    setValidationErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const calculateEmissions = async () => {
+    // Validate form before calculation
+    if (!validateForm()) {
+      toast({
+        title: "Form Incomplete",
+        description: "Please fill in all required fields before calculating.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setIsCalculating(true);
+    setCalculation(null); // Clear previous results
+    
     try {
       // Aggregate staff transport data from all groups
       const totalStaffCount = formData.staffTransportGroups.reduce((sum, g) => sum + g.count, 0);
@@ -281,9 +323,32 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
       if (response.ok) {
         const result = await response.json();
         setCalculation(result);
+        
+        // Notify parent component of calculation completion
+        if (onCalculationComplete) {
+          onCalculationComplete(formData, result);
+        }
+        
+        // Show success toast
+        toast({
+          title: "Calculation Complete",
+          description: "Your event's carbon footprint has been calculated successfully.",
+        });
+      } else {
+        const errorData = await response.json();
+        toast({
+          title: "Calculation Failed",
+          description: errorData.error || "Failed to calculate emissions. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Calculation error:', error);
+      toast({
+        title: "Network Error",
+        description: "Failed to connect to the calculation service. Please try again.",
+        variant: "destructive",
+      });
     } finally {
       setIsCalculating(false);
     }
@@ -291,6 +356,103 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
   const updateField = (field: keyof EventFormData, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
+    // Clear validation error for this field when it's updated
+    if (validationErrors[field]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[field];
+        return newErrors;
+      });
+    }
+  };
+
+  // Section navigation
+  const handleSectionChange = (section: string) => {
+    setCurrentSection(section);
+    if (onSectionChange) {
+      onSectionChange(section);
+    }
+  };
+
+  // Export functions
+  const exportToPDF = () => {
+    if (!calculation) return;
+    
+    const doc = new jsPDF();
+    
+    // Add title
+    doc.setFontSize(22);
+    doc.text('Carbon Footprint Calculation Report', 105, 20, { align: 'center' });
+    
+    // Add event details
+    doc.setFontSize(16);
+    doc.text('Event Details', 20, 35);
+    
+    doc.setFontSize(12);
+    doc.text(`Event Type: ${formData.eventType}`, 20, 45);
+    doc.text(`Attendance: ${formData.attendance}`, 20, 55);
+    doc.text(`Duration: ${formData.durationDays} days, ${formData.durationHours} hours/day`, 20, 65);
+    
+    // Add results
+    doc.setFontSize(16);
+    doc.text('Calculation Results', 20, 85);
+    
+    doc.setFontSize(12);
+    doc.text(`Total Carbon Footprint: ${calculation.total.toFixed(2)} tCO₂e`, 20, 95);
+    doc.text(`Per Attendee: ${calculation.emissionsPerAttendee.toFixed(4)} tCO₂e`, 20, 105);
+    doc.text(`Performance Rating: ${calculation.benchmarkComparison.performance}`, 20, 115);
+    
+    // Add breakdown
+    doc.setFontSize(14);
+    doc.text('Emissions Breakdown', 20, 135);
+    
+    doc.setFontSize(12);
+    doc.text(`Venue: ${calculation.venue.toFixed(2)} tCO₂e`, 20, 145);
+    doc.text(`Transportation: ${calculation.transportation.toFixed(2)} tCO₂e`, 20, 155);
+    doc.text(`Energy: ${calculation.energy.toFixed(2)} tCO₂e`, 20, 165);
+    doc.text(`Catering: ${calculation.catering.toFixed(2)} tCO₂e`, 20, 175);
+    doc.text(`Waste: ${calculation.waste.toFixed(2)} tCO₂e`, 20, 185);
+    doc.text(`Production: ${calculation.production.toFixed(2)} tCO₂e`, 20, 195);
+    
+    // Save the PDF
+    doc.save(`carbon-footprint-${formData.eventType}-${new Date().toISOString().slice(0, 10)}.pdf`);
+    
+    toast({
+      title: "Export Successful",
+      description: "Your carbon footprint report has been exported as PDF.",
+    });
+  };
+
+  const exportToCSV = () => {
+    if (!calculation) return;
+    
+    // Create CSV content
+    let csvContent = "Category,Value (tCO₂e)\\n";
+    csvContent += `Total,${calculation.total.toFixed(2)}\\n`;
+    csvContent += `Venue,${calculation.venue.toFixed(2)}\\n`;
+    csvContent += `Transportation,${calculation.transportation.toFixed(2)}\\n`;
+    csvContent += `Energy,${calculation.energy.toFixed(2)}\\n`;
+    csvContent += `Catering,${calculation.catering.toFixed(2)}\\n`;
+    csvContent += `Waste,${calculation.waste.toFixed(2)}\\n`;
+    csvContent += `Production,${calculation.production.toFixed(2)}\\n`;
+    csvContent += `Per Attendee,${calculation.emissionsPerAttendee.toFixed(4)}\\n`;
+    csvContent += `Performance Rating,${calculation.benchmarkComparison.performance}\\n`;
+    
+    // Create download link
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `carbon-footprint-${formData.eventType}-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast({
+      title: "Export Successful",
+      description: "Your carbon footprint report has been exported as CSV.",
+    });
   };
 
   return (
@@ -300,18 +462,54 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
           <Calculator className="w-6 h-6 text-emerald-400" />
           <h2 className="text-2xl font-bold text-white">Event Carbon Calculator</h2>
         </div>
+        
+        <div className="mb-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
+          <p className="text-slate-300 text-sm">
+            <span className="text-emerald-400 font-semibold">Required fields:</span> Event Type, Attendance, Duration Days, and Hours per Day are marked with an asterisk (*). 
+            <br />
+            <span className="text-violet-400 font-semibold">Optional fields:</span> You can still get an estimate even if you leave optional fields blank.
+          </p>
+        </div>
+        
+        {/* Progress Indicator */}
+        <div className="mb-6">
+          <div className="flex justify-between text-sm text-slate-400 mb-2">
+            <span>Event Details</span>
+            <span>Transportation</span>
+            <span>Production</span>
+            <span>Food & Power</span>
+          </div>
+          <div className="w-full bg-slate-700 rounded-full h-2">
+            <div 
+              className="bg-gradient-to-r from-emerald-500 to-violet-500 h-2 rounded-full transition-all duration-300"
+              style={{ 
+                width: currentSection === 'event-details' ? '25%' : 
+                       currentSection === 'transportation' ? '50%' : 
+                       currentSection === 'production' ? '75%' : '100%' 
+              }}
+            ></div>
+          </div>
+        </div>
 
         <div className="space-y-6">
           {/* Event Type */}
-          <div className="space-y-2">
-            <Label className="text-slate-300">Event Type</Label>
+          <div className="space-y-2" onClick={() => handleSectionChange('event-details')}>
+            <div className="flex items-center gap-2">
+              <Label className="text-slate-300">Event Type *</Label>
+              {validationErrors.eventType && (
+                <div className="flex items-center gap-1 text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  {validationErrors.eventType}
+                </div>
+              )}
+            </div>
             <Select value={formData.eventType} onValueChange={(value) => updateField('eventType', value)}>
               <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
                 <SelectValue placeholder="Select event type" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="festival" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🎵 Music Festival</SelectItem>
-                <SelectItem value="conference" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">💼 Corporate Conference</SelectItem>
+                <SelectItem value="festival" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🎪 Music Festival</SelectItem>
+                <SelectItem value="conference" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">📋 Corporate Conference</SelectItem>
                 <SelectItem value="wedding" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">💍 Wedding</SelectItem>
                 <SelectItem value="concert" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🎸 Concert/Show</SelectItem>
                 <SelectItem value="sports_event" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚽ Sports Event</SelectItem>
@@ -322,7 +520,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
           {/* Attendance */}
           <div className="space-y-2">
-            <Label className="text-slate-300">Expected Attendance</Label>
+            <div className="flex items-center gap-2">
+              <Label className="text-slate-300">Expected Attendance *</Label>
+              {validationErrors.attendance && (
+                <div className="flex items-center gap-1 text-red-400 text-sm">
+                  <AlertCircle className="w-4 h-4" />
+                  {validationErrors.attendance}
+                </div>
+              )}
+            </div>
             <Input
               type="number"
               value={formData.attendance || ''}
@@ -335,7 +541,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
           {/* Duration */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label className="text-slate-300">Duration (Days)</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-slate-300">Duration (Days) *</Label>
+                {validationErrors.durationDays && (
+                  <div className="flex items-center gap-1 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {validationErrors.durationDays}
+                  </div>
+                )}
+              </div>
               <Input
                 type="number"
                 value={formData.durationDays || ''}
@@ -345,7 +559,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
               />
             </div>
             <div className="space-y-2">
-              <Label className="text-slate-300">Hours per Day</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-slate-300">Hours per Day *</Label>
+                {validationErrors.durationHours && (
+                  <div className="flex items-center gap-1 text-red-400 text-sm">
+                    <AlertCircle className="w-4 h-4" />
+                    {validationErrors.durationHours}
+                  </div>
+                )}
+              </div>
               <Input
                 type="number"
                 value={formData.durationHours || ''}
@@ -359,440 +581,400 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
           {/* Venue Type */}
           <div className="space-y-2">
             <Label className="text-slate-300">Venue Type</Label>
-            <Select value={formData.isOutdoor ? 'outdoor' : 'indoor'} onValueChange={(value) => {
-              updateField('isOutdoor', value === 'outdoor');
-              updateField('venueType', value);
-            }}>
+            <Select value={formData.venueType} onValueChange={(value) => updateField('venueType', value)}>
               <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                <SelectValue />
+                <SelectValue placeholder="Select venue type" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="indoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🏛️ Indoor Venue</SelectItem>
-                <SelectItem value="outdoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌳 Outdoor Venue</SelectItem>
+                <SelectItem value="indoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🏢 Indoor Venue</SelectItem>
+                <SelectItem value="outdoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌳 Outdoor Space</SelectItem>
+                <SelectItem value="mixed" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Mixed Indoor/Outdoor</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Attendee/Guest Transportation */}
-          <div
-            className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50"
-            onFocus={() => onSectionChange?.('transportation')}
-          >
-            <h3 className="text-lg font-semibold text-emerald-400">👥 Attendee Transportation</h3>
+          {/* Outdoor Venue Toggle */}
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="isOutdoor"
+              checked={formData.isOutdoor}
+              onChange={(e) => updateField('isOutdoor', e.target.checked)}
+              className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+            />
+            <Label htmlFor="isOutdoor" className="text-slate-300">
+              Outdoor Event
+              <InfoTooltip 
+                title="Outdoor Events"
+                content="Outdoor events typically have different energy requirements and may need additional infrastructure like temporary power or shelter."
+              />
+            </Label>
+          </div>
 
+          {/* Attendee Transportation */}
+          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+            <h3 className="text-lg font-semibold text-white">Audience Transportation</h3>
+            
             <div className="space-y-2">
-              <Label className="text-slate-300">Primary Mode</Label>
+              <Label className="text-slate-300">Primary Travel Method</Label>
               <Select value={formData.attendeeTransportMode} onValueChange={(value) => updateField('attendeeTransportMode', value)}>
                 <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                  <SelectValue />
+                  <SelectValue placeholder="Select travel method" />
                 </SelectTrigger>
                 <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                  <SelectItem value="mixed" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔀 Mixed (Multiple Modes)</SelectItem>
-                  <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying</SelectItem>
-                  <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
+                  <SelectItem value="mixed" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Mixed (Local/Regional/Flying)</SelectItem>
+                  <SelectItem value="local" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Local/Regional Travel</SelectItem>
+                  <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying (Domestic/International)</SelectItem>
                   <SelectItem value="transit" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚇 Public Transit</SelectItem>
-                  <SelectItem value="walking" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚶 Walking/Local</SelectItem>
+                  <SelectItem value="walking" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚶 Walking/Biking</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-slate-300">Average Travel Distance (km)</Label>
+                <Input
+                  type="number"
+                  value={formData.attendeeTransportDistance}
+                  onChange={(e) => updateField('attendeeTransportDistance', parseInt(e.target.value) || 0)}
+                  placeholder="50"
+                  className="bg-slate-900/50 border-slate-700 text-white"
+                />
+              </div>
             </div>
 
             {formData.attendeeTransportMode === 'mixed' && (
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">% Local/Transit</Label>
+                  <Label className="text-slate-300">% Local Travel</Label>
                   <Input
                     type="number"
-                    value={formData.attendeeLocalPercentage || ''}
-                    onChange={(e) => updateField('attendeeLocalPercentage', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                    value={formData.attendeeLocalPercentage}
+                    onChange={(e) => updateField('attendeeLocalPercentage', parseInt(e.target.value) || 0)}
                     placeholder="60"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-slate-900/50 border-slate-700 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">% Domestic Flight</Label>
+                  <Label className="text-slate-300">% Domestic Flights</Label>
                   <Input
                     type="number"
-                    value={formData.attendeeDomesticFlightPercentage || ''}
-                    onChange={(e) => updateField('attendeeDomesticFlightPercentage', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                    value={formData.attendeeDomesticFlightPercentage}
+                    onChange={(e) => updateField('attendeeDomesticFlightPercentage', parseInt(e.target.value) || 0)}
                     placeholder="30"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-slate-900/50 border-slate-700 text-white"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300 text-sm">% International</Label>
+                  <Label className="text-slate-300">% International Flights</Label>
                   <Input
                     type="number"
-                    value={formData.attendeeInternationalFlightPercentage || ''}
-                    onChange={(e) => updateField('attendeeInternationalFlightPercentage', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                    value={formData.attendeeInternationalFlightPercentage}
+                    onChange={(e) => updateField('attendeeInternationalFlightPercentage', parseInt(e.target.value) || 0)}
                     placeholder="10"
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-slate-900/50 border-slate-700 text-white"
                   />
                 </div>
               </div>
             )}
-
-            <div className="space-y-2">
-              <Label className="text-slate-300">Average Distance (km)</Label>
-              <Input
-                type="number"
-                value={formData.attendeeTransportDistance || ''}
-                onChange={(e) => updateField('attendeeTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                placeholder="50"
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-              />
-            </div>
           </div>
 
-          {/* Staff Transportation - Granular Groups */}
-          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('staff-transportation')}>
-              <h3 className="text-lg font-semibold text-violet-400">👷 Staff Transportation</h3>
-              <InfoTooltip content="Break down your staff by how they travel. E.g., 18 local staff driving + 2 flying in from out of state. Add as many groups as you need." />
+          {/* Staff Transportation */}
+          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-white">Staff Transportation</h3>
+              <Button 
+                onClick={addStaffGroup}
+                variant="outline" 
+                size="sm"
+                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Group
+              </Button>
             </div>
 
             {formData.staffTransportGroups.length === 0 ? (
-              <div className="text-center p-6 border-2 border-dashed border-slate-600 rounded-lg">
-                <p className="text-slate-400 mb-3">No staff transport added yet</p>
-                <Button
-                  type="button"
-                  onClick={addStaffGroup}
-                  className="bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 border border-violet-500/50"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Staff Group
-                </Button>
+              <div className="text-slate-400 text-sm">
+                No staff transportation groups added. Click "Add Group" to specify how your staff will travel.
               </div>
             ) : (
-              <>
-                {formData.staffTransportGroups.map((group, index) => (
-                  <div key={group.id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-violet-300">Staff Group {index + 1}</span>
-                      <Button
-                        type="button"
+              <div className="space-y-4">
+                {formData.staffTransportGroups.map((group) => (
+                  <Card key={group.id} className="bg-slate-900/50 border-slate-700/50 p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-white">Staff Group</h4>
+                      <Button 
                         onClick={() => removeStaffGroup(group.id)}
-                        size="sm"
                         variant="ghost"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        size="sm"
+                        className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-3">
+                    
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm"># of Staff</Label>
+                        <Label className="text-slate-300">Number of Staff</Label>
                         <Input
                           type="number"
-                          value={group.count || ''}
+                          value={group.count}
                           onChange={(e) => updateStaffGroup(group.id, 'count', parseInt(e.target.value) || 0)}
-                          placeholder="e.g., 18"
-                          className="bg-slate-900/50 border-slate-700 text-white"
+                          className="bg-slate-800/50 border-slate-700 text-white"
                         />
                       </div>
-
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm">Transport Mode</Label>
+                        <Label className="text-slate-300">Travel Method</Label>
                         <Select value={group.mode} onValueChange={(value) => updateStaffGroup(group.id, 'mode', value)}>
-                          <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                            <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
-                            <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying</SelectItem>
-                            <SelectItem value="transit" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚇 Public Transit</SelectItem>
-                            <SelectItem value="carpool" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚙 Carpool/Shuttle</SelectItem>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                            <SelectItem value="driving" className="text-white">🚗 Driving</SelectItem>
+                            <SelectItem value="transit" className="text-white">🚇 Public Transit</SelectItem>
+                            <SelectItem value="flying" className="text-white">✈️ Flying</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm">Distance (km)</Label>
+                        <Label className="text-slate-300">Average Distance (km)</Label>
                         <Input
                           type="number"
-                          value={group.distance || ''}
+                          value={group.distance}
                           onChange={(e) => updateStaffGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
-                          placeholder="e.g., 20"
-                          className="bg-slate-900/50 border-slate-700 text-white"
+                          className="bg-slate-800/50 border-slate-700 text-white"
                         />
                       </div>
-
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm">Overnight Stays</Label>
+                        <Label className="text-slate-300">Overnight Stays</Label>
                         <Input
                           type="number"
-                          value={group.overnightStays || ''}
+                          value={group.overnightStays}
                           onChange={(e) => updateStaffGroup(group.id, 'overnightStays', parseInt(e.target.value) || 0)}
-                          placeholder="0"
-                          className="bg-slate-900/50 border-slate-700 text-white"
+                          className="bg-slate-800/50 border-slate-700 text-white"
                         />
                       </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
-
-                <Button
-                  type="button"
-                  onClick={addStaffGroup}
-                  className="w-full bg-violet-500/20 hover:bg-violet-500/30 text-violet-300 border border-violet-500/50"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Another Staff Group
-                </Button>
-              </>
+              </div>
             )}
           </div>
 
-          {/* Artist/Performer Transportation - Granular Groups */}
-          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('artist-transportation')}>
-              <h3 className="text-lg font-semibold text-amber-400">🎤 Artist/Performer Transportation</h3>
-              <InfoTooltip content="Break down performers by how they arrive. E.g., 5 artists flying commercially + 1 headliner on private jet. Each group can have different transport modes and distances." />
+          {/* Artist/Performer Transportation */}
+          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+            <div className="flex justify-between items-center">
+              <h3 className="text-lg font-semibold text-white">Artist Transportation</h3>
+              <Button 
+                onClick={addArtistGroup}
+                variant="outline" 
+                size="sm"
+                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+              >
+                <Plus className="w-4 h-4 mr-1" />
+                Add Group
+              </Button>
             </div>
 
             {formData.artistTransportGroups.length === 0 ? (
-              <div className="text-center p-6 border-2 border-dashed border-slate-600 rounded-lg">
-                <p className="text-slate-400 mb-3">No artist transport added yet</p>
-                <Button
-                  type="button"
-                  onClick={addArtistGroup}
-                  className="bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Artist Group
-                </Button>
+              <div className="text-slate-400 text-sm">
+                No artist transportation groups added. Click "Add Group" to specify how performers will travel.
               </div>
             ) : (
-              <>
-                {formData.artistTransportGroups.map((group, index) => (
-                  <div key={group.id} className="p-4 bg-slate-800/50 rounded-lg border border-slate-700 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-semibold text-amber-300">Artist Group {index + 1}</span>
-                      <Button
-                        type="button"
+              <div className="space-y-4">
+                {formData.artistTransportGroups.map((group) => (
+                  <Card key={group.id} className="bg-slate-900/50 border-slate-700/50 p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <h4 className="font-medium text-white">Artist Group</h4>
+                      <Button 
                         onClick={() => removeArtistGroup(group.id)}
-                        size="sm"
                         variant="ghost"
-                        className="text-red-400 hover:text-red-300 hover:bg-red-500/10"
+                        size="sm"
+                        className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
                     </div>
-
-                    <div className="grid grid-cols-2 gap-3">
+                    
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm"># of Artists</Label>
+                        <Label className="text-slate-300">Number of Artists</Label>
                         <Input
                           type="number"
-                          value={group.count || ''}
+                          value={group.count}
                           onChange={(e) => updateArtistGroup(group.id, 'count', parseInt(e.target.value) || 0)}
-                          placeholder="e.g., 5"
-                          className="bg-slate-900/50 border-slate-700 text-white"
+                          className="bg-slate-800/50 border-slate-700 text-white"
                         />
                       </div>
-
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm">Transport Mode</Label>
+                        <Label className="text-slate-300">Travel Method</Label>
                         <Select value={group.mode} onValueChange={(value) => updateArtistGroup(group.id, 'mode', value)}>
-                          <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                            <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Commercial Flight</SelectItem>
-                            <SelectItem value="tour_bus" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚌 Tour Bus</SelectItem>
-                            <SelectItem value="driving" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Driving</SelectItem>
-                            <SelectItem value="private_jet" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🛩️ Private Jet</SelectItem>
+                          <SelectContent className="bg-slate-800 border-slate-700 text-white">
+                            <SelectItem value="driving" className="text-white">🚗 Driving</SelectItem>
+                            <SelectItem value="transit" className="text-white">🚇 Public Transit</SelectItem>
+                            <SelectItem value="flying" className="text-white">✈️ Flying</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
-
                       <div className="space-y-2">
-                        <Label className="text-slate-300 text-sm">Distance (km)</Label>
+                        <Label className="text-slate-300">Average Distance (km)</Label>
                         <Input
                           type="number"
-                          value={group.distance || ''}
+                          value={group.distance}
                           onChange={(e) => updateArtistGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
-                          placeholder="e.g., 500"
-                          className="bg-slate-900/50 border-slate-700 text-white"
+                          className="bg-slate-800/50 border-slate-700 text-white"
                         />
                       </div>
-
-                      {group.mode === 'tour_bus' && (
-                        <div className="flex items-center gap-2 p-2 bg-slate-900/30 rounded col-span-2">
-                          <input
-                            type="checkbox"
-                            checked={group.tourBus}
-                            onChange={(e) => updateArtistGroup(group.id, 'tourBus', e.target.checked)}
-                            className="w-4 h-4"
-                          />
-                          <Label className="text-slate-300 text-sm">Overnight in tour bus (reduces hotel emissions)</Label>
-                        </div>
-                      )}
+                      <div className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`tourBus-${group.id}`}
+                          checked={group.tourBus}
+                          onChange={(e) => updateArtistGroup(group.id, 'tourBus', e.target.checked)}
+                          className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+                        />
+                        <Label htmlFor={`tourBus-${group.id}`} className="text-slate-300">
+                          Tour Bus
+                        </Label>
+                      </div>
                     </div>
-                  </div>
+                  </Card>
                 ))}
-
-                <Button
-                  type="button"
-                  onClick={addArtistGroup}
-                  className="w-full bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/50"
-                >
-                  <Plus className="w-4 h-4 mr-2" />
-                  Add Another Artist Group
-                </Button>
-              </>
+              </div>
             )}
           </div>
 
           {/* Equipment Transportation */}
-          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('equipment-transportation')}>
-              <h3 className="text-lg font-semibold text-cyan-400">📦 Equipment Transportation</h3>
-              <InfoTooltip content="Be realistic about production scale. Major festivals often need 20-100+ trucks for staging, sound, lighting, and vendor equipment. Small events might need 1-5 trucks." />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+            <h3 className="text-lg font-semibold text-white">Equipment Transportation</h3>
+            
+            <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Number of Trucks</Label>
+                <Label className="text-slate-300">Trucks Required</Label>
                 <Input
                   type="number"
-                  value={formData.equipmentTrucksRequired || ''}
+                  value={formData.equipmentTrucksRequired}
                   onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
-                  placeholder="Enter realistic number (1-100+)"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-                  min="0"
-                  max="500"
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label className="text-slate-300">Avg Distance (km)</Label>
+                <Label className="text-slate-300">Average Distance (km)</Label>
                 <Input
                   type="number"
-                  value={formData.equipmentTransportDistance || ''}
-                  onChange={(e) => updateField('equipmentTransportDistance', e.target.value === '' ? 0 : parseInt(e.target.value))}
+                  value={formData.equipmentTransportDistance}
+                  onChange={(e) => updateField('equipmentTransportDistance', parseInt(e.target.value) || 0)}
                   placeholder="200"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label className="text-slate-300">Freight Flights (international shipping)</Label>
-                <InfoTooltip content="If equipment is flown in internationally (e.g., bringing gear from overseas for a touring artist), specify number of cargo flights." />
+              <div className="space-y-2">
+                <Label className="text-slate-300">Freight Flights</Label>
+                <Input
+                  type="number"
+                  value={formData.equipmentFreightFlights}
+                  onChange={(e) => updateField('equipmentFreightFlights', parseInt(e.target.value) || 0)}
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
+                />
               </div>
-              <Input
-                type="number"
-                value={formData.equipmentFreightFlights || ''}
-                onChange={(e) => updateField('equipmentFreightFlights', e.target.value === '' ? 0 : parseInt(e.target.value))}
-                placeholder="0"
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
-              />
             </div>
           </div>
 
           {/* Power Source */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2">
-              <Label className="text-slate-300">Power Source</Label>
-              <InfoTooltip
-                title="Power Source Options"
-                content="Grid: Building's electrical service. Generator: Diesel/propane units for outdoor/remote events. Hybrid: Mix of grid + backup generators. Renewable: Solar panels, battery banks, biodiesel generators."
-              />
-            </div>
+          <div className="space-y-2 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('production')}>
+            <Label className="text-slate-300">Power Source</Label>
             <Select value={formData.powerSource} onValueChange={(value) => updateField('powerSource', value)}>
               <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                <SelectValue />
+                <SelectValue placeholder="Select power source" />
               </SelectTrigger>
               <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="grid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚡ Grid Power (venue electrical)</SelectItem>
-                <SelectItem value="generator" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⛽ Generator (diesel/propane)</SelectItem>
-                <SelectItem value="hybrid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔋 Hybrid (grid + backup)</SelectItem>
-                <SelectItem value="renewable" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">♻️ Renewable (solar/biodiesel)</SelectItem>
+                <SelectItem value="grid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔌 Grid Power</SelectItem>
+                <SelectItem value="generator" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚡ Generator</SelectItem>
+                <SelectItem value="renewable" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">☀️ Renewable Energy</SelectItem>
+                <SelectItem value="hybrid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Hybrid (Grid + Renewable)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
-          {/* Catering - Granular Breakdown */}
-          <div className="space-y-4 p-4 bg-slate-900/30 rounded-lg border border-slate-700/50">
-            <div className="flex items-center justify-between" onFocus={() => onSectionChange?.('food')}>
-              <h3 className="text-lg font-semibold text-orange-400">🍽️ Food & Catering</h3>
-              <InfoTooltip content="Break down meals by category: crew meals (breakfast/lunch/dinner for staff), attendee food service (concessions, food vendors), VIP catering (hospitality lounges), and talent catering (green room, artist meals)." />
-            </div>
-
+          {/* Food & Catering */}
+          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('food-power')}>
+            <h3 className="text-lg font-semibold text-white">Food & Catering</h3>
+            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300 text-sm">Staff/Crew Meals</Label>
+                <Label className="text-slate-300">Staff Meals</Label>
                 <Input
                   type="number"
-                  value={formData.meals.staffMeals || ''}
+                  value={formData.meals.staffMeals}
                   onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
-                  placeholder="e.g., 150 (50 staff × 3 meals)"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label className="text-slate-300 text-sm">Attendee Food Service</Label>
+                <Label className="text-slate-300">Attendee Food</Label>
                 <Input
                   type="number"
-                  value={formData.meals.attendeeFood || ''}
+                  value={formData.meals.attendeeFood}
                   onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
-                  placeholder="e.g., 2000 (food vendors/concessions)"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label className="text-slate-300 text-sm">VIP Catering</Label>
+                <Label className="text-slate-300">VIP Catering</Label>
                 <Input
                   type="number"
-                  value={formData.meals.vipCatering || ''}
+                  value={formData.meals.vipCatering}
                   onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
-                  placeholder="e.g., 100 (VIP lounge meals)"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
-
               <div className="space-y-2">
-                <Label className="text-slate-300 text-sm">Artist/Talent Catering</Label>
+                <Label className="text-slate-300">Talent Catering</Label>
                 <Input
                   type="number"
-                  value={formData.meals.talentCatering || ''}
+                  value={formData.meals.talentCatering}
                   onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
-                  placeholder="e.g., 30 (green room/backstage)"
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                  placeholder="0"
+                  className="bg-slate-900/50 border-slate-700 text-white"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Label className="text-slate-300">Food Sourcing</Label>
-                <InfoTooltip
-                  title="Food Sourcing Options"
-                  content="Standard: Commercial suppliers like Sysco, US Foods, GFS (bulk shipped from distribution centers). Local/Organic: Locally sourced from farms within 100 miles, organic/sustainable practices (lower transportation emissions)."
+            <div className="flex items-center space-x-2 pt-2">
+              <input
+                type="checkbox"
+                id="localFood"
+                checked={formData.localFood}
+                onChange={(e) => updateField('localFood', e.target.checked)}
+                className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+              />
+              <Label htmlFor="localFood" className="text-slate-300">
+                Locally Sourced Food
+                <InfoTooltip 
+                  title="Locally Sourced Food"
+                  content="Using locally sourced food can significantly reduce transportation emissions from your catering."
                 />
-              </div>
-              <Select value={formData.localFood ? 'local' : 'standard'} onValueChange={(value) => updateField('localFood', value === 'local')}>
-                <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                  <SelectItem value="local" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌾 Local/Organic (from nearby farms)</SelectItem>
-                  <SelectItem value="standard" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🍽️ Standard (Sysco/US Foods/GFS)</SelectItem>
-                </SelectContent>
-              </Select>
+              </Label>
             </div>
           </div>
+        </div>
 
-          {/* Calculate Button */}
-          <Button
+        {/* Calculate Button */}
+        <div className="pt-6 border-t border-slate-700/50">
+          <Button 
             onClick={calculateEmissions}
-            disabled={!formData.eventType || formData.attendance === 0 || isCalculating}
-            className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
-            size="lg"
+            disabled={isCalculating}
+            className="w-full bg-gradient-to-r from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-white"
           >
             {isCalculating ? (
               <>
@@ -811,14 +993,39 @@ export function EventFormCalculator({ initialEventType, onSectionChange }: Event
 
       {/* Results */}
       {calculation && (
-        <CarbonResults
-          calculation={calculation}
-          eventData={{
-            attendance: formData.attendance,
-            eventType: formData.eventType,
-            location: 'Unknown'
-          }}
-        />
+        <div className="space-y-6">
+          <CarbonResults
+            calculation={calculation}
+            eventData={{
+              attendance: formData.attendance,
+              eventType: formData.eventType,
+              location: 'Unknown'
+            }}
+          />
+          
+          {/* Export Buttons */}
+          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+            <h3 className="text-lg font-semibold text-white mb-4">Export Results</h3>
+            <div className="flex flex-wrap gap-3">
+              <Button 
+                onClick={exportToPDF}
+                variant="outline"
+                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export as PDF
+              </Button>
+              <Button 
+                onClick={exportToCSV}
+                variant="outline"
+                className="border-violet-400/50 text-violet-400 hover:bg-violet-400/10"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Export as CSV
+              </Button>
+            </div>
+          </Card>
+        </div>
       )}
     </div>
   );

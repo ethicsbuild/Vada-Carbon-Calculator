@@ -514,7 +514,6 @@ export type InsertAttendeeChoice = z.infer<typeof insertAttendeeChoiceSchema>;
 export type AttendeeAchievement = typeof attendeeAchievements.$inferSelect;
 export type InsertAttendeeAchievement = z.infer<typeof insertAttendeeAchievementSchema>;
 
-export type AttendeeReward = typeof attendeeRewards.$inferSelect;
 export type InsertAttendeeReward = z.infer<typeof insertAttendeeRewardSchema>;
 
 export type BlockchainRecord = typeof blockchainRecords.$inferSelect;
@@ -532,7 +531,7 @@ export type InsertSavedEvent = z.infer<typeof insertSavedEventSchema>;
 export type ContactSubmission = typeof contactSubmissions.$inferSelect;
 export type InsertContactSubmission = z.infer<typeof insertContactSubmissionSchema>;
 
-// Event calculation validation schema
+// Event calculation validation schema - Updated to match frontend data structure
 export const eventCalculationSchema = z.object({
   eventType: z.string().min(1).max(50),
   attendance: z.number().int().positive().max(10000000),
@@ -550,7 +549,97 @@ export const eventCalculationSchema = z.object({
   localPercentage: z.number().min(0).max(100).optional(),
   accommodation: z.boolean().optional(),
   isOutdoor: z.boolean().optional(),
-}).strict(); // Reject any extra fields
+  
+  // Additional fields sent by frontend
+  venue: z.object({
+    type: z.string().max(50).optional(),
+    capacity: z.number().optional(),
+    location: z.string().max(500).optional(),
+    isOutdoor: z.boolean().optional(),
+    hasExistingPower: z.boolean().optional(),
+  }).optional(),
+  
+  production: z.object({
+    numberOfStages: z.number().optional(),
+    stageSize: z.string().max(50).optional(),
+    audioVisual: z.object({
+      soundSystemSize: z.string().max(50).optional(),
+      lightingRig: z.string().max(50).optional(),
+      videoScreens: z.boolean().optional(),
+      livestreaming: z.boolean().optional(),
+    }).optional(),
+    powerRequirements: z.object({
+      generatorPower: z.boolean().optional(),
+      generatorSize: z.string().max(50).optional(),
+      gridPowerUsage: z.number().optional(),
+    }).optional(),
+  }).optional(),
+  
+  staffing: z.object({
+    totalStaff: z.number().optional(),
+    onSiteStaff: z.number().optional(),
+    crewSize: z.number().optional(),
+  }).optional(),
+  
+  transportation: z.object({
+    audienceTravel: z.object({
+      averageDistance: z.number().optional(),
+      internationalAttendees: z.number().optional(),
+      domesticFlights: z.number().optional(),
+      localTransit: z.number().optional(),
+    }).optional(),
+    crewTransportation: z.object({
+      method: z.string().max(50).optional(),
+      estimatedDistance: z.number().optional(),
+      numberOfVehicles: z.number().optional(),
+      staffCount: z.number().optional(),
+      overnightStays: z.number().optional(),
+      staffGroups: z.array(z.object({
+        id: z.string(),
+        count: z.number(),
+        mode: z.string(),
+        distance: z.number(),
+        overnightStays: z.number().optional(),
+      })).optional(),
+    }).optional(),
+    artistTransportation: z.object({
+      artistCount: z.number().optional(),
+      method: z.string().max(50).optional(),
+      distance: z.number().optional(),
+      tourBus: z.boolean().optional(),
+      artistGroups: z.array(z.object({
+        id: z.string(),
+        count: z.number(),
+        mode: z.string(),
+        distance: z.number(),
+        tourBus: z.boolean().optional(),
+      })).optional(),
+    }).optional(),
+    equipmentTransportation: z.object({
+      trucksRequired: z.number().optional(),
+      averageDistance: z.number().optional(),
+      freightFlights: z.number().optional(),
+    }).optional(),
+  }).optional(),
+  
+  catering: z.object({
+    foodServiceType: z.string().max(50).optional(),
+    expectedMealsServed: z.number().optional(),
+    isLocallySourced: z.boolean().optional(),
+    alcoholServed: z.boolean().optional(),
+    mealBreakdown: z.object({
+      staffMeals: z.number().optional(),
+      attendeeFood: z.number().optional(),
+      vipCatering: z.number().optional(),
+      talentCatering: z.number().optional(),
+    }).optional(),
+  }).optional(),
+  
+  waste: z.object({
+    recyclingProgram: z.boolean().optional(),
+    wasteReductionMeasures: z.array(z.string()).optional(),
+  }).optional(),
+}).strict(); // Keep strict but now include all expected fields
 
 // Contact form validation with strict sanitization
 export const contactFormSchema = z.object({
@@ -566,4 +655,4 @@ export const contactFormSchema = z.object({
     .min(1, "Message is required")
     .max(5000, "Message too long")
     .regex(/^[^<>{}[\]\\]*$/, "Message contains invalid characters"), // Block script injection chars but allow unicode
-}).strict();
+});
