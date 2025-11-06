@@ -632,85 +632,412 @@ export class CarbonCalculatorService {
       influenceScore = 20; // Poor
     }
 
-    // Generate insights
+    // Generate comprehensive insights
     const insights: { category: string; message: string; impact: 'high' | 'medium' | 'low'; actionable: boolean }[] = [];
 
-    // High influence insights
+    // === HIGH INFLUENCE INSIGHTS ===
+    
+    // Energy Insights (Very High Control)
     if (energyEmissions > 0) {
       const hasRenewable = eventData.production?.powerRequirements?.gridPowerUsage && !eventData.production?.powerRequirements?.generatorPower;
+      const usesGenerators = eventData.production?.powerRequirements?.generatorPower;
+      
       if (hasRenewable) {
         insights.push({
           category: 'Energy',
-          message: 'Excellent use of grid power over generators. Consider renewable energy certificates for even greater impact.',
+          message: '⚡ Excellent use of grid power over generators! Next step: Purchase renewable energy certificates (RECs) or carbon offsets to make this event carbon-neutral on energy.',
           impact: 'high',
           actionable: true
         });
-      } else {
+        
+        // Additional energy optimization
+        if (eventData.production?.audioVisual?.videoScreens) {
+          insights.push({
+            category: 'Energy',
+            message: '💡 Quick Win: Use LED video screens instead of traditional displays to reduce energy consumption by 40-60%.',
+            impact: 'high',
+            actionable: true
+          });
+        }
+      } else if (usesGenerators) {
+        const generatorSize = eventData.production?.powerRequirements?.generatorSize;
         insights.push({
           category: 'Energy',
-          message: 'Switching from generators to grid power or renewable sources could significantly reduce your footprint.',
+          message: `🔋 High Impact: Switching from ${generatorSize || 'diesel'} generators to grid power could reduce energy emissions by 60-80%. If grid power isn't available, consider biodiesel generators or battery storage systems.`,
+          impact: 'high',
+          actionable: true
+        });
+        
+        insights.push({
+          category: 'Energy',
+          message: '💰 Budget-Friendly: Right-size your generator capacity. Oversized generators waste fuel and money. Consider load monitoring to optimize usage.',
           impact: 'high',
           actionable: true
         });
       }
+      
+      // Lighting optimization
+      if (eventData.production?.audioVisual?.lightingRig) {
+        const lightingType = eventData.production.audioVisual.lightingRig;
+        if (lightingType === 'festival' || lightingType === 'elaborate') {
+          insights.push({
+            category: 'Energy',
+            message: '💡 Lighting Upgrade: Transition to LED lighting systems. They use 75% less energy than traditional stage lights and generate less heat, reducing cooling needs.',
+            impact: 'high',
+            actionable: true
+          });
+        }
+      }
     }
 
+    // Catering Insights (Very High Control)
     if (cateringEmissions > 0) {
       const isLocallySourced = eventData.catering?.isLocallySourced;
+      const mealsServed = eventData.catering?.expectedMealsServed || 0;
+      const perMealEmissions = cateringEmissions / mealsServed;
+      
       if (isLocallySourced) {
         insights.push({
           category: 'Catering',
-          message: 'Great job sourcing locally! Consider increasing plant-based options for additional impact.',
+          message: '🌱 Great job sourcing locally! Next level: Aim for 50%+ plant-based menu options. Plant-based meals have 50-75% lower emissions than meat-based meals.',
+          impact: 'high',
+          actionable: true
+        });
+        
+        insights.push({
+          category: 'Catering',
+          message: '♻️ Zero Waste Catering: Partner with vendors who use compostable serviceware and have food donation programs for leftovers. This can reduce catering-related waste by 80%.',
           impact: 'high',
           actionable: true
         });
       } else {
         insights.push({
           category: 'Catering',
-          message: 'Local sourcing and plant-based menu options can reduce catering emissions by up to 50%.',
+          message: `🚚 High Impact: Sourcing food locally (within 100 miles) can reduce catering emissions by 20-30%. You're currently at ${perMealEmissions.toFixed(3)} tCO₂e per meal—local sourcing could bring this down significantly.`,
+          impact: 'high',
+          actionable: true
+        });
+        
+        insights.push({
+          category: 'Catering',
+          message: '🥗 Menu Optimization: Offer a 70% plant-based menu with meat as an option rather than the default. This simple switch can cut catering emissions in half.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+      
+      // Seasonal recommendations
+      insights.push({
+        category: 'Catering',
+        message: '📅 Seasonal Strategy: Use seasonal, regional ingredients. They require less transportation and storage, reducing emissions by 15-25% while often being fresher and cheaper.',
+        impact: 'high',
+        actionable: true
+      });
+      
+      // Portion control
+      if (mealsServed > 1000) {
+        insights.push({
+          category: 'Catering',
+          message: '📊 Smart Portioning: For large events, implement portion control and made-to-order stations to reduce food waste by 30-40%. Wasted food = wasted emissions.',
           impact: 'high',
           actionable: true
         });
       }
     }
 
+    // Waste Management Insights (Very High Control)
     if (wasteEmissions > 0) {
       const hasRecycling = eventData.waste?.recyclingProgram;
+      const wasteReductionMeasures = eventData.waste?.wasteReductionMeasures || [];
+      
       if (hasRecycling) {
         insights.push({
           category: 'Waste',
-          message: 'Your recycling program is making a difference! Consider adding composting for organic waste.',
+          message: '♻️ Recycling program active—excellent! Next step: Add composting for organic waste (food scraps, compostable serviceware). This can divert 50-60% of event waste from landfills.',
           impact: 'high',
           actionable: true
         });
+        
+        if (!wasteReductionMeasures.includes('composting')) {
+          insights.push({
+            category: 'Waste',
+            message: '🌿 Composting Opportunity: Partner with local composting facilities. Composting organic waste reduces methane emissions by 90% compared to landfilling.',
+            impact: 'high',
+            actionable: true
+          });
+        }
+        
+        if (!wasteReductionMeasures.includes('reusable-cups')) {
+          insights.push({
+            category: 'Waste',
+            message: '🥤 Reusable Revolution: Implement a reusable cup system with deposits. Events using this system reduce single-use waste by 95% and attendees love it!',
+            impact: 'high',
+            actionable: true
+          });
+        }
       } else {
         insights.push({
           category: 'Waste',
-          message: 'Implementing a comprehensive recycling and composting program could reduce waste emissions by 40%.',
+          message: '🗑️ Critical Opportunity: Implementing a comprehensive recycling and composting program could reduce waste emissions by 60-70%. This is one of the highest-impact changes you can make.',
+          impact: 'high',
+          actionable: true
+        });
+        
+        insights.push({
+          category: 'Waste',
+          message: '💰 Cost Savings: Zero-waste programs often pay for themselves through reduced hauling fees and material recovery. Many venues will partner with you on this.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+      
+      // Signage and education
+      insights.push({
+        category: 'Waste',
+        message: '📢 Waste Education: Clear signage and waste ambassadors increase proper sorting by 40-60%. Make it easy for attendees to do the right thing.',
+        impact: 'high',
+        actionable: true
+      });
+    }
+
+    // Production Insights (Very High Control)
+    if (productionEmissions > 0) {
+      const hasVideoScreens = eventData.production?.audioVisual?.videoScreens;
+      const hasLivestreaming = eventData.production?.audioVisual?.livestreaming;
+      const soundSystemSize = eventData.production?.audioVisual?.soundSystemSize;
+      
+      // Equipment efficiency
+      if (soundSystemSize === 'festival' || soundSystemSize === 'large') {
+        insights.push({
+          category: 'Production',
+          message: '🎵 Equipment Efficiency: Use modern, energy-efficient sound systems. Newer systems use 30-40% less power while delivering better sound quality.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+      
+      // Reusable staging
+      insights.push({
+        category: 'Production',
+        message: '🏗️ Sustainable Staging: Use modular, reusable staging and set pieces instead of custom builds. This reduces production emissions by 50-70% and saves money on future events.',
+        impact: 'high',
+        actionable: true
+      });
+      
+      // Equipment sharing
+      if (eventData.duration?.days && eventData.duration.days > 1) {
+        insights.push({
+          category: 'Production',
+          message: '🤝 Equipment Sharing: For multi-day events, share equipment between stages during off-hours to reduce total equipment needs by 20-30%.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+      
+      // Digital alternatives
+      if (hasVideoScreens && !hasLivestreaming) {
+        insights.push({
+          category: 'Production',
+          message: '📱 Digital Reach: Consider livestreaming to reduce the need for physical attendance. Virtual attendees have 95% lower emissions than in-person attendees.',
           impact: 'high',
           actionable: true
         });
       }
     }
 
-    // Medium influence insights
+    // Venue Insights (High Control)
+    if (venueEmissions > 0) {
+      const isOutdoor = eventData.venue?.isOutdoor;
+      const venueType = eventData.venue?.type;
+      
+      if (isOutdoor) {
+        insights.push({
+          category: 'Venue',
+          message: '🏕️ Outdoor Venue Optimization: Use existing infrastructure where possible. Temporary structures have high emissions. Consider venues with permanent facilities nearby.',
+          impact: 'high',
+          actionable: true
+        });
+        
+        insights.push({
+          category: 'Venue',
+          message: '🌤️ Weather Planning: For outdoor events, have weather contingency plans that don\'t require last-minute infrastructure. This reduces emergency resource use.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+      
+      // Venue certification
+      insights.push({
+        category: 'Venue',
+        message: '🏆 Venue Selection: For future events, prioritize LEED-certified or green-certified venues. They typically have 30-50% lower operational emissions.',
+        impact: 'high',
+        actionable: true
+      });
+      
+      // Climate control
+      if (!isOutdoor) {
+        insights.push({
+          category: 'Venue',
+          message: '🌡️ Climate Control: Work with venue to optimize HVAC settings. Each degree of temperature adjustment can reduce energy use by 3-5%.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+    }
+
+    // === MEDIUM INFLUENCE INSIGHTS ===
+    
+    // Staff Travel Insights
     if (staffTravel > 0) {
+      const totalStaff = eventData.staffing?.totalStaff || 0;
+      const crewMethod = eventData.transportation?.crewTransportation?.method;
+      
+      if (crewMethod === 'flights') {
+        insights.push({
+          category: 'Staff Travel',
+          message: '✈️ Staff Travel Optimization: For crew traveling by air, consider regional talent to reduce flight emissions. Each avoided flight saves 0.5-2 tCO₂e per person.',
+          impact: 'medium',
+          actionable: true
+        });
+      }
+      
       insights.push({
         category: 'Staff Travel',
-        message: 'Consider organizing carpools or shuttle services for staff to reduce transportation emissions.',
+        message: '🚐 Staff Shuttles: Organize shared transportation for staff. Carpooling or shuttle buses can reduce staff travel emissions by 60-75% compared to individual cars.',
+        impact: 'medium',
+        actionable: true
+      });
+      
+      if (totalStaff > 50) {
+        insights.push({
+          category: 'Staff Travel',
+          message: '🏨 Accommodation Strategy: Provide nearby accommodation for staff to minimize daily commute emissions. This also improves staff satisfaction and reduces fatigue.',
+          impact: 'medium',
+          actionable: true
+        });
+      }
+      
+      // Remote work options
+      insights.push({
+        category: 'Staff Travel',
+        message: '💻 Remote Roles: Identify roles that can be done remotely (ticketing, marketing, social media). Remote staff have zero travel emissions.',
         impact: 'medium',
         actionable: true
       });
     }
 
-    // Low influence context
+    // Equipment Transport Insights
+    if (equipmentTransport > 0) {
+      const trucksRequired = eventData.transportation?.equipmentTransportation?.trucksRequired || 0;
+      const distance = eventData.transportation?.equipmentTransportation?.averageDistance || 0;
+      
+      if (trucksRequired > 5) {
+        insights.push({
+          category: 'Equipment Transport',
+          message: `🚚 Logistics Optimization: You're using ${trucksRequired} trucks traveling ${distance}km. Consolidate shipments and use local equipment rental to reduce truck trips by 30-40%.`,
+          impact: 'medium',
+          actionable: true
+        });
+      }
+      
+      insights.push({
+        category: 'Equipment Transport',
+        message: '📦 Smart Packing: Optimize truck loading to maximize space efficiency. Better packing can reduce required trucks by 15-25%.',
+        impact: 'medium',
+        actionable: true
+      });
+      
+      // Local sourcing
+      insights.push({
+        category: 'Equipment Transport',
+        message: '🏪 Local Equipment Rental: Source equipment locally when possible. Each 100km reduction in transport distance saves 0.12-0.17 tCO₂e per truck.',
+        impact: 'medium',
+        actionable: true
+      });
+    }
+
+    // Venue Location Impact
+    if (mediumInfluence.categories.venueLocation && mediumInfluence.categories.venueLocation > 0) {
+      const venueLocation = eventData.venue?.location;
+      
+      insights.push({
+        category: 'Venue Location',
+        message: '🚇 Transit Access: Your venue choice affects attendee travel patterns. Transit-accessible venues can reduce attendee travel emissions by 20-40% compared to car-dependent locations.',
+        impact: 'medium',
+        actionable: true
+      });
+      
+      insights.push({
+        category: 'Venue Location',
+        message: '🅿️ Parking Incentives: Offer discounted or free parking for carpools (3+ people). This simple incentive can increase carpooling by 25-35%.',
+        impact: 'medium',
+        actionable: true
+      });
+      
+      // Future planning
+      insights.push({
+        category: 'Venue Location',
+        message: '📍 Future Planning: For next year, consider venues within 5km of major transit hubs. This makes sustainable travel the easy choice for attendees.',
+        impact: 'medium',
+        actionable: true
+      });
+    }
+
+    // === LOW INFLUENCE INSIGHTS (Context Only) ===
+    
+    // Attendee Travel Context
     if (attendeeTravel > 0) {
       const percentOfTotal = (attendeeTravel / (highInfluence.total + mediumInfluence.total + lowInfluence.total)) * 100;
+      const attendance = eventData.attendance;
+      const avgDistance = eventData.transportation?.audienceTravel?.averageDistance || 0;
+      
       insights.push({
         category: 'Attendee Travel',
-        message: `Attendee travel represents ${percentOfTotal.toFixed(0)}% of your total footprint. While largely outside your control, your transit-accessible venue choice helps minimize this impact.`,
+        message: `🚗 Attendee Travel Context: Attendee travel represents ${percentOfTotal.toFixed(0)}% of your total footprint (${attendeeTravel.toFixed(2)} tCO₂e). While largely outside your control, your venue choice and location help minimize this impact.`,
         impact: 'low',
         actionable: false
+      });
+      
+      // Influence strategies
+      insights.push({
+        category: 'Attendee Travel',
+        message: `🎟️ Gentle Nudges: While you can't control attendee travel, you can influence it. Offer transit pass bundles with tickets, partner with rideshare apps for discounts, or create a carpool matching platform. These can reduce attendee travel emissions by 10-15%.`,
+        impact: 'low',
+        actionable: true
+      });
+      
+      // Virtual options
+      if (attendance > 1000) {
+        insights.push({
+          category: 'Attendee Travel',
+          message: '🌐 Hybrid Events: Consider offering virtual attendance options for future events. Even if just 10% of attendees go virtual, you could reduce total emissions by 8-10%.',
+          impact: 'low',
+          actionable: true
+        });
+      }
+      
+      // Communication
+      insights.push({
+        category: 'Attendee Travel',
+        message: '📧 Pre-Event Communication: Send attendees information about sustainable travel options (transit routes, carpool matching, bike parking). Clear communication increases sustainable travel by 15-20%.',
+        impact: 'low',
+        actionable: true
+      });
+    }
+
+    // === QUICK WINS SUMMARY ===
+    // Add a summary insight highlighting the easiest high-impact changes
+    const quickWins: string[] = [];
+    if (!eventData.waste?.recyclingProgram) quickWins.push('recycling program');
+    if (!eventData.catering?.isLocallySourced) quickWins.push('local food sourcing');
+    if (eventData.production?.powerRequirements?.generatorPower) quickWins.push('switch to grid power');
+    
+    if (quickWins.length > 0) {
+      insights.push({
+        category: 'Quick Wins',
+        message: `⚡ Fastest Impact: Focus on these quick wins first: ${quickWins.join(', ')}. These changes are relatively easy to implement and deliver immediate results.`,
+        impact: 'high',
+        actionable: true
       });
     }
 

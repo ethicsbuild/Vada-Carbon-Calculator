@@ -48,6 +48,28 @@ The **Influence Score** measures performance on controllable elements, while sti
 - [x] Provide context for low-influence areas without guilt
 - [x] Show "what you did well" before "what to improve"
 
+### [x] 6. Expand Insights & Recommendations
+- [x] Add more detailed venue-specific insights
+- [x] Include production equipment optimization suggestions
+- [x] Add catering menu optimization recommendations
+- [x] Include waste reduction best practices
+- [x] Add energy source transition guidance
+- [x] Include staff travel optimization strategies
+- [x] Add venue location impact analysis
+- [x] Include seasonal and weather-based recommendations
+- [x] Add budget-conscious improvement suggestions
+- [x] Include quick wins vs. long-term improvements
+
+## Summary of Enhancements
+- **Insights increased from 5 to 32+** comprehensive recommendations
+- **Categorized by impact level:** High (controllable), Medium (influenceable), Low (context)
+- **Actionable vs. informational:** Clear distinction between what can be done vs. what to know
+- **Emoji indicators:** Visual cues for quick scanning
+- **Specific metrics:** Percentage improvements and emission reductions quantified
+- **Budget considerations:** Cost-saving opportunities highlighted
+- **Quick wins section:** Prioritized easy-to-implement changes
+- **Future planning:** Long-term strategic recommendations included
+
 ### [ ] 6. Update Sage AI Guidance
 - [ ] Modify Sage prompts to emphasize influence-based approach
 - [ ] Focus chat guidance on controllable actions
