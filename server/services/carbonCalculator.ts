@@ -1,5 +1,8 @@
 import { storage } from "../storage";
 import { type CarbonCalculation, type InsertCarbonCalculation } from "@shared/schema";
+import { getRelevantSuccessStories, type SuccessStory } from "../data/successStories";
+import { getBenchmark, calculatePercentile, getTrendAnalysis, type BenchmarkData } from "../data/industryBenchmarks";
+import { recommendCertifications, type CertificationPathway } from "../data/certificationPathways";
 
 export interface Scope1Data {
   // Direct emissions
@@ -171,6 +174,22 @@ export interface EventCalculationResult {
       impact: 'high' | 'medium' | 'low';
       actionable: boolean;
     }[];
+      // Success stories, benchmarks, and certifications
+      successStories?: SuccessStory[];
+      detailedBenchmark?: {
+        data: BenchmarkData;
+        percentileAnalysis: {
+          percentile: number;
+          rating: string;
+          message: string;
+        };
+        trendAnalysis: {
+          direction: 'improving' | 'stable' | 'declining';
+          averageYearlyChange: number;
+          message: string;
+        };
+      };
+      certificationRecommendations?: CertificationPathway[];
 }
 
 export class CarbonCalculatorService {
@@ -1076,6 +1095,34 @@ export class CarbonCalculatorService {
       eventData
     );
 
+    // Get success stories
+    const successStories = getRelevantSuccessStories(
+      eventData.eventType,
+      eventData.attendance,
+      total,
+      [] // Can be expanded to match specific improvements
+    );
+
+    // Get detailed benchmark analysis
+    const benchmark = getBenchmark(eventData.eventType);
+    let detailedBenchmark;
+    if (benchmark) {
+      const percentileAnalysis = calculatePercentile(emissionsPerAttendee, benchmark);
+      const trendAnalysis = getTrendAnalysis(benchmark);
+      detailedBenchmark = {
+        data: benchmark,
+        percentileAnalysis,
+        trendAnalysis
+      };
+    }
+
+    // Get certification recommendations
+    const certificationRecommendations = recommendCertifications(
+      eventData.eventType,
+      influenceMetrics.influenceScore,
+      total < 100 ? 'low' : total < 500 ? 'medium' : 'high'
+    );
+
     return {
       venue: venueResults.total,
       transportation: transportationResults.total,
@@ -1095,6 +1142,9 @@ export class CarbonCalculatorService {
         ...influenceMetrics,
       emissionsPerAttendee,
       benchmarkComparison,
+      successStories,
+      detailedBenchmark,
+      certificationRecommendations,
     };
   }
 
