@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { TrendingDown, TrendingUp, Award, AlertTriangle, Save, History } from 'lucide-react';
+import { TrendingDown, TrendingUp, Award, AlertTriangle, Save, History, Target } from 'lucide-react';
 import { HumanScaleComparisons } from './human-scale-comparisons';
 import { ActionableRecommendations } from './actionable-recommendations';
 import { SaveEventDialog } from '../events/save-event-dialog';
+import { InfluenceScoreResults } from './influence-score-results';
 
 interface CarbonResultsProps {
   calculation: {
@@ -22,6 +23,28 @@ interface CarbonResultsProps {
       percentile: number;
       performance: string;
     };
+    influenceScore?: number;
+    highInfluenceEmissions?: {
+      total: number;
+      categories: Record<string, number>;
+      breakdown: Record<string, number>;
+    };
+    mediumInfluenceEmissions?: {
+      total: number;
+      categories: Record<string, number>;
+      breakdown: Record<string, number>;
+    };
+    lowInfluenceEmissions?: {
+      total: number;
+      categories: Record<string, number>;
+      breakdown: Record<string, number>;
+    };
+    influenceInsights?: {
+      category: string;
+      message: string;
+      impact: 'high' | 'medium' | 'low';
+      actionable: boolean;
+    }[];
   };
   eventData?: {
     attendance?: number;
@@ -184,8 +207,12 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
       </Card>
 
       {/* Tabbed Content */}
-      <Tabs defaultValue="comparisons" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 bg-slate-800/50">
+      <Tabs defaultValue="influence" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-slate-800/50">
+          <TabsTrigger value="influence" className="data-[state=active]:bg-emerald-500/20">
+            <Target className="w-4 h-4 mr-2" />
+            Your Control
+          </TabsTrigger>
           <TabsTrigger value="comparisons" className="data-[state=active]:bg-emerald-500/20">
             What Does This Mean?
           </TabsTrigger>
@@ -193,6 +220,30 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
             How To Improve
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="influence" className="mt-6">
+          {calculation.influenceScore !== undefined && 
+           calculation.highInfluenceEmissions && 
+           calculation.mediumInfluenceEmissions && 
+           calculation.lowInfluenceEmissions && 
+           calculation.influenceInsights ? (
+            <InfluenceScoreResults
+              influenceScore={calculation.influenceScore}
+              highInfluenceEmissions={calculation.highInfluenceEmissions}
+              mediumInfluenceEmissions={calculation.mediumInfluenceEmissions}
+              lowInfluenceEmissions={calculation.lowInfluenceEmissions}
+              influenceInsights={calculation.influenceInsights}
+              total={total}
+              attendance={eventData?.attendance || 1}
+            />
+          ) : (
+            <Card className="bg-slate-800/50 border-slate-700/50 p-6">
+              <p className="text-slate-400 text-center">
+                Influence score data not available for this calculation.
+              </p>
+            </Card>
+          )}
+        </TabsContent>
 
         <TabsContent value="comparisons" className="mt-6">
           <HumanScaleComparisons

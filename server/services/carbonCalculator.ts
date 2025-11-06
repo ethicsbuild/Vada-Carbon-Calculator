@@ -45,6 +45,38 @@ export interface CalculationResult {
   };
 }
 
+
+// Influence weights for each emission category (0-100, representing % of control)
+export interface InfluenceWeights {
+  venue: number;
+  energy: number;
+  catering: number;
+  waste: number;
+  production: number;
+  staffTravel: number;
+  venueLocation: number;
+  attendeeTravel: number;
+  equipmentTransport: number;
+}
+
+export const DEFAULT_INFLUENCE_WEIGHTS: InfluenceWeights = {
+  venue: 85,              // High control: venue selection and operations
+  energy: 95,             // Very high control: direct energy choices
+  catering: 90,           // Very high control: menu and sourcing decisions
+  waste: 90,              // Very high control: waste management programs
+  production: 95,         // Very high control: equipment and setup choices
+  staffTravel: 60,        // Medium control: can encourage carpools, provide shuttles
+  venueLocation: 50,      // Medium control: affects attendee travel patterns
+  equipmentTransport: 70, // Medium-high control: logistics planning
+  attendeeTravel: 10,     // Low control: mostly individual attendee choices
+};
+
+export interface InfluenceTierEmissions {
+  total: number;
+  categories: Record<string, number>;
+  breakdown: Record<string, number>;
+}
+
 // Event-specific emission calculation interfaces
 export interface EventEmissionData {
   eventType: string;
@@ -128,6 +160,17 @@ export interface EventCalculationResult {
     percentile: number;
     performance: string;
   };
+    // New influence score fields
+    influenceScore: number;
+    highInfluenceEmissions: InfluenceTierEmissions;
+    mediumInfluenceEmissions: InfluenceTierEmissions;
+    lowInfluenceEmissions: InfluenceTierEmissions;
+    influenceInsights: {
+      category: string;
+      message: string;
+      impact: 'high' | 'medium' | 'low';
+      actionable: boolean;
+    }[];
 }
 
 export class CarbonCalculatorService {
@@ -466,6 +509,220 @@ export class CarbonCalculatorService {
   }
 
   // Event-specific emission calculation methods
+
+  // Calculate influence score and tier emissions
+  private calculateInfluenceMetrics(
+    venueEmissions: number,
+    transportationResults: { total: number; breakdown: Record<string, number> },
+    energyEmissions: number,
+    cateringEmissions: number,
+    wasteEmissions: number,
+    productionEmissions: number,
+    eventData: EventEmissionData
+  ): {
+    influenceScore: number;
+    highInfluenceEmissions: InfluenceTierEmissions;
+    mediumInfluenceEmissions: InfluenceTierEmissions;
+    lowInfluenceEmissions: InfluenceTierEmissions;
+    influenceInsights: { category: string; message: string; impact: 'high' | 'medium' | 'low'; actionable: boolean }[];
+  } {
+    const weights = DEFAULT_INFLUENCE_WEIGHTS;
+
+    // Categorize emissions by influence level
+    const highInfluence: InfluenceTierEmissions = {
+      total: 0,
+      categories: {},
+      breakdown: {}
+    };
+
+    const mediumInfluence: InfluenceTierEmissions = {
+      total: 0,
+      categories: {},
+      breakdown: {}
+    };
+
+    const lowInfluence: InfluenceTierEmissions = {
+      total: 0,
+      categories: {},
+      breakdown: {}
+    };
+
+    // High influence (85-100%)
+    if (weights.venue >= 85) {
+      highInfluence.categories.venue = venueEmissions;
+      highInfluence.total += venueEmissions;
+    }
+    if (weights.energy >= 85) {
+      highInfluence.categories.energy = energyEmissions;
+      highInfluence.total += energyEmissions;
+    }
+    if (weights.catering >= 85) {
+      highInfluence.categories.catering = cateringEmissions;
+      highInfluence.total += cateringEmissions;
+    }
+    if (weights.waste >= 85) {
+      highInfluence.categories.waste = wasteEmissions;
+      highInfluence.total += wasteEmissions;
+    }
+    if (weights.production >= 85) {
+      highInfluence.categories.production = productionEmissions;
+      highInfluence.total += productionEmissions;
+    }
+
+    // Medium influence (40-84%)
+    // Extract staff and equipment travel from transportation breakdown
+    const staffTravel = transportationResults.breakdown.crewTransport || 0;
+    const equipmentTransport = transportationResults.breakdown.equipmentShipping || 0;
+    const attendeeTravel = transportationResults.total - staffTravel - equipmentTransport;
+
+    if (weights.staffTravel >= 40 && weights.staffTravel < 85) {
+      mediumInfluence.categories.staffTravel = staffTravel;
+      mediumInfluence.total += staffTravel;
+    }
+    if (weights.equipmentTransport >= 40 && weights.equipmentTransport < 85) {
+      mediumInfluence.categories.equipmentTransport = equipmentTransport;
+      mediumInfluence.total += equipmentTransport;
+    }
+    if (weights.venueLocation >= 40 && weights.venueLocation < 85) {
+      // Venue location influence is reflected in attendee travel patterns
+      const venueLocationImpact = attendeeTravel * (weights.venueLocation / 100);
+      mediumInfluence.categories.venueLocation = venueLocationImpact;
+      mediumInfluence.total += venueLocationImpact;
+    }
+
+    // Low influence (<40%)
+    if (weights.attendeeTravel < 40) {
+      lowInfluence.categories.attendeeTravel = attendeeTravel;
+      lowInfluence.total += attendeeTravel;
+    }
+
+    // Calculate influence score (0-100)
+    // Score based on performance in high-influence areas compared to benchmarks
+    const highInfluencePerAttendee = highInfluence.total / eventData.attendance;
+    const benchmarks: Record<string, number> = {
+      concert: 0.005,
+      festival: 0.008,
+      conference: 0.004,
+      sports_event: 0.006,
+      theater_performance: 0.003,
+      wedding: 0.002,
+      corporate_event: 0.003,
+      trade_show: 0.005,
+      community_event: 0.002,
+      outdoor_event: 0.007,
+      other: 0.005
+    };
+
+    const highInfluenceBenchmark = benchmarks[eventData.eventType] || 0.005;
+    const performanceRatio = highInfluencePerAttendee / highInfluenceBenchmark;
+
+    // Convert to 0-100 score (lower emissions = higher score)
+    let influenceScore = 100;
+    if (performanceRatio <= 0.5) {
+      influenceScore = 100; // Excellent
+    } else if (performanceRatio <= 0.75) {
+      influenceScore = 90; // Very good
+    } else if (performanceRatio <= 1.0) {
+      influenceScore = 75; // Good
+    } else if (performanceRatio <= 1.5) {
+      influenceScore = 60; // Fair
+    } else if (performanceRatio <= 2.0) {
+      influenceScore = 40; // Needs improvement
+    } else {
+      influenceScore = 20; // Poor
+    }
+
+    // Generate insights
+    const insights: { category: string; message: string; impact: 'high' | 'medium' | 'low'; actionable: boolean }[] = [];
+
+    // High influence insights
+    if (energyEmissions > 0) {
+      const hasRenewable = eventData.production?.powerRequirements?.gridPowerUsage && !eventData.production?.powerRequirements?.generatorPower;
+      if (hasRenewable) {
+        insights.push({
+          category: 'Energy',
+          message: 'Excellent use of grid power over generators. Consider renewable energy certificates for even greater impact.',
+          impact: 'high',
+          actionable: true
+        });
+      } else {
+        insights.push({
+          category: 'Energy',
+          message: 'Switching from generators to grid power or renewable sources could significantly reduce your footprint.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+    }
+
+    if (cateringEmissions > 0) {
+      const isLocallySourced = eventData.catering?.isLocallySourced;
+      if (isLocallySourced) {
+        insights.push({
+          category: 'Catering',
+          message: 'Great job sourcing locally! Consider increasing plant-based options for additional impact.',
+          impact: 'high',
+          actionable: true
+        });
+      } else {
+        insights.push({
+          category: 'Catering',
+          message: 'Local sourcing and plant-based menu options can reduce catering emissions by up to 50%.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+    }
+
+    if (wasteEmissions > 0) {
+      const hasRecycling = eventData.waste?.recyclingProgram;
+      if (hasRecycling) {
+        insights.push({
+          category: 'Waste',
+          message: 'Your recycling program is making a difference! Consider adding composting for organic waste.',
+          impact: 'high',
+          actionable: true
+        });
+      } else {
+        insights.push({
+          category: 'Waste',
+          message: 'Implementing a comprehensive recycling and composting program could reduce waste emissions by 40%.',
+          impact: 'high',
+          actionable: true
+        });
+      }
+    }
+
+    // Medium influence insights
+    if (staffTravel > 0) {
+      insights.push({
+        category: 'Staff Travel',
+        message: 'Consider organizing carpools or shuttle services for staff to reduce transportation emissions.',
+        impact: 'medium',
+        actionable: true
+      });
+    }
+
+    // Low influence context
+    if (attendeeTravel > 0) {
+      const percentOfTotal = (attendeeTravel / (highInfluence.total + mediumInfluence.total + lowInfluence.total)) * 100;
+      insights.push({
+        category: 'Attendee Travel',
+        message: `Attendee travel represents ${percentOfTotal.toFixed(0)}% of your total footprint. While largely outside your control, your transit-accessible venue choice helps minimize this impact.`,
+        impact: 'low',
+        actionable: false
+      });
+    }
+
+    return {
+      influenceScore,
+      highInfluenceEmissions: highInfluence,
+      mediumInfluenceEmissions: mediumInfluence,
+      lowInfluenceEmissions: lowInfluence,
+      influenceInsights: insights
+    };
+  }
+
   async calculateEventEmissions(eventData: EventEmissionData): Promise<EventCalculationResult> {
     // Calculate emissions for each category
     const venueResults = this.calculateVenueEmissions(eventData);
@@ -480,6 +737,17 @@ export class CarbonCalculatorService {
 
     const emissionsPerAttendee = total / eventData.attendance;
     const benchmarkComparison = this.getEventBenchmarkComparison(eventData.eventType, emissionsPerAttendee);
+
+    // Calculate influence metrics
+    const influenceMetrics = this.calculateInfluenceMetrics(
+      venueResults.total,
+      transportationResults,
+      energyResults.total,
+      cateringResults.total,
+      wasteResults.total,
+      productionResults.total,
+      eventData
+    );
 
     return {
       venue: venueResults.total,
@@ -497,6 +765,7 @@ export class CarbonCalculatorService {
         wasteDetails: wasteResults.breakdown,
         productionDetails: productionResults.breakdown,
       },
+        ...influenceMetrics,
       emissionsPerAttendee,
       benchmarkComparison,
     };
