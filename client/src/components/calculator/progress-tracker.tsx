@@ -97,7 +97,7 @@ export function ProgressTracker({ progress }: ProgressTrackerProps) {
             <div className="absolute inset-0 flex items-center justify-center">
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">{Math.round(progress.progress)}%</div>
-                <div className="text-sm text-gray-600 dark:text-gray-400">Complete</div>
+                <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Complete</div>
               </div>
             </div>
           </div>
@@ -119,24 +119,24 @@ export function ProgressTracker({ progress }: ProgressTrackerProps) {
                 )}>
                   <Icon className={cn(
                     "w-4 h-4",
-                    status === 'completed' && "text-white",
-                    status === 'current' && "text-white",
-                    status === 'pending' && "text-gray-600 dark:text-gray-400"
+                    status === 'completed' && "text-forest-900 dark:text-forest-50",
+                    status === 'current' && "text-forest-900 dark:text-forest-50",
+                    status === 'pending' && "text-gray-600 dark:text-sage-600 dark:text-sage-400"
                   )} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={cn(
                     "font-medium text-sm",
-                    status === 'completed' && "text-gray-900 dark:text-white",
+                    status === 'completed' && "text-gray-900 dark:text-forest-900 dark:text-forest-50",
                     status === 'current' && "text-green-600 dark:text-green-400",
-                    status === 'pending' && "text-gray-600 dark:text-gray-400"
+                    status === 'pending' && "text-gray-600 dark:text-sage-600 dark:text-sage-400"
                   )}>
                     {step.title}
                     {status === 'current' && (
                       <Badge variant="secondary" className="ml-2 text-xs">Current</Badge>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-sage-600 dark:text-sage-400 mt-1">
                     {step.description}
                   </div>
                 </div>

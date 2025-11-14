@@ -161,21 +161,21 @@ export default function Resources() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-forest-900 dark:text-forest-50 mb-4">
             Resources
           </h1>
-          <p className="text-lg text-slate-300 max-w-2xl mx-auto">
+          <p className="text-lg text-sage-700 dark:text-sage-300 max-w-2xl mx-auto">
             Essential links and information to help you measure and reduce your event's carbon footprint
           </p>
         </div>
 
         {/* Recommended Guides & Standards */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Industry Guides & Standards</h2>
+          <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-6">Industry Guides & Standards</h2>
           <div className="grid md:grid-cols-2 gap-6">
             {recommendedGuides.map((guide, index) => (
               <a
@@ -185,19 +185,19 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:bg-slate-800/70 hover:border-emerald-500/50 transition-all">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 hover:border-emerald-500/50 transition-all">
                   <div className="flex gap-4">
                     <div className="p-3 bg-emerald-500/10 rounded-lg h-fit group-hover:bg-emerald-500/20 transition-colors">
                       <guide.icon className="w-6 h-6 text-emerald-500" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
-                        <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors">
+                        <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-50 mb-2 group-hover:text-emerald-400 transition-colors">
                           {guide.title}
                         </h3>
                         <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-emerald-400 transition-colors" />
                       </div>
-                      <p className="text-sm text-slate-300 mb-3">{guide.description}</p>
+                      <p className="text-sm text-sage-700 dark:text-sage-300 mb-3">{guide.description}</p>
                       <span className="inline-block text-xs text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full">
                         {guide.type}
                       </span>
@@ -211,7 +211,7 @@ export default function Resources() {
 
         {/* Educational Content */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Educational Resources</h2>
+          <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-6">Educational Resources</h2>
           <div className="grid md:grid-cols-3 gap-6">
             {educationalContent.map((content, index) => (
               <a
@@ -221,19 +221,19 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:bg-slate-800/70 hover:border-violet-500/50 transition-all h-full">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
                   <div className="mb-3">
                     <span className="inline-block text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-3">
                       {content.category}
                     </span>
                     <div className="flex items-start justify-between mb-2">
-                      <h3 className="text-white font-semibold group-hover:text-violet-400 transition-colors flex-1">
+                      <h3 className="text-forest-900 dark:text-forest-50 font-semibold group-hover:text-violet-400 transition-colors flex-1">
                         {content.title}
                       </h3>
                       <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-violet-400 transition-colors ml-2" />
                     </div>
-                    <p className="text-sm text-slate-300 mb-3">{content.description}</p>
-                    <p className="text-xs text-slate-400">{content.duration}</p>
+                    <p className="text-sm text-sage-700 dark:text-sage-300 mb-3">{content.description}</p>
+                    <p className="text-xs text-sage-600 dark:text-sage-400">{content.duration}</p>
                   </div>
                 </Card>
               </a>
@@ -243,7 +243,7 @@ export default function Resources() {
 
         {/* Key Topics */}
         <div className="mb-12">
-          <h2 className="text-2xl font-bold text-white mb-6">Key Sustainability Topics</h2>
+          <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-6">Key Sustainability Topics</h2>
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {keyTopics.map((topic, index) => (
               <a
@@ -253,14 +253,14 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 text-center hover:bg-slate-800/70 hover:border-violet-500/50 transition-all h-full">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 text-center hover:bg-forest-50 dark:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
                   <div className="inline-flex p-4 bg-violet-500/10 rounded-full mb-4 group-hover:bg-violet-500/20 transition-colors">
                     <topic.icon className="w-8 h-8 text-violet-500" />
                   </div>
-                  <h3 className="text-white font-semibold mb-2 group-hover:text-violet-400 transition-colors">
+                  <h3 className="text-forest-900 dark:text-forest-50 font-semibold mb-2 group-hover:text-violet-400 transition-colors">
                     {topic.title}
                   </h3>
-                  <p className="text-sm text-slate-300 mb-3">{topic.description}</p>
+                  <p className="text-sm text-sage-700 dark:text-sage-300 mb-3">{topic.description}</p>
                   <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-violet-400 transition-colors mx-auto" />
                 </Card>
               </a>
@@ -269,10 +269,10 @@ export default function Resources() {
         </div>
 
         {/* External Resources */}
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 mb-12">
+        <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 mb-12">
           <div className="flex items-center gap-2 mb-6">
             <BookOpen className="w-6 h-6 text-emerald-500" />
-            <h2 className="text-2xl font-bold text-white">External Resources</h2>
+            <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50">External Resources</h2>
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {externalResources.map((resource, index) => (
@@ -284,10 +284,10 @@ export default function Resources() {
                 className="flex items-center justify-between p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors group"
               >
                 <div className="flex-1">
-                  <h3 className="text-white font-medium mb-1 group-hover:text-emerald-400 transition-colors">
+                  <h3 className="text-forest-900 dark:text-forest-50 font-medium mb-1 group-hover:text-emerald-400 transition-colors">
                     {resource.name}
                   </h3>
-                  <p className="text-sm text-slate-400">{resource.description}</p>
+                  <p className="text-sm text-sage-600 dark:text-sage-400">{resource.description}</p>
                   <p className="text-xs text-slate-500 mt-1">{resource.url}</p>
                 </div>
                 <ExternalLink className="w-5 h-5 text-slate-500 group-hover:text-emerald-400 transition-colors ml-4" />
@@ -297,12 +297,12 @@ export default function Resources() {
         </Card>
 
         {/* Contact Form */}
-        <Card className="bg-slate-800/70 border-slate-700/50 backdrop-blur-sm p-8">
+        <Card className="bg-forest-50 dark:bg-forest-800/70 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-8">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-3">
+            <h2 className="text-3xl font-bold text-forest-900 dark:text-forest-50 mb-3">
               Need Help or Have Questions?
             </h2>
-            <p className="text-slate-200 max-w-2xl mx-auto">
+            <p className="text-forest-700 dark:text-forest-200 max-w-2xl mx-auto">
               Our team is here to help. Send us a message and we'll get back to you as soon as possible.
             </p>
           </div>
@@ -310,8 +310,8 @@ export default function Resources() {
           {formSubmitted ? (
             <div className="text-center py-12">
               <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-white mb-2">Message Sent!</h3>
-              <p className="text-slate-300">We'll get back to you soon.</p>
+              <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-2">Message Sent!</h3>
+              <p className="text-sage-700 dark:text-sage-300">We'll get back to you soon.</p>
             </div>
           ) : (
             <>
@@ -323,19 +323,19 @@ export default function Resources() {
               <form onSubmit={handleContactSubmit} className="max-w-2xl mx-auto space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                  <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                     Name
                   </label>
                   <Input
                     required
                     value={contactForm.name}
                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400"
                     placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                  <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                     Email
                   </label>
                   <Input
@@ -343,27 +343,27 @@ export default function Resources() {
                     required
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-2">
+                <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                   Message
                 </label>
                 <Textarea
                   required
                   value={contactForm.message}
                   onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[150px]"
+                  className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400 min-h-[150px]"
                   placeholder="Tell us how we can help..."
                 />
               </div>
               <Button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-emerald-500 hover:bg-emerald-600 text-forest-900 dark:text-forest-50 py-6 text-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Send className="w-5 h-5 mr-2" />
                 {isSubmitting ? 'Sending...' : 'Send Message'}

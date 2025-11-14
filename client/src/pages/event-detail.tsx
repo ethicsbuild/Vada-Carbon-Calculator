@@ -77,7 +77,7 @@ export default function EventDetail() {
       case 'average': return 'text-yellow-400';
       case 'needs improvement': return 'text-orange-400';
       case 'poor': return 'text-red-400';
-      default: return 'text-slate-400';
+      default: return 'text-sage-600 dark:text-sage-400';
     }
   };
 
@@ -93,16 +93,16 @@ export default function EventDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white">Loading event details...</div>
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950 flex items-center justify-center">
+        <div className="text-forest-900 dark:text-forest-50">Loading event details...</div>
       </div>
     );
   }
 
   if (error || !comparisonData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <Card className="bg-slate-800/50 border-slate-700/50 p-8 text-center">
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950 flex items-center justify-center">
+        <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 p-8 text-center">
           <p className="text-red-400">{error || 'Event not found'}</p>
           <Link href="/history">
             <Button className="mt-4">Back to History</Button>
@@ -128,12 +128,12 @@ export default function EventDetail() {
   ].sort((a, b) => b.value - a.value);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
           <Link href="/history">
-            <Button variant="ghost" className="text-slate-400 hover:text-white mb-4">
+            <Button variant="ghost" className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50 mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to History
             </Button>
@@ -141,8 +141,8 @@ export default function EventDetail() {
           <div className="flex items-center gap-4 mb-4">
             <span className="text-6xl">{getEventIcon(currentEvent.eventType)}</span>
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold text-white">{currentEvent.eventName}</h1>
-              <p className="text-xl text-slate-400">{currentEvent.eventYear}</p>
+              <h1 className="text-4xl md:text-5xl font-bold text-forest-900 dark:text-forest-50">{currentEvent.eventName}</h1>
+              <p className="text-xl text-sage-600 dark:text-sage-400">{currentEvent.eventYear}</p>
             </div>
           </div>
         </div>
@@ -151,14 +151,14 @@ export default function EventDetail() {
           {/* Main Stats */}
           <div className="lg:col-span-2 space-y-6">
             {/* Total Emissions Card */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+            <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h2 className="text-lg text-slate-400 mb-2">Total Carbon Footprint</h2>
+                  <h2 className="text-lg text-sage-600 dark:text-sage-400 mb-2">Total Carbon Footprint</h2>
                   <div className="text-5xl font-bold bg-gradient-to-r from-emerald-400 to-violet-400 bg-clip-text text-transparent">
                     {total.toFixed(2)} tCO₂e
                   </div>
-                  <p className="text-slate-400 mt-2">
+                  <p className="text-sage-600 dark:text-sage-400 mt-2">
                     {parseFloat(currentEvent.emissionsPerAttendee).toFixed(4)} tCO₂e per attendee
                   </p>
                 </div>
@@ -187,7 +187,7 @@ export default function EventDetail() {
                       </>
                     )}
                   </div>
-                  <p className="text-sm text-slate-400 mt-2">
+                  <p className="text-sm text-sage-600 dark:text-sage-400 mt-2">
                     Previous year: {parseFloat(previousEvent.totalEmissions).toFixed(2)} tCO₂e
                   </p>
                 </div>
@@ -195,16 +195,16 @@ export default function EventDetail() {
             </Card>
 
             {/* Emissions Breakdown */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-              <h3 className="text-xl font-bold text-white mb-4">Emissions Breakdown</h3>
+            <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
+              <h3 className="text-xl font-bold text-forest-900 dark:text-forest-50 mb-4">Emissions Breakdown</h3>
               <div className="space-y-4">
                 {breakdownData.map((item, index) => {
                   const percentage = (item.value / total) * 100;
                   return (
                     <div key={index}>
                       <div className="flex justify-between text-sm mb-1">
-                        <span className="text-slate-400">{item.label}</span>
-                        <span className="text-white font-medium">
+                        <span className="text-sage-600 dark:text-sage-400">{item.label}</span>
+                        <span className="text-forest-900 dark:text-forest-50 font-medium">
                           {item.value.toFixed(3)} tCO₂e ({percentage.toFixed(1)}%)
                         </span>
                       </div>
@@ -222,19 +222,19 @@ export default function EventDetail() {
 
             {/* Historical Trend */}
             {historicalTrend.length > 1 && (
-              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-                <h3 className="text-xl font-bold text-white mb-4">Historical Trend</h3>
+              <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
+                <h3 className="text-xl font-bold text-forest-900 dark:text-forest-50 mb-4">Historical Trend</h3>
                 <div className="space-y-3">
                   {historicalTrend.sort((a, b) => b.year - a.year).map((event, index) => {
                     const isCurrent = event.year === currentEvent.eventYear;
                     return (
-                      <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${isCurrent ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-slate-900/50'}`}>
+                      <div key={index} className={`flex items-center justify-between p-3 rounded-lg ${isCurrent ? 'bg-emerald-500/10 border border-emerald-500/20' : 'bg-sage-50 dark:bg-forest-900/50'}`}>
                         <div className="flex items-center gap-3">
-                          <div className="text-lg font-bold text-white">{event.year}</div>
+                          <div className="text-lg font-bold text-forest-900 dark:text-forest-50">{event.year}</div>
                           {isCurrent && <span className="text-xs text-emerald-400 font-semibold">Current</span>}
                         </div>
                         <div className="text-right">
-                          <div className="text-white font-medium">{parseFloat(event.totalEmissions).toFixed(2)} tCO₂e</div>
+                          <div className="text-forest-900 dark:text-forest-50 font-medium">{parseFloat(event.totalEmissions).toFixed(2)} tCO₂e</div>
                           <div className={`text-xs capitalize ${getPerformanceColor(event.performance)}`}>
                             {event.performance}
                           </div>
@@ -248,9 +248,9 @@ export default function EventDetail() {
 
             {/* Notes */}
             {currentEvent.notes && (
-              <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-                <h3 className="text-xl font-bold text-white mb-3">Notes</h3>
-                <p className="text-slate-300 whitespace-pre-wrap">{currentEvent.notes}</p>
+              <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
+                <h3 className="text-xl font-bold text-forest-900 dark:text-forest-50 mb-3">Notes</h3>
+                <p className="text-sage-700 dark:text-sage-300 whitespace-pre-wrap">{currentEvent.notes}</p>
               </Card>
             )}
           </div>
@@ -258,31 +258,31 @@ export default function EventDetail() {
           {/* Sidebar */}
           <div className="space-y-6">
             {/* Event Details */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Event Details</h3>
+            <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
+              <h3 className="text-lg font-bold text-forest-900 dark:text-forest-50 mb-4">Event Details</h3>
               <div className="space-y-3 text-sm">
                 {currentEvent.eventDate && (
                   <div className="flex items-start gap-3">
-                    <Calendar className="w-5 h-5 text-slate-400 mt-0.5" />
+                    <Calendar className="w-5 h-5 text-sage-600 dark:text-sage-400 mt-0.5" />
                     <div>
-                      <div className="text-slate-400">Date</div>
-                      <div className="text-white">{new Date(currentEvent.eventDate).toLocaleDateString()}</div>
+                      <div className="text-sage-600 dark:text-sage-400">Date</div>
+                      <div className="text-forest-900 dark:text-forest-50">{new Date(currentEvent.eventDate).toLocaleDateString()}</div>
                     </div>
                   </div>
                 )}
                 <div className="flex items-start gap-3">
-                  <Users className="w-5 h-5 text-slate-400 mt-0.5" />
+                  <Users className="w-5 h-5 text-sage-600 dark:text-sage-400 mt-0.5" />
                   <div>
-                    <div className="text-slate-400">Attendance</div>
-                    <div className="text-white">{currentEvent.attendance.toLocaleString()} attendees</div>
+                    <div className="text-sage-600 dark:text-sage-400">Attendance</div>
+                    <div className="text-forest-900 dark:text-forest-50">{currentEvent.attendance.toLocaleString()} attendees</div>
                   </div>
                 </div>
                 {currentEvent.location && (
                   <div className="flex items-start gap-3">
-                    <MapPin className="w-5 h-5 text-slate-400 mt-0.5" />
+                    <MapPin className="w-5 h-5 text-sage-600 dark:text-sage-400 mt-0.5" />
                     <div>
-                      <div className="text-slate-400">Location</div>
-                      <div className="text-white">{currentEvent.location}</div>
+                      <div className="text-sage-600 dark:text-sage-400">Location</div>
+                      <div className="text-forest-900 dark:text-forest-50">{currentEvent.location}</div>
                     </div>
                   </div>
                 )}
@@ -290,26 +290,26 @@ export default function EventDetail() {
             </Card>
 
             {/* Benchmarking */}
-            <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Industry Comparison</h3>
+            <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
+              <h3 className="text-lg font-bold text-forest-900 dark:text-forest-50 mb-4">Industry Comparison</h3>
               <div className="space-y-3">
                 <div>
-                  <div className="text-sm text-slate-400 mb-1">Your Performance</div>
-                  <div className="text-2xl font-bold text-white">
+                  <div className="text-sm text-sage-600 dark:text-sage-400 mb-1">Your Performance</div>
+                  <div className="text-2xl font-bold text-forest-900 dark:text-forest-50">
                     {parseFloat(currentEvent.emissionsPerAttendee).toFixed(4)}
                   </div>
                   <div className="text-xs text-slate-500">tCO₂e per attendee</div>
                 </div>
                 <div>
-                  <div className="text-sm text-slate-400 mb-1">Industry Average</div>
-                  <div className="text-xl font-medium text-slate-300">
+                  <div className="text-sm text-sage-600 dark:text-sage-400 mb-1">Industry Average</div>
+                  <div className="text-xl font-medium text-sage-700 dark:text-sage-300">
                     {parseFloat(currentEvent.industryAverage).toFixed(4)}
                   </div>
                   <div className="text-xs text-slate-500">tCO₂e per attendee</div>
                 </div>
                 {currentEvent.percentile && (
-                  <div className="pt-3 border-t border-slate-700">
-                    <div className="text-sm text-slate-400 mb-1">Percentile Rank</div>
+                  <div className="pt-3 border-t border-forest-200 dark:border-forest-700">
+                    <div className="text-sm text-sage-600 dark:text-sage-400 mb-1">Percentile Rank</div>
                     <div className="text-xl font-bold text-emerald-400">
                       Top {currentEvent.percentile}%
                     </div>

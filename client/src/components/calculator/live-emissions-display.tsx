@@ -63,10 +63,10 @@ export function LiveEmissionsDisplay({
         {breakdownItems.map((item) => (
           <Card
             key={item.label}
-            className="bg-white/5 border-slate-700 p-4"
+            className="bg-white/5 border-forest-200 dark:border-forest-700 p-4"
           >
-            <div className="text-slate-400 text-sm mb-1">{item.label}</div>
-            <div className="text-white text-xl font-semibold mb-2">
+            <div className="text-sage-600 dark:text-sage-400 text-sm mb-1">{item.label}</div>
+            <div className="text-forest-900 dark:text-forest-50 text-xl font-semibold mb-2">
               {item.value.toFixed(1)} tons
             </div>
             <div className="h-1 bg-slate-700 rounded-full overflow-hidden">

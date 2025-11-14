@@ -295,7 +295,7 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                       description: 'Supply chain, business travel, waste'
                     }
                   ].map((scope) => (
-                    <div key={scope.id} className="flex items-center space-x-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800">
+                    <div key={scope.id} className="flex items-center space-x-3 p-3 border border-gray-300 dark:border-gray-600 rounded-lg cursor-pointer hover:bg-gray-50 dark:hover:bg-forest-50 dark:bg-forest-800">
                       <Checkbox
                         id={scope.id}
                         checked={form.watch('scopes').includes(scope.id as any)}
@@ -309,8 +309,8 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                         }}
                       />
                       <div className="flex-1">
-                        <div className="font-medium text-gray-900 dark:text-white">{scope.title}</div>
-                        <div className="text-sm text-gray-600 dark:text-gray-400">{scope.description}</div>
+                        <div className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">{scope.title}</div>
+                        <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">{scope.description}</div>
                         {scope.id === 'scope3' && (
                           <Badge variant="secondary" className="mt-1 text-xs bg-orange-100 text-orange-700">
                             Required per 2025 GHG Protocol
@@ -347,8 +347,8 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
 
           <TabsContent value="scope1" className="space-y-4">
             <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Scope 1 - Direct Emissions</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50 mb-2">Scope 1 - Direct Emissions</h3>
+              <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">
                 Direct GHG emissions from sources owned or controlled by your organization
               </p>
             </div>
@@ -399,8 +399,8 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
 
           <TabsContent value="scope2" className="space-y-4">
             <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Scope 2 - Energy Indirect</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50 mb-2">Scope 2 - Energy Indirect</h3>
+              <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">
                 Indirect GHG emissions from purchased electricity, steam, heating and cooling
               </p>
             </div>
@@ -453,8 +453,8 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
 
           <TabsContent value="scope3" className="space-y-4">
             <div className="mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Scope 3 - Value Chain</h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50 mb-2">Scope 3 - Value Chain</h3>
+              <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">
                 All other indirect emissions in your value chain (mandatory per GHG Protocol 2025)
               </p>
             </div>
@@ -602,7 +602,7 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
           <TabsContent value="results" className="space-y-4">
             {result && (
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50 mb-4">
                   Calculation Results
                 </h3>
                 
@@ -610,25 +610,25 @@ export function CalculationForm({ onEstimate, onCalculate, isLoading, result }: 
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-2xl font-bold text-green-600">{result.total.toFixed(1)}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Total tCO2e</div>
+                      <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Total tCO2e</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-xl font-bold text-red-600">{result.scope1.toFixed(1)}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Scope 1</div>
+                      <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 1</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-xl font-bold text-orange-600">{result.scope2.toFixed(1)}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Scope 2</div>
+                      <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 2</div>
                     </CardContent>
                   </Card>
                   <Card>
                     <CardContent className="p-4 text-center">
                       <div className="text-xl font-bold text-green-600">{result.scope3.toFixed(1)}</div>
-                      <div className="text-sm text-gray-600 dark:text-gray-400">Scope 3</div>
+                      <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 3</div>
                     </CardContent>
                   </Card>
                 </div>

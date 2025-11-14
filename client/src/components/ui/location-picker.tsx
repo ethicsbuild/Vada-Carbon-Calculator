@@ -167,7 +167,7 @@ export function LocationPicker({
   return (
     <div className={`relative ${className}`} data-testid={dataTestId}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-sage-600 dark:text-sage-400 w-4 h-4" />
         <Input
           ref={inputRef}
           value={query}
@@ -246,14 +246,14 @@ export function LocationPicker({
             )}
 
             {isLoading && (
-              <div className="p-3 text-sm text-gray-500 dark:text-gray-400 flex items-center">
+              <div className="p-3 text-sm text-gray-500 dark:text-sage-600 dark:text-sage-400 flex items-center">
                 <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mr-2"></div>
                 Searching locations...
               </div>
             )}
 
             {!isLoading && !error && suggestions.length === 0 && query.trim().length >= 3 && (
-              <div className="p-3 text-sm text-gray-500 dark:text-gray-400">
+              <div className="p-3 text-sm text-gray-500 dark:text-sage-600 dark:text-sage-400">
                 No locations found for "{query}"
               </div>
             )}
@@ -261,17 +261,17 @@ export function LocationPicker({
             {suggestions.map((location, index) => (
               <button
                 key={`${location.placeId}-${index}`}
-                className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-700 last:border-b-0"
+                className="w-full text-left p-3 hover:bg-gray-50 dark:hover:bg-forest-50 dark:bg-forest-800 border-b border-gray-100 dark:border-forest-200 dark:border-forest-700 last:border-b-0"
                 onClick={() => handleLocationSelect(location)}
                 data-testid={`${dataTestId}-suggestion-${index}`}
               >
                 <div className="flex items-start space-x-3">
-                  <MapPin className="w-4 h-4 mt-0.5 text-gray-400" />
+                  <MapPin className="w-4 h-4 mt-0.5 text-sage-600 dark:text-sage-400" />
                   <div className="flex-1">
-                    <div className="font-medium text-sm text-gray-900 dark:text-white">
+                    <div className="font-medium text-sm text-gray-900 dark:text-forest-900 dark:text-forest-50">
                       {location.name}
                     </div>
-                    <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400 mt-1">
                       {location.address}
                     </div>
                     {location.types.length > 0 && (

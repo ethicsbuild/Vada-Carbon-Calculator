@@ -118,10 +118,10 @@ export function CaseStudies() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
+          <h2 className="text-3xl md:text-4xl font-bold text-forest-900 dark:text-forest-50 mb-4">
             Real Events. Real Results.
           </h2>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-sage-600 dark:text-sage-400 max-w-2xl mx-auto">
             These aren't hypotheticals—they're real stories from event producers who tried, succeeded,
             and sometimes failed. Learn from both the wins and the mistakes.
           </p>
@@ -130,15 +130,15 @@ export function CaseStudies() {
         {/* Case Studies */}
         <div className="space-y-8">
           {caseStudies.map((study, index) => (
-            <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm overflow-hidden">
+            <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm overflow-hidden">
               <div className="p-6 md:p-8">
                 {/* Header */}
                 <div className="flex items-start justify-between mb-6">
                   <div className="flex items-center gap-4">
                     <div className="text-5xl">{study.icon}</div>
                     <div>
-                      <h3 className="text-2xl font-bold text-white mb-1">{study.festival}</h3>
-                      <div className="flex items-center gap-3 text-sm text-slate-400">
+                      <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-1">{study.festival}</h3>
+                      <div className="flex items-center gap-3 text-sm text-sage-600 dark:text-sage-400">
                         <span className={`px-2 py-0.5 rounded text-xs font-semibold ${
                           study.outcome === 'success' ? 'bg-emerald-500/20 text-emerald-400' :
                           study.outcome === 'failure' ? 'bg-red-500/20 text-red-400' :
@@ -158,11 +158,11 @@ export function CaseStudies() {
 
                 {/* Challenge & Solution */}
                 <div className="grid md:grid-cols-2 gap-6 mb-6">
-                  <div className="bg-slate-900/50 rounded-lg p-4">
+                  <div className="bg-sage-50 dark:bg-forest-900/50 rounded-lg p-4">
                     <div className="text-xs font-semibold text-red-400 mb-2">🚨 THE CHALLENGE</div>
-                    <p className="text-slate-300 text-sm">{study.challenge}</p>
+                    <p className="text-sage-700 dark:text-sage-300 text-sm">{study.challenge}</p>
                   </div>
-                  <div className="bg-slate-900/50 rounded-lg p-4">
+                  <div className="bg-sage-50 dark:bg-forest-900/50 rounded-lg p-4">
                     <div className={`text-xs font-semibold mb-2 ${
                       study.outcome === 'success' ? 'text-emerald-400' :
                       study.outcome === 'failure' ? 'text-orange-400' :
@@ -172,7 +172,7 @@ export function CaseStudies() {
                        study.outcome === 'failure' ? '⚠️ WHAT HAPPENED' :
                        '🔄 WHAT THEY TRIED'}
                     </div>
-                    <p className="text-slate-300 text-sm">{study.solution}</p>
+                    <p className="text-sage-700 dark:text-sage-300 text-sm">{study.solution}</p>
                   </div>
                 </div>
 
@@ -189,9 +189,9 @@ export function CaseStudies() {
                       } border rounded-lg p-4`}>
                         <div className="flex items-center gap-2 mb-2">
                           <Icon className={`w-4 h-4 ${isNegative ? 'text-orange-400' : 'text-emerald-400'}`} />
-                          <div className="text-xs font-semibold text-slate-400">{result.metric}</div>
+                          <div className="text-xs font-semibold text-sage-600 dark:text-sage-400">{result.metric}</div>
                         </div>
-                        <div className={`text-2xl font-bold ${isNegative ? 'text-orange-300' : 'text-white'}`}>
+                        <div className={`text-2xl font-bold ${isNegative ? 'text-orange-300' : 'text-forest-900 dark:text-forest-50'}`}>
                           {result.value}
                         </div>
                       </div>
@@ -200,12 +200,12 @@ export function CaseStudies() {
                 </div>
 
                 {/* Quote */}
-                <div className={`border-l-4 pl-4 py-2 bg-slate-900/30 rounded-r-lg ${
+                <div className={`border-l-4 pl-4 py-2 bg-sage-50 dark:bg-forest-900/30 rounded-r-lg ${
                   study.outcome === 'success' ? 'border-emerald-500/50' :
                   study.outcome === 'failure' ? 'border-orange-500/50' :
                   'border-yellow-500/50'
                 }`}>
-                  <p className="text-slate-300 italic mb-2">"{study.quote}"</p>
+                  <p className="text-sage-700 dark:text-sage-300 italic mb-2">"{study.quote}"</p>
                   <p className="text-sm text-slate-500">— {study.author}</p>
                 </div>
               </div>
@@ -224,12 +224,12 @@ export function CaseStudies() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <a href="/calculator">
-              <button className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all">
+              <button className="px-6 py-3 bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-forest-900 dark:text-forest-50 font-semibold rounded-lg transition-all">
                 Calculate Your Footprint
               </button>
             </a>
             <a href="/resources">
-              <button className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg transition-all">
+              <button className="px-6 py-3 bg-slate-700 hover:bg-slate-600 text-forest-900 dark:text-forest-50 font-semibold rounded-lg transition-all">
                 Read More Case Studies
               </button>
             </a>

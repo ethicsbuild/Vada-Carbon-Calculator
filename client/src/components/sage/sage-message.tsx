@@ -29,8 +29,8 @@ export function SageMessage({ message, isStreaming }: SageMessageProps) {
           className={cn(
             "rounded-2xl px-4 py-3 relative",
             isUser
-              ? "bg-emerald-500 text-white"
-              : "bg-slate-700/50 text-slate-100"
+              ? "bg-emerald-500 text-forest-900 dark:text-forest-50"
+              : "bg-slate-700/50 text-forest-800 dark:text-forest-100"
           )}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>

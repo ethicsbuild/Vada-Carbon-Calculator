@@ -12,7 +12,7 @@ export function FloatingSageChat() {
       {/* Floating Chat Button */}
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-24 right-6 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-white z-50 flex items-center justify-center group transition-all hover:scale-110"
+        className="fixed bottom-24 right-6 h-14 w-14 rounded-full shadow-2xl bg-gradient-to-br from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-forest-900 dark:text-forest-50 z-50 flex items-center justify-center group transition-all hover:scale-110"
         aria-label="Chat with Sage Riverstone"
       >
         <MessageCircle className="w-6 h-6" />
@@ -21,9 +21,9 @@ export function FloatingSageChat() {
 
       {/* Chat Dialog */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-3xl h-[700px] p-0 bg-slate-900 border-slate-700">
-          <div className="flex items-center justify-between p-4 border-b border-slate-700">
-            <DialogTitle className="text-xl font-bold text-white flex items-center gap-2">
+        <DialogContent className="max-w-3xl h-[700px] p-0 bg-sage-50 dark:bg-forest-900 border-forest-200 dark:border-forest-700">
+          <div className="flex items-center justify-between p-4 border-b border-forest-200 dark:border-forest-700">
+            <DialogTitle className="text-xl font-bold text-forest-900 dark:text-forest-50 flex items-center gap-2">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-500 to-violet-500 flex items-center justify-center text-lg">
                 🌱
               </div>
@@ -33,7 +33,7 @@ export function FloatingSageChat() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-slate-400 hover:text-white"
+              className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
             >
               <X className="w-5 h-5" />
             </Button>

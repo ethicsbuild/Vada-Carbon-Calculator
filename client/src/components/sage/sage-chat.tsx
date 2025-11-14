@@ -198,23 +198,23 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
   };
 
   return (
-    <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm flex flex-col h-[600px]">
+    <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm flex flex-col h-[600px]">
       {/* Chat Header */}
-      <div className="p-6 border-b border-slate-700/50">
+      <div className="p-6 border-b border-forest-200 dark:border-forest-700/50">
         <div className="flex items-center gap-3 mb-2">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-violet-500 flex items-center justify-center text-xl">
             🌱
           </div>
           <div>
-            <h3 className="text-lg font-semibold text-white">Sage</h3>
-            <p className="text-sm text-slate-400">Your Carbon Calculator Co-Pilot</p>
+            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-50">Sage</h3>
+            <p className="text-sm text-sage-600 dark:text-sage-400">Your Carbon Calculator Co-Pilot</p>
           </div>
         </div>
 
         {/* Progress Indicator */}
         {completionPercentage > 0 && (
           <div className="mt-3">
-            <div className="flex justify-between text-xs text-slate-400 mb-1">
+            <div className="flex justify-between text-xs text-sage-600 dark:text-sage-400 mb-1">
               <span>Event Data Collection</span>
               <span>{completionPercentage}%</span>
             </div>
@@ -255,7 +255,7 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
       </ScrollArea>
 
       {/* Input Area */}
-      <div className="p-6 border-t border-slate-700/50">
+      <div className="p-6 border-t border-forest-200 dark:border-forest-700/50">
         <div className="flex gap-3">
           <Input
             value={input}
@@ -263,7 +263,7 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
             onKeyPress={handleKeyPress}
             placeholder="Tell me about your event..."
             disabled={isLoading || isRecording}
-            className="flex-1 bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 focus:border-emerald-500"
+            className="flex-1 bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400 focus:border-emerald-500"
           />
           <Button
             onClick={toggleVoiceInput}
@@ -272,7 +272,7 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
               isRecording
                 ? 'bg-red-500 hover:bg-red-600 animate-pulse'
                 : 'bg-slate-700 hover:bg-slate-600'
-            } text-white`}
+            } text-forest-900 dark:text-forest-50`}
           >
             {isRecording ? (
               <MicOff className="w-4 h-4" />
@@ -283,7 +283,7 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
           <Button
             onClick={handleSend}
             disabled={isLoading || !input.trim()}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white px-6"
+            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-forest-900 dark:text-forest-50 px-6"
           >
             {isLoading ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -310,19 +310,19 @@ export const SageChat = forwardRef<SageChatRef, SageChatProps>(
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               onClick={() => setInput("It's a 3-day music festival with about 5,000 attendees")}
-              className="text-xs px-3 py-1.5 bg-slate-700/50 text-slate-300 rounded-full hover:bg-slate-700 transition-colors"
+              className="text-xs px-3 py-1.5 bg-slate-700/50 text-sage-700 dark:text-sage-300 rounded-full hover:bg-slate-700 transition-colors"
             >
               Music Festival
             </button>
             <button
               onClick={() => setInput("Corporate conference for 200 people, 2 days")}
-              className="text-xs px-3 py-1.5 bg-slate-700/50 text-slate-300 rounded-full hover:bg-slate-700 transition-colors"
+              className="text-xs px-3 py-1.5 bg-slate-700/50 text-sage-700 dark:text-sage-300 rounded-full hover:bg-slate-700 transition-colors"
             >
               Conference
             </button>
             <button
               onClick={() => setInput("Wedding with 150 guests, outdoor venue")}
-              className="text-xs px-3 py-1.5 bg-slate-700/50 text-slate-300 rounded-full hover:bg-slate-700 transition-colors"
+              className="text-xs px-3 py-1.5 bg-slate-700/50 text-sage-700 dark:text-sage-300 rounded-full hover:bg-slate-700 transition-colors"
             >
               Wedding
             </button>

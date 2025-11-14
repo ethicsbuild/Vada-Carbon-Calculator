@@ -39,7 +39,7 @@ export function EmissionsChart() {
       </CardHeader>
       <CardContent>
         {/* Chart Placeholder - In real app, use a proper charting library */}
-        <div className="relative h-64 bg-white dark:bg-gray-800 rounded-xl p-4 mb-4">
+        <div className="relative h-64 bg-white dark:bg-forest-50 dark:bg-forest-800 rounded-xl p-4 mb-4">
           {/* Mock chart visualization */}
           <div className="w-full h-full bg-gradient-to-t from-green-100 to-transparent dark:from-green-900/20 dark:to-transparent rounded-lg relative overflow-hidden">
             {/* Trend line mockup */}
@@ -53,19 +53,19 @@ export function EmissionsChart() {
                       minHeight: '20px'
                     }}
                   ></div>
-                  <span className="text-xs text-gray-600 dark:text-gray-400 mt-1">{data.month}</span>
+                  <span className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400 mt-1">{data.month}</span>
                 </div>
               ))}
             </div>
             
             {/* Chart overlay info */}
             <div className="absolute top-4 left-4">
-              <div className="bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-lg p-3">
+              <div className="bg-white/90 dark:bg-forest-50 dark:bg-forest-800/90 backdrop-blur-sm rounded-lg p-3">
                 <div className="flex items-center space-x-2 mb-2">
                   <div className="w-3 h-3 bg-green-600 rounded"></div>
-                  <span className="text-sm font-medium text-gray-900 dark:text-white">Total Emissions</span>
+                  <span className="text-sm font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">Total Emissions</span>
                 </div>
-                <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                <div className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-50">
                   {chartData.totalEmissions} tCO2e
                 </div>
                 <div className="flex items-center space-x-1 mt-1">
@@ -81,20 +81,20 @@ export function EmissionsChart() {
 
         {/* Period Comparison */}
         <div className="grid grid-cols-3 gap-4">
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Current Period</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-3 bg-gray-50 dark:bg-forest-50 dark:bg-forest-800 rounded-lg">
+            <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Current Period</div>
+            <div className="text-lg font-bold text-gray-900 dark:text-forest-900 dark:text-forest-50">
               {chartData.totalEmissions} tCO2e
             </div>
           </div>
-          <div className="text-center p-3 bg-gray-50 dark:bg-gray-800 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Previous Period</div>
-            <div className="text-lg font-bold text-gray-900 dark:text-white">
+          <div className="text-center p-3 bg-gray-50 dark:bg-forest-50 dark:bg-forest-800 rounded-lg">
+            <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Previous Period</div>
+            <div className="text-lg font-bold text-gray-900 dark:text-forest-900 dark:text-forest-50">
               {chartData.previousPeriod} tCO2e
             </div>
           </div>
           <div className="text-center p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-            <div className="text-sm text-gray-600 dark:text-gray-400">Change</div>
+            <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Change</div>
             <div className="text-lg font-bold text-green-600">
               {chartData.change}%
             </div>

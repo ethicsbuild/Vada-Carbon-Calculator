@@ -107,8 +107,8 @@ export function HumanScaleComparisons({ totalEmissions, perAttendee, attendance 
   return (
     <div className="space-y-6">
       <div className="text-center mb-6">
-        <h3 className="text-2xl font-bold text-white mb-2">What Does This Actually Mean?</h3>
-        <p className="text-slate-400 text-sm">
+        <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-2">What Does This Actually Mean?</h3>
+        <p className="text-sage-600 dark:text-sage-400 text-sm">
           {totalEmissions.toFixed(1)} tons of CO₂ is hard to visualize. Here's what it equals in real-world terms:
         </p>
       </div>
@@ -116,15 +116,15 @@ export function HumanScaleComparisons({ totalEmissions, perAttendee, attendance 
       {/* Main Comparisons Grid */}
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
         {comparisons.slice(0, 6).map((comp, index) => (
-          <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-4 hover:border-emerald-500/30 transition-all">
+          <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-4 hover:border-emerald-500/30 transition-all">
             <div className="flex items-start gap-3">
               <div className={comp.color}>
                 {comp.icon}
               </div>
               <div className="flex-1">
-                <div className="text-xs text-slate-400 mb-1">{comp.title}</div>
-                <div className="text-2xl font-bold text-white mb-1">{comp.value}</div>
-                <div className="text-xs text-slate-400 leading-relaxed">{comp.description}</div>
+                <div className="text-xs text-sage-600 dark:text-sage-400 mb-1">{comp.title}</div>
+                <div className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-1">{comp.value}</div>
+                <div className="text-xs text-sage-600 dark:text-sage-400 leading-relaxed">{comp.description}</div>
               </div>
             </div>
           </Card>
@@ -143,18 +143,18 @@ export function HumanScaleComparisons({ totalEmissions, perAttendee, attendance 
                 <div className="text-sm text-violet-300 font-semibold mb-1">
                   {perAttendeeComparisons[0].title}
                 </div>
-                <div className="text-3xl font-bold text-white mb-1">
+                <div className="text-3xl font-bold text-forest-900 dark:text-forest-50 mb-1">
                   {perAttendeeComparisons[0].value}
                 </div>
-                <div className="text-sm text-slate-300">
+                <div className="text-sm text-sage-700 dark:text-sage-300">
                   {perAttendeeComparisons[0].description}
                 </div>
               </div>
             </div>
             {attendance && (
               <div className="text-right">
-                <div className="text-sm text-slate-400">Total Attendees</div>
-                <div className="text-2xl font-bold text-white">{attendance.toLocaleString()}</div>
+                <div className="text-sm text-sage-600 dark:text-sage-400">Total Attendees</div>
+                <div className="text-2xl font-bold text-forest-900 dark:text-forest-50">{attendance.toLocaleString()}</div>
               </div>
             )}
           </div>
@@ -162,9 +162,9 @@ export function HumanScaleComparisons({ totalEmissions, perAttendee, attendance 
       )}
 
       {/* Context Note */}
-      <div className="bg-slate-900/50 rounded-lg p-4 border border-slate-700/50">
-        <p className="text-xs text-slate-400 leading-relaxed">
-          <span className="font-semibold text-slate-300">Note:</span> These comparisons use EPA and DOE conversion factors.
+      <div className="bg-sage-50 dark:bg-forest-900/50 rounded-lg p-4 border border-forest-200 dark:border-forest-700/50">
+        <p className="text-xs text-sage-600 dark:text-sage-400 leading-relaxed">
+          <span className="font-semibold text-sage-700 dark:text-sage-300">Note:</span> These comparisons use EPA and DOE conversion factors.
           One tree absorbs ~60kg CO₂/year, average car emits 4.6 tons/year, average home uses 11,500 kWh/year.
           Your mileage (literally) may vary based on specific vehicle types, home sizes, and tree species.
         </p>

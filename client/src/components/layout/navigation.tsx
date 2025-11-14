@@ -103,8 +103,8 @@ export function Navigation() {
                       className={cn(
                         "px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer",
                         isActive
-                          ? "text-white bg-slate-800"
-                          : "text-sage-600 dark:text-sage-400 hover:text-forest-600 dark:hover:text-forest-400 hover:bg-slate-800"
+                          ? "text-forest-900 dark:text-forest-50 bg-forest-50 dark:bg-forest-800"
+                          : "text-sage-600 dark:text-sage-400 hover:text-forest-600 dark:hover:text-forest-400 hover:bg-forest-50 dark:bg-forest-800"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -116,7 +116,7 @@ export function Navigation() {
 
               {/* Carbon Score Badge Mobile */}
               <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="bg-slate-800 px-4 py-2 rounded-lg border border-emerald-500/50 text-center">
+                <div className="bg-forest-50 dark:bg-forest-800 px-4 py-2 rounded-lg border border-emerald-500/50 text-center">
                   <span className="text-sm text-forest-700 dark:text-forest-300">
                     Your Score: <span className="font-bold text-forest-600 dark:text-forest-400">{carbonScore}</span>
                   </span>

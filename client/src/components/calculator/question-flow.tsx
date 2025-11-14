@@ -47,7 +47,7 @@ export function QuestionFlow({
 }: QuestionFlowProps) {
   return (
     <div className="mb-8">
-      <h2 className="text-2xl md:text-3xl font-light text-white mb-6">
+      <h2 className="text-2xl md:text-3xl font-light text-forest-900 dark:text-forest-50 mb-6">
         How are most people getting to your event?
       </h2>
 
@@ -60,12 +60,12 @@ export function QuestionFlow({
               "p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 text-center",
               selectedTransport === option.id
                 ? "bg-emerald-500/10 border-emerald-500"
-                : "bg-white/5 border-slate-700 hover:bg-white/10 hover:border-emerald-500/50"
+                : "bg-white/5 border-forest-200 dark:border-forest-700 hover:bg-white/10 hover:border-emerald-500/50"
             )}
           >
             <div className="text-4xl mb-3">{option.icon}</div>
-            <div className="text-white font-medium mb-1">{option.label}</div>
-            <div className="text-slate-400 text-sm">{option.detail}</div>
+            <div className="text-forest-900 dark:text-forest-50 font-medium mb-1">{option.label}</div>
+            <div className="text-sage-600 dark:text-sage-400 text-sm">{option.detail}</div>
           </div>
         ))}
       </div>

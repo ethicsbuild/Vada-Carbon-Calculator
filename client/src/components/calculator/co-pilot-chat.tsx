@@ -100,10 +100,10 @@ export function CoPilotChat() {
       <CardHeader className="pb-3">
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-            <Bot className="w-6 h-6 text-white" />
+            <Bot className="w-6 h-6 text-forest-900 dark:text-forest-50" />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900 dark:text-white">Carbon Co-Pilot</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50">Carbon Co-Pilot</h3>
             <div className="flex items-center space-x-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
               <span className="text-sm text-green-600 dark:text-green-400">Online</span>
@@ -118,15 +118,15 @@ export function CoPilotChat() {
               <div key={index} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[80%] rounded-lg p-4 ${
                   message.role === 'user'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-white'
+                    ? 'bg-green-600 text-forest-900 dark:text-forest-50'
+                    : 'bg-gray-100 dark:bg-forest-50 dark:bg-forest-800 text-gray-900 dark:text-forest-900 dark:text-forest-50'
                 }`}>
                   <div className="flex items-start space-x-2">
                     {message.role === 'assistant' && (
                       <Bot className="w-5 h-5 mt-0.5 text-green-600" />
                     )}
                     {message.role === 'user' && (
-                      <User className="w-5 h-5 mt-0.5 text-white" />
+                      <User className="w-5 h-5 mt-0.5 text-forest-900 dark:text-forest-50" />
                     )}
                     <div className="flex-1">
                       <div className="text-sm leading-relaxed whitespace-pre-wrap">
@@ -151,7 +151,7 @@ export function CoPilotChat() {
             
             {sendMessageMutation.isPending && (
               <div className="flex justify-start">
-                <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 max-w-[80%]">
+                <div className="bg-gray-100 dark:bg-forest-50 dark:bg-forest-800 rounded-lg p-4 max-w-[80%]">
                   <div className="flex items-center space-x-2">
                     <Bot className="w-5 h-5 text-green-600" />
                     <div className="flex space-x-1">
@@ -170,7 +170,7 @@ export function CoPilotChat() {
         {/* Suggested Actions */}
         {messages[messages.length - 1]?.metadata?.suggestedActions && (
           <div className="mb-4">
-            <div className="text-xs text-gray-600 dark:text-gray-400 mb-2">Suggested actions:</div>
+            <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400 mb-2">Suggested actions:</div>
             <div className="flex flex-wrap gap-2">
               {messages[messages.length - 1].metadata!.suggestedActions!.map((action, index) => (
                 <Badge

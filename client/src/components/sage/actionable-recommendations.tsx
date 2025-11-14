@@ -203,66 +203,66 @@ export function ActionableRecommendations({ calculation, eventData }: Actionable
     <div className="space-y-6">
       <div className="flex items-center gap-3 mb-4">
         <Lightbulb className="w-6 h-6 text-yellow-400" />
-        <h2 className="text-2xl font-bold text-white">Your Action Plan</h2>
+        <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50">Your Action Plan</h2>
       </div>
 
-      <p className="text-slate-300 mb-6">
+      <p className="text-sage-700 dark:text-sage-300 mb-6">
         Based on your footprint, here are the highest-impact actions you can take.
         These aren't just ideas—they're proven strategies from festivals that have succeeded.
       </p>
 
       {recommendations.map((rec, index) => (
-        <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:border-emerald-500/30 transition-all">
+        <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:border-emerald-500/30 transition-all">
           <div className="space-y-4">
             {/* Header */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-2">{rec.title}</h3>
-                <p className="text-slate-300 text-sm">{rec.description}</p>
+                <h3 className="text-xl font-bold text-forest-900 dark:text-forest-50 mb-2">{rec.title}</h3>
+                <p className="text-sage-700 dark:text-sage-300 text-sm">{rec.description}</p>
               </div>
               <div className="flex flex-col items-end gap-1">
                 <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                   rec.impact === 'High' ? 'bg-emerald-500/20 text-emerald-400' :
                   rec.impact === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' :
-                  'bg-slate-500/20 text-slate-400'
+                  'bg-slate-500/20 text-sage-600 dark:text-sage-400'
                 }`}>
                   {rec.impact} Impact
                 </span>
-                <span className="text-xs text-slate-400">{rec.costEffectiveness}</span>
+                <span className="text-xs text-sage-600 dark:text-sage-400">{rec.costEffectiveness}</span>
               </div>
             </div>
 
             {/* Metrics */}
-            <div className="grid grid-cols-3 gap-4 p-3 bg-slate-900/50 rounded-lg">
+            <div className="grid grid-cols-3 gap-4 p-3 bg-sage-50 dark:bg-forest-900/50 rounded-lg">
               <div className="flex items-center gap-2">
                 <TrendingDown className="w-4 h-4 text-emerald-400" />
                 <div>
-                  <div className="text-xs text-slate-400">Potential Savings</div>
+                  <div className="text-xs text-sage-600 dark:text-sage-400">Potential Savings</div>
                   <div className="text-sm font-semibold text-emerald-400">{rec.carbonSavings}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-blue-400" />
                 <div>
-                  <div className="text-xs text-slate-400">Timeline</div>
-                  <div className="text-sm font-semibold text-white">{rec.timeline}</div>
+                  <div className="text-xs text-sage-600 dark:text-sage-400">Timeline</div>
+                  <div className="text-sm font-semibold text-forest-900 dark:text-forest-50">{rec.timeline}</div>
                 </div>
               </div>
               <div className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4 text-yellow-400" />
                 <div>
-                  <div className="text-xs text-slate-400">Cost</div>
-                  <div className="text-sm font-semibold text-white">{rec.costEffectiveness}</div>
+                  <div className="text-xs text-sage-600 dark:text-sage-400">Cost</div>
+                  <div className="text-sm font-semibold text-forest-900 dark:text-forest-50">{rec.costEffectiveness}</div>
                 </div>
               </div>
             </div>
 
             {/* Specific Actions */}
             <div>
-              <h4 className="text-sm font-semibold text-slate-300 mb-2">Step-by-Step Action Plan:</h4>
+              <h4 className="text-sm font-semibold text-sage-700 dark:text-sage-300 mb-2">Step-by-Step Action Plan:</h4>
               <ol className="space-y-2">
                 {rec.specificActions.map((action, i) => (
-                  <li key={i} className="flex gap-2 text-sm text-slate-400">
+                  <li key={i} className="flex gap-2 text-sm text-sage-600 dark:text-sage-400">
                     <span className="text-emerald-400 font-semibold">{i + 1}.</span>
                     <span>{action}</span>
                   </li>
@@ -272,17 +272,17 @@ export function ActionableRecommendations({ calculation, eventData }: Actionable
 
             {/* Vendors */}
             {rec.vendors && rec.vendors.length > 0 && (
-              <div className="border-t border-slate-700 pt-4">
-                <h4 className="text-sm font-semibold text-slate-300 mb-3 flex items-center gap-2">
+              <div className="border-t border-forest-200 dark:border-forest-700 pt-4">
+                <h4 className="text-sm font-semibold text-sage-700 dark:text-sage-300 mb-3 flex items-center gap-2">
                   <Users className="w-4 h-4" />
                   Recommended Vendors:
                 </h4>
                 <div className="grid gap-2">
                   {rec.vendors.map((vendor, i) => (
-                    <div key={i} className="flex items-center justify-between p-2 bg-slate-900/30 rounded">
+                    <div key={i} className="flex items-center justify-between p-2 bg-sage-50 dark:bg-forest-900/30 rounded">
                       <div>
-                        <span className="text-white font-medium">{vendor.name}</span>
-                        <span className="text-xs text-slate-400 ml-2">({vendor.type})</span>
+                        <span className="text-forest-900 dark:text-forest-50 font-medium">{vendor.name}</span>
+                        <span className="text-xs text-sage-600 dark:text-sage-400 ml-2">({vendor.type})</span>
                         <div className="text-xs text-slate-500 mt-0.5">{vendor.note}</div>
                       </div>
                       <Button
@@ -303,7 +303,7 @@ export function ActionableRecommendations({ calculation, eventData }: Actionable
             {rec.caseStudy && (
               <div className="bg-gradient-to-r from-violet-500/10 to-emerald-500/10 border border-violet-500/20 rounded-lg p-3">
                 <div className="text-xs font-semibold text-violet-400 mb-1">📖 PROVEN SUCCESS STORY</div>
-                <p className="text-sm text-slate-300">{rec.caseStudy}</p>
+                <p className="text-sm text-sage-700 dark:text-sage-300">{rec.caseStudy}</p>
               </div>
             )}
           </div>
@@ -312,8 +312,8 @@ export function ActionableRecommendations({ calculation, eventData }: Actionable
 
       {/* Bottom CTA */}
       <Card className="bg-gradient-to-br from-emerald-500/20 to-violet-500/20 border-emerald-500/30 p-6 text-center">
-        <h3 className="text-xl font-bold text-white mb-2">Need Help Getting Started?</h3>
-        <p className="text-slate-300 text-sm mb-4">
+        <h3 className="text-xl font-bold text-forest-900 dark:text-forest-50 mb-2">Need Help Getting Started?</h3>
+        <p className="text-sage-700 dark:text-sage-300 text-sm mb-4">
           Talk to Sage Riverstone for personalized guidance on which recommendations to prioritize for your specific event.
         </p>
         <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700">

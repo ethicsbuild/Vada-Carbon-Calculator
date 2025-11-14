@@ -84,14 +84,14 @@ export default function Community() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950 leaf-pattern">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-forest-900 dark:text-forest-50 mb-4">
             Community
           </h1>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-sage-600 dark:text-sage-400 max-w-2xl mx-auto">
             Join a growing network of event organizers committed to creating sustainable, carbon-conscious experiences
           </p>
         </div>
@@ -99,14 +99,14 @@ export default function Community() {
         {/* Community Features */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {communityFeatures.map((feature, index) => (
-            <Card key={index} className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6 hover:bg-slate-800/70 transition-all">
+            <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 transition-all">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-emerald-500/10 rounded-lg">
                   <feature.icon className="w-6 h-6 text-emerald-500" />
                 </div>
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-white mb-2">{feature.title}</h3>
-                  <p className="text-sm text-slate-300 mb-3">{feature.description}</p>
+                  <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-50 mb-2">{feature.title}</h3>
+                  <p className="text-sm text-sage-700 dark:text-sage-300 mb-3">{feature.description}</p>
                   <span className="text-xs text-emerald-400 font-medium">
                     {feature.members || feature.topics || feature.active}
                   </span>
@@ -119,21 +119,21 @@ export default function Community() {
         {/* Two Column Layout */}
         <div className="grid lg:grid-cols-2 gap-8">
           {/* Upcoming Events */}
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+          <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
             <div className="flex items-center gap-2 mb-6">
               <Calendar className="w-5 h-5 text-violet-500" />
-              <h2 className="text-xl font-semibold text-white">Upcoming Events</h2>
+              <h2 className="text-xl font-semibold text-forest-900 dark:text-forest-50">Upcoming Events</h2>
             </div>
             <div className="space-y-4">
               {upcomingEvents.map((event, index) => (
-                <div key={index} className="flex gap-4 p-4 bg-slate-700/30 rounded-lg hover:bg-slate-700/50 transition-colors">
+                <div key={index} className="flex gap-4 p-4 bg-forest-100/80 dark:bg-forest-700/30 rounded-lg hover:bg-slate-700/50 transition-colors">
                   <div className="text-center min-w-[60px]">
                     <div className="text-2xl font-bold text-emerald-400">{event.date.split(' ')[1]}</div>
-                    <div className="text-xs text-slate-400">{event.date.split(' ')[0]}</div>
+                    <div className="text-xs text-sage-600 dark:text-sage-400">{event.date.split(' ')[0]}</div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-white font-medium mb-1">{event.title}</h3>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <h3 className="text-forest-900 dark:text-forest-50 font-medium mb-1">{event.title}</h3>
+                    <div className="flex items-center gap-3 text-xs text-sage-600 dark:text-sage-400">
                       <span className="flex items-center gap-1">
                         <span className="w-2 h-2 bg-violet-500 rounded-full"></span>
                         {event.type}
@@ -150,20 +150,20 @@ export default function Community() {
           </Card>
 
           {/* Success Stories */}
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+          <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6">
             <div className="flex items-center gap-2 mb-6">
               <Share2 className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-xl font-semibold text-white">Success Stories</h2>
+              <h2 className="text-xl font-semibold text-forest-900 dark:text-forest-50">Success Stories</h2>
             </div>
             <div className="space-y-4">
               {successStories.map((story, index) => (
-                <div key={index} className="p-4 bg-slate-700/30 rounded-lg border-l-4 border-emerald-500">
+                <div key={index} className="p-4 bg-forest-100/80 dark:bg-forest-700/30 rounded-lg border-l-4 border-emerald-500">
                   <div className="flex items-start justify-between mb-2">
-                    <h3 className="text-white font-semibold">{story.event}</h3>
+                    <h3 className="text-forest-900 dark:text-forest-50 font-semibold">{story.event}</h3>
                     <span className="text-emerald-400 font-bold text-lg">-{story.reduction}</span>
                   </div>
-                  <p className="text-xs text-slate-400 mb-2">by {story.organizer}</p>
-                  <p className="text-sm text-slate-300">{story.highlight}</p>
+                  <p className="text-xs text-sage-600 dark:text-sage-400 mb-2">by {story.organizer}</p>
+                  <p className="text-sm text-sage-700 dark:text-sage-300">{story.highlight}</p>
                 </div>
               ))}
             </div>
@@ -171,12 +171,12 @@ export default function Community() {
         </div>
 
         {/* Interest Form */}
-        <Card className="bg-slate-800/70 border-slate-700/50 backdrop-blur-sm p-8 mt-12">
+        <Card className="bg-forest-50 dark:bg-forest-800/70 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-8 mt-12">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold text-white mb-3">
+            <h2 className="text-3xl font-bold text-forest-900 dark:text-forest-50 mb-3">
               Interested in Joining Our Community?
             </h2>
-            <p className="text-slate-200 max-w-2xl mx-auto">
+            <p className="text-forest-700 dark:text-forest-200 max-w-2xl mx-auto">
               We're building a network of event organizers committed to sustainability. Share your interest and we'll keep you updated on launch details.
             </p>
           </div>
@@ -184,26 +184,26 @@ export default function Community() {
           {formSubmitted ? (
             <div className="text-center py-12">
               <CheckCircle2 className="w-16 h-16 text-emerald-500 mx-auto mb-4" />
-              <h3 className="text-2xl font-bold text-white mb-2">Thanks for Your Interest!</h3>
-              <p className="text-slate-300">We'll be in touch soon.</p>
+              <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-2">Thanks for Your Interest!</h3>
+              <p className="text-sage-700 dark:text-sage-300">We'll be in touch soon.</p>
             </div>
           ) : (
             <form onSubmit={handleInterestSubmit} className="max-w-2xl mx-auto space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                  <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                     Name
                   </label>
                   <Input
                     required
                     value={interestForm.name}
                     onChange={(e) => setInterestForm({ ...interestForm, name: e.target.value })}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400"
                     placeholder="Your name"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-200 mb-2">
+                  <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                     Email
                   </label>
                   <Input
@@ -211,24 +211,24 @@ export default function Community() {
                     required
                     value={interestForm.email}
                     onChange={(e) => setInterestForm({ ...interestForm, email: e.target.value })}
-                    className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                    className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400"
                     placeholder="you@example.com"
                   />
                 </div>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-200 mb-2">
+                <label className="block text-sm font-medium text-forest-700 dark:text-forest-200 mb-2">
                   What are you most interested in?
                 </label>
                 <Textarea
                   required
                   value={interestForm.interest}
                   onChange={(e) => setInterestForm({ ...interestForm, interest: e.target.value })}
-                  className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500 min-h-[100px]"
+                  className="bg-sage-50 dark:bg-forest-900/50 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 placeholder:text-sage-500 dark:placeholder:text-sage-400 min-h-[100px]"
                   placeholder="e.g., Networking with other organizers, accessing sustainability resources, etc."
                 />
               </div>
-              <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-white py-6 text-lg">
+              <Button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-600 text-forest-900 dark:text-forest-50 py-6 text-lg">
                 Express Interest
               </Button>
             </form>

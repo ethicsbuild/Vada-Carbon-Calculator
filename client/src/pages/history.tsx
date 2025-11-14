@@ -55,7 +55,7 @@ export default function History() {
       case 'average': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
       case 'needs improvement': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
       case 'poor': return 'bg-red-500/20 text-red-400 border-red-500/30';
-      default: return 'bg-slate-500/20 text-slate-400 border-slate-500/30';
+      default: return 'bg-slate-500/20 text-sage-600 dark:text-sage-400 border-slate-500/30';
     }
   };
 
@@ -80,27 +80,27 @@ export default function History() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center">
-        <div className="text-white">Loading your events...</div>
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950 flex items-center justify-center">
+        <div className="text-forest-900 dark:text-forest-50">Loading your events...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="mb-8">
           <Link href="/">
-            <Button variant="ghost" className="text-slate-400 hover:text-white mb-4">
+            <Button variant="ghost" className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50 mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
           </Link>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-forest-900 dark:text-forest-50 mb-4">
             Your Event History
           </h1>
-          <p className="text-lg text-slate-400 max-w-2xl">
+          <p className="text-lg text-sage-600 dark:text-sage-400 max-w-2xl">
             Track your progress over time and see how your events are improving.
           </p>
         </div>
@@ -112,14 +112,14 @@ export default function History() {
         )}
 
         {events.length === 0 ? (
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-12 text-center">
+          <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-12 text-center">
             <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-2xl font-bold text-white mb-2">No Events Yet</h2>
-            <p className="text-slate-400 mb-6">
+            <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-2">No Events Yet</h2>
+            <p className="text-sage-600 dark:text-sage-400 mb-6">
               Calculate your first event's carbon footprint to start tracking your progress.
             </p>
             <Link href="/calculator">
-              <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white">
+              <Button className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-forest-900 dark:text-forest-50">
                 Calculate Your First Event
               </Button>
             </Link>
@@ -129,11 +129,11 @@ export default function History() {
             {/* Show events grouped by name */}
             {Object.entries(groupedEvents).map(([eventName, eventGroup]) => (
               <div key={eventName}>
-                <h2 className="text-2xl font-bold text-white mb-4 flex items-center gap-2">
+                <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-4 flex items-center gap-2">
                   <span>{getEventIcon(eventGroup[0].eventType)}</span>
                   {eventName}
                   {eventGroup.length > 1 && (
-                    <span className="text-sm text-slate-400 font-normal">
+                    <span className="text-sm text-sage-600 dark:text-sage-400 font-normal">
                       ({eventGroup.length} years tracked)
                     </span>
                   )}
@@ -146,12 +146,12 @@ export default function History() {
 
                     return (
                       <Link key={event.id} href={`/event/${event.id}`}>
-                        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm hover:border-emerald-500/50 transition-all cursor-pointer h-full">
+                        <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm hover:border-emerald-500/50 transition-all cursor-pointer h-full">
                           <div className="p-6 space-y-4">
                             {/* Year and Performance */}
                             <div className="flex items-start justify-between">
                               <div>
-                                <div className="text-3xl font-bold text-white">{event.eventYear}</div>
+                                <div className="text-3xl font-bold text-forest-900 dark:text-forest-50">{event.eventYear}</div>
                                 <div className={`inline-block px-3 py-1 rounded-full border text-xs font-semibold mt-2 capitalize ${getPerformanceColor(event.performance)}`}>
                                   {event.performance}
                                 </div>
@@ -170,9 +170,9 @@ export default function History() {
 
                             {/* Emissions */}
                             <div>
-                              <div className="text-sm text-slate-400 mb-1">Total Emissions</div>
-                              <div className="text-2xl font-bold text-white">
-                                {parseFloat(event.totalEmissions).toFixed(2)} <span className="text-sm text-slate-400">tCO₂e</span>
+                              <div className="text-sm text-sage-600 dark:text-sage-400 mb-1">Total Emissions</div>
+                              <div className="text-2xl font-bold text-forest-900 dark:text-forest-50">
+                                {parseFloat(event.totalEmissions).toFixed(2)} <span className="text-sm text-sage-600 dark:text-sage-400">tCO₂e</span>
                               </div>
                               <div className="text-xs text-slate-500">
                                 {parseFloat(event.emissionsPerAttendee).toFixed(4)} per attendee
@@ -180,7 +180,7 @@ export default function History() {
                             </div>
 
                             {/* Event Details */}
-                            <div className="space-y-2 text-sm text-slate-400">
+                            <div className="space-y-2 text-sm text-sage-600 dark:text-sage-400">
                               {event.eventDate && (
                                 <div className="flex items-center gap-2">
                                   <Calendar className="w-4 h-4" />
@@ -200,7 +200,7 @@ export default function History() {
                             </div>
 
                             {/* View Details Link */}
-                            <div className="pt-2 border-t border-slate-700/50">
+                            <div className="pt-2 border-t border-forest-200 dark:border-forest-700/50">
                               <div className="flex items-center justify-between text-sm text-emerald-400 hover:text-emerald-300">
                                 <span>View Details</span>
                                 <ChevronRight className="w-4 h-4" />

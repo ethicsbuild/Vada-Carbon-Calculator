@@ -54,15 +54,15 @@ export function ScopeBreakdown({ scope1, scope2, scope3, total }: ScopeBreakdown
               <div className="flex justify-between items-center mb-2">
                 <div className="flex items-center space-x-2">
                   <div className={`w-3 h-3 rounded-full ${scope.color}`}></div>
-                  <span className="font-medium text-gray-900 dark:text-white">
+                  <span className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">
                     {scope.name}
                   </span>
                 </div>
                 <div className="text-right">
-                  <div className="font-semibold text-gray-900 dark:text-white">
+                  <div className="font-semibold text-gray-900 dark:text-forest-900 dark:text-forest-50">
                     {scope.value.toFixed(1)} tCO2e
                   </div>
-                  <div className="text-xs text-gray-600 dark:text-gray-400">
+                  <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400">
                     {scope.percentage.toFixed(1)}%
                   </div>
                 </div>
@@ -70,7 +70,7 @@ export function ScopeBreakdown({ scope1, scope2, scope3, total }: ScopeBreakdown
               
               <Progress value={scope.percentage} className="h-2 mb-2" />
               
-              <div className="text-xs text-gray-600 dark:text-gray-400 mb-1">
+              <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400 mb-1">
                 {scope.description}
               </div>
               
@@ -79,7 +79,7 @@ export function ScopeBreakdown({ scope1, scope2, scope3, total }: ScopeBreakdown
                   <Badge 
                     key={index} 
                     variant="secondary" 
-                    className="text-xs bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400"
+                    className="text-xs bg-gray-100 dark:bg-forest-50 dark:bg-forest-800 text-gray-600 dark:text-sage-600 dark:text-sage-400"
                   >
                     {example}
                   </Badge>
@@ -90,15 +90,15 @@ export function ScopeBreakdown({ scope1, scope2, scope3, total }: ScopeBreakdown
         </div>
 
         {/* Summary */}
-        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-forest-50 dark:bg-forest-800 rounded-lg">
           <div className="flex justify-between items-center">
-            <span className="font-medium text-gray-900 dark:text-white">Total Emissions</span>
-            <span className="text-xl font-bold text-gray-900 dark:text-white">
+            <span className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">Total Emissions</span>
+            <span className="text-xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-50">
               {total.toFixed(1)} tCO2e
             </span>
           </div>
           
-          <div className="mt-3 text-xs text-gray-600 dark:text-gray-400">
+          <div className="mt-3 text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400">
             {scope2 > scope1 + scope3 && (
               <div className="flex items-center space-x-1 text-orange-600">
                 <div className="w-1 h-1 bg-orange-600 rounded-full"></div>

@@ -48,7 +48,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-sage-50 dark:bg-forest-900 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
@@ -56,7 +56,7 @@ export default function Dashboard() {
             <h1 className="text-4xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100 mb-2">
               Analytics Dashboard
             </h1>
-            <p className="text-xl text-gray-600 dark:text-gray-300">
+            <p className="text-xl text-gray-600 dark:text-sage-700 dark:text-sage-300">
               Real-time insights and trend analysis for your carbon footprint
             </p>
           </div>
@@ -82,13 +82,13 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Total Emissions</p>
+                  <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Total Emissions</p>
                   <p className="text-3xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.total} <span className="text-sm font-normal">tCO2e</span>
                   </p>
                 </div>
-                <div className="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center">
-                  <BarChart3 className="w-6 h-6 text-gray-600 dark:text-gray-400" />
+                <div className="w-12 h-12 bg-gray-100 dark:bg-forest-50 dark:bg-forest-800 rounded-full flex items-center justify-center">
+                  <BarChart3 className="w-6 h-6 text-gray-600 dark:text-sage-600 dark:text-sage-400" />
                 </div>
               </div>
               <div className="flex items-center mt-4">
@@ -104,7 +104,7 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Scope 1</p>
+                  <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 1</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope1} <span className="text-sm font-normal">tCO2e</span>
                   </p>
@@ -120,7 +120,7 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Scope 2</p>
+                  <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 2</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope2} <span className="text-sm font-normal">tCO2e</span>
                   </p>
@@ -136,7 +136,7 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">Scope 3</p>
+                  <p className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Scope 3</p>
                   <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope3} <span className="text-sm font-normal">tCO2e</span>
                   </p>
@@ -180,7 +180,7 @@ export default function Dashboard() {
                           <div className={`w-8 h-8 ${metric.bgColor} rounded-full flex items-center justify-center`}>
                             <Icon className="w-4 h-4 text-forest-900 dark:text-forest-100" />
                           </div>
-                          <span className="text-sm text-gray-600 dark:text-gray-400">{metric.label}</span>
+                          <span className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">{metric.label}</span>
                         </div>
                         <span className={`text-sm font-medium ${metric.color}`}>{metric.value}</span>
                       </div>

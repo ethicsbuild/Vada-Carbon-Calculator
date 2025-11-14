@@ -71,7 +71,7 @@ export default function Home() {
             <Link href={`/calculator?type=${selectedEventType}`}>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-forest-600 to-sage-600 hover:from-forest-700 hover:to-sage-700 text-white shadow-lg shadow-forest-500/25 rounded-xl"
+                className="bg-gradient-to-r from-forest-600 to-sage-600 hover:from-forest-700 hover:to-sage-700 text-forest-900 dark:text-forest-50 shadow-lg shadow-forest-500/25 rounded-xl"
               >
                 Start Calculating
               </Button>

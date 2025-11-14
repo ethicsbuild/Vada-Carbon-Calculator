@@ -123,13 +123,13 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-slate-800 border-slate-700 text-white max-w-lg">
+      <DialogContent className="bg-forest-50 dark:bg-forest-800 border-forest-200 dark:border-forest-700 text-forest-900 dark:text-forest-50 max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
             <Save className="w-6 h-6 text-emerald-400" />
             Save Your Event
           </DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogDescription className="text-sage-600 dark:text-sage-400">
             Save this calculation to track your progress over time and compare year-over-year.
           </DialogDescription>
         </DialogHeader>
@@ -137,7 +137,7 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
         <div className="space-y-4 py-4">
           {/* Event Name */}
           <div className="space-y-2">
-            <Label htmlFor="eventName" className="text-slate-300">
+            <Label htmlFor="eventName" className="text-sage-700 dark:text-sage-300">
               Event Name <span className="text-red-400">*</span>
             </Label>
             <Input
@@ -145,14 +145,14 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
               value={eventName}
               onChange={(e) => setEventName(e.target.value)}
               placeholder="e.g., Lightning in a Bottle, Symbiosis Gathering"
-              className="bg-slate-900 border-slate-600 text-white"
+              className="bg-sage-50 dark:bg-forest-900 border-sage-300 dark:border-sage-600 text-forest-900 dark:text-forest-50"
             />
           </div>
 
           {/* Event Year and Date */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="eventYear" className="text-slate-300">
+              <Label htmlFor="eventYear" className="text-sage-700 dark:text-sage-300">
                 Event Year <span className="text-red-400">*</span>
               </Label>
               <Input
@@ -162,11 +162,11 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
                 onChange={(e) => setEventYear(parseInt(e.target.value))}
                 min={2000}
                 max={2100}
-                className="bg-slate-900 border-slate-600 text-white"
+                className="bg-sage-50 dark:bg-forest-900 border-sage-300 dark:border-sage-600 text-forest-900 dark:text-forest-50"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="eventDate" className="text-slate-300">
+              <Label htmlFor="eventDate" className="text-sage-700 dark:text-sage-300">
                 Event Date (Optional)
               </Label>
               <Input
@@ -174,14 +174,14 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
                 type="date"
                 value={eventDate}
                 onChange={(e) => setEventDate(e.target.value)}
-                className="bg-slate-900 border-slate-600 text-white"
+                className="bg-sage-50 dark:bg-forest-900 border-sage-300 dark:border-sage-600 text-forest-900 dark:text-forest-50"
               />
             </div>
           </div>
 
           {/* Notes */}
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-slate-300">
+            <Label htmlFor="notes" className="text-sage-700 dark:text-sage-300">
               Notes (Optional)
             </Label>
             <Textarea
@@ -189,14 +189,14 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Add any notes about this calculation, improvements you plan to make, etc."
-              className="bg-slate-900 border-slate-600 text-white min-h-[100px]"
+              className="bg-sage-50 dark:bg-forest-900 border-sage-300 dark:border-sage-600 text-forest-900 dark:text-forest-50 min-h-[100px]"
             />
           </div>
 
           {/* Summary */}
-          <div className="bg-slate-900/50 rounded-lg p-4 space-y-2">
-            <div className="text-sm text-slate-400">Summary:</div>
-            <div className="text-white">
+          <div className="bg-sage-50 dark:bg-forest-900/50 rounded-lg p-4 space-y-2">
+            <div className="text-sm text-sage-600 dark:text-sage-400">Summary:</div>
+            <div className="text-forest-900 dark:text-forest-50">
               <span className="font-semibold">{calculation.total.toFixed(2)} tCO₂e</span>
               {' '}({calculation.emissionsPerAttendee.toFixed(4)} per attendee)
             </div>
@@ -221,14 +221,14 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={saving}
-            className="text-slate-400 hover:text-white"
+            className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSave}
             disabled={saving || !eventName.trim()}
-            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white"
+            className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-forest-900 dark:text-forest-50"
           >
             {saving ? (
               <>

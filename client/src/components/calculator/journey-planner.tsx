@@ -201,7 +201,7 @@ export function JourneyPlanner({
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
                     <Icon className={`w-4 h-4 ${modeInfo.color}`} />
-                    <h4 className="font-medium text-gray-900 dark:text-white">
+                    <h4 className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">
                       Journey {index + 1}
                     </h4>
                     {journey.co2eTonnes !== undefined && (

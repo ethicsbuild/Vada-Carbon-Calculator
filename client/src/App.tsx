@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/use-theme";
 import { Navigation } from "@/components/layout/navigation";
 import { FloatingSageChat } from "@/components/sage/floating-sage-chat";
+import { NatureGradientOverlay, NatureBorder } from "@/components/ui/nature-decorations";
 import Home from "@/pages/home";
 import Calculator from "@/pages/calculator";
 import Dashboard from "@/pages/dashboard";
@@ -16,9 +17,11 @@ import NotFound from "@/pages/not-found";
 
 function Router() {
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sage-50 via-forest-50 to-sage-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-sage-50 via-forest-50 to-sage-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950 relative">
+        <NatureGradientOverlay />
+        <NatureBorder />
       <Navigation />
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         <Switch>
           <Route path="/" component={Home} />
           <Route path="/calculator" component={Calculator} />

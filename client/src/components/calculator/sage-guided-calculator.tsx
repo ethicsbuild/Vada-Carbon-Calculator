@@ -167,7 +167,7 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
                   <div className={`flex-1 ${message.role === 'user' ? 'ml-10' : ''}`}>
                     <div className={`rounded-xl p-3 ${
                       message.role === 'sage'
-                        ? 'bg-sage-50 dark:bg-sage-900/50 text-slate-200'
+                        ? 'bg-sage-50 dark:bg-sage-900/50 text-forest-700 dark:text-forest-200'
                         : 'bg-forest-500/20 text-emerald-100'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">

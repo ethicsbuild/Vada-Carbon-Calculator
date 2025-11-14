@@ -110,7 +110,7 @@ export function AchievementBadges() {
             {unlockedCount}/{totalCount}
           </Badge>
         </CardTitle>
-        <div className="text-sm text-gray-600 dark:text-gray-400">
+        <div className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">
           {completionPercentage.toFixed(0)}% Complete
         </div>
       </CardHeader>
@@ -133,9 +133,9 @@ export function AchievementBadges() {
                   transition-all duration-200
                 `}>
                   {achievement.unlocked ? (
-                    <Icon className="w-8 h-8 text-white" />
+                    <Icon className="w-8 h-8 text-forest-900 dark:text-forest-50" />
                   ) : (
-                    <Lock className="w-6 h-6 text-gray-500 dark:text-gray-400" />
+                    <Lock className="w-6 h-6 text-gray-500 dark:text-sage-600 dark:text-sage-400" />
                   )}
                   
                   {achievement.unlocked && (
@@ -146,13 +146,13 @@ export function AchievementBadges() {
                 </div>
                 
                 <div className={`text-xs font-medium ${
-                  achievement.unlocked ? 'text-gray-900 dark:text-white' : 'text-gray-500 dark:text-gray-400'
+                  achievement.unlocked ? 'text-gray-900 dark:text-forest-900 dark:text-forest-50' : 'text-gray-500 dark:text-sage-600 dark:text-sage-400'
                 }`}>
                   {achievement.title}
                 </div>
                 
                 {achievement.unlocked && achievement.unlockedAt && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  <div className="text-xs text-gray-500 dark:text-sage-600 dark:text-sage-400 mt-1">
                     {achievement.unlockedAt.toLocaleDateString()}
                   </div>
                 )}
@@ -166,13 +166,13 @@ export function AchievementBadges() {
           <div className="p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
-                <Trophy className="w-5 h-5 text-white" />
+                <Trophy className="w-5 h-5 text-forest-900 dark:text-forest-50" />
               </div>
               <div className="flex-1">
-                <div className="font-medium text-gray-900 dark:text-white text-sm">
+                <div className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50 text-sm">
                   Recent Achievement Unlocked!
                 </div>
-                <div className="text-xs text-gray-600 dark:text-gray-400">
+                <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400">
                   {achievements.find(a => a.unlocked)?.description}
                 </div>
               </div>
@@ -184,13 +184,13 @@ export function AchievementBadges() {
         <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
           <div className="flex items-center space-x-3">
             <div className="w-8 h-8 bg-gray-300 dark:bg-gray-600 rounded-full flex items-center justify-center">
-              <Lock className="w-4 h-4 text-gray-500 dark:text-gray-400" />
+              <Lock className="w-4 h-4 text-gray-500 dark:text-sage-600 dark:text-sage-400" />
             </div>
             <div className="flex-1">
-              <div className="font-medium text-gray-900 dark:text-white text-sm">
+              <div className="font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50 text-sm">
                 Next: {achievements.find(a => !a.unlocked)?.title}
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">
+              <div className="text-xs text-gray-600 dark:text-sage-600 dark:text-sage-400">
                 {achievements.find(a => !a.unlocked)?.description}
               </div>
             </div>
@@ -200,8 +200,8 @@ export function AchievementBadges() {
         {/* Progress towards next milestone */}
         <div className="mt-4">
           <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600 dark:text-gray-400">Progress to Next Level</span>
-            <span className="text-sm font-medium text-gray-900 dark:text-white">
+            <span className="text-sm text-gray-600 dark:text-sage-600 dark:text-sage-400">Progress to Next Level</span>
+            <span className="text-sm font-medium text-gray-900 dark:text-forest-900 dark:text-forest-50">
               {Math.min(75, completionPercentage + 25)}%
             </span>
           </div>
