@@ -39,7 +39,6 @@ export function Navigation() {
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer group">
-                <span className="text-3xl animate-leaf-float">🌿</span>
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-forest-600 to-sage-600 bg-clip-text text-transparent tracking-tight group-hover:from-forest-500 group-hover:to-sage-500 transition-all">
                   VADA
                 </h1>
