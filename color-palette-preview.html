@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VADA Carbon Calculator - Nature Color Palette</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8ebe3 100%);
+            padding: 2rem;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 2rem;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(50, 160, 106, 0.15);
+        }
+        
+        h1 {
+            font-size: 3rem;
+            color: #228354;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+        
+        .subtitle {
+            font-size: 1.25rem;
+            color: #576849;
+            margin-bottom: 3rem;
+        }
+        
+        .palette-section {
+            margin-bottom: 3rem;
+        }
+        
+        .palette-title {
+            font-size: 1.75rem;
+            color: #1b6844;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .color-swatch {
+            aspect-ratio: 1;
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        
+        .color-swatch:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+        
+        .color-code {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-top: 0.25rem;
+        }
+        
+        /* Forest Green */
+        .forest-50 { background: #f0f9f4; color: #1b6844; }
+        .forest-100 { background: #dcf2e4; color: #1b6844; }
+        .forest-200 { background: #bae5cd; color: #1b6844; }
+        .forest-300 { background: #8bd3ad; color: #175337; }
+        .forest-400 { background: #56ba87; color: white; }
+        .forest-500 { background: #32a06a; color: white; }
+        .forest-600 { background: #228354; color: white; }
+        .forest-700 { background: #1b6844; color: white; }
+        .forest-800 { background: #175337; color: white; }
+        .forest-900 { background: #14442e; color: white; }
+        
+        /* Sage Green */
+        .sage-50 { background: #f6f7f4; color: #45523b; }
+        .sage-100 { background: #e8ebe3; color: #45523b; }
+        .sage-200 { background: #d1d8c8; color: #45523b; }
+        .sage-300 { background: #b0bda3; color: #394332; }
+        .sage-400 { background: #8d9f7c; color: white; }
+        .sage-500 { background: #6f835f; color: white; }
+        .sage-600 { background: #576849; color: white; }
+        .sage-700 { background: #45523b; color: white; }
+        .sage-800 { background: #394332; color: white; }
+        .sage-900 { background: #30392b; color: white; }
+        
+        /* Moss Green */
+        .moss-50 { background: #f4f6f3; color: #3c4f37; }
+        .moss-100 { background: #e5ebe1; color: #3c4f37; }
+        .moss-200 { background: #ccd7c5; color: #3c4f37; }
+        .moss-300 { background: #a8bba0; color: #32412f; }
+        .moss-400 { background: #7f9975; color: white; }
+        .moss-500 { background: #5f7d56; color: white; }
+        .moss-600 { background: #4a6343; color: white; }
+        .moss-700 { background: #3c4f37; color: white; }
+        .moss-800 { background: #32412f; color: white; }
+        .moss-900 { background: #2b3729; color: white; }
+        
+        /* Earth Tones */
+        .earth-50 { background: #f9f7f4; color: #7f5844; }
+        .earth-100 { background: #f0ebe3; color: #7f5844; }
+        .earth-200 { background: #e0d5c5; color: #7f5844; }
+        .earth-300 { background: #cbb89f; color: #69493b; }
+        .earth-400 { background: #b59778; color: white; }
+        .earth-500 { background: #a67f5d; color: white; }
+        .earth-600 { background: #996d51; color: white; }
+        .earth-700 { background: #7f5844; color: white; }
+        .earth-800 { background: #69493b; color: white; }
+        .earth-900 { background: #573d32; color: white; }
+        
+        .examples {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .example-card {
+            background: linear-gradient(135deg, #f0f9f4 0%, #e8ebe3 100%);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(50, 160, 106, 0.1);
+        }
+        
+        .example-title {
+            font-size: 1.25rem;
+            color: #1b6844;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            cursor: pointer;
+            border: none;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background: #228354;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #1b6844;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 131, 84, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #576849;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #45523b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(87, 104, 73, 0.3);
+        }
+        
+        .btn-accent {
+            background: #996d51;
+            color: white;
+        }
+        
+        .btn-accent:hover {
+            background: #7f5844;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(153, 109, 81, 0.3);
+        }
+        
+        .input-example {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #d1d8c8;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            margin-top: 0.5rem;
+            transition: all 0.2s;
+        }
+        
+        .input-example:focus {
+            outline: none;
+            border-color: #228354;
+            box-shadow: 0 0 0 3px rgba(34, 131, 84, 0.1);
+        }
+        
+        .leaf-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: float 3s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(5deg); }
+        }
+    </style>
+<script src="https://sites.super.myninja.ai/_assets/ninja-daytona-script.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>🌿 VADA Carbon Calculator</h1>
+        <p class="subtitle">Nature-Forward Color Palette & Design System</p>
+        
+        <div class="palette-section">
+            <h2 class="palette-title">Forest Green (Primary)</h2>
+            <div class="color-grid">
+                <div class="color-swatch forest-50">
+                    <span>50</span>
+                    <span class="color-code">#f0f9f4</span>
+                </div>
+                <div class="color-swatch forest-100">
+                    <span>100</span>
+                    <span class="color-code">#dcf2e4</span>
+                </div>
+                <div class="color-swatch forest-200">
+                    <span>200</span>
+                    <span class="color-code">#bae5cd</span>
+                </div>
+                <div class="color-swatch forest-300">
+                    <span>300</span>
+                    <span class="color-code">#8bd3ad</span>
+                </div>
+                <div class="color-swatch forest-400">
+                    <span>400</span>
+                    <span class="color-code">#56ba87</span>
+                </div>
+                <div class="color-swatch forest-500">
+                    <span>500</span>
+                    <span class="color-code">#32a06a</span>
+                </div>
+                <div class="color-swatch forest-600">
+                    <span>600</span>
+                    <span class="color-code">#228354</span>
+                </div>
+                <div class="color-swatch forest-700">
+                    <span>700</span>
+                    <span class="color-code">#1b6844</span>
+                </div>
+                <div class="color-swatch forest-800">
+                    <span>800</span>
+                    <span class="color-code">#175337</span>
+                </div>
+                <div class="color-swatch forest-900">
+                    <span>900</span>
+                    <span class="color-code">#14442e</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="palette-section">
+            <h2 class="palette-title">Sage Green (Secondary)</h2>
+            <div class="color-grid">
+                <div class="color-swatch sage-50">
+                    <span>50</span>
+                    <span class="color-code">#f6f7f4</span>
+                </div>
+                <div class="color-swatch sage-100">
+                    <span>100</span>
+                    <span class="color-code">#e8ebe3</span>
+                </div>
+                <div class="color-swatch sage-200">
+                    <span>200</span>
+                    <span class="color-code">#d1d8c8</span>
+                </div>
+                <div class="color-swatch sage-300">
+                    <span>300</span>
+                    <span class="color-code">#b0bda3</span>
+                </div>
+                <div class="color-swatch sage-400">
+                    <span>400</span>
+                    <span class="color-code">#8d9f7c</span>
+                </div>
+                <div class="color-swatch sage-500">
+                    <span>500</span>
+                    <span class="color-code">#6f835f</span>
+                </div>
+                <div class="color-swatch sage-600">
+                    <span>600</span>
+                    <span class="color-code">#576849</span>
+                </div>
+                <div class="color-swatch sage-700">
+                    <span>700</span>
+                    <span class="color-code">#45523b</span>
+                </div>
+                <div class="color-swatch sage-800">
+                    <span>800</span>
+                    <span class="color-code">#394332</span>
+                </div>
+                <div class="color-swatch sage-900">
+                    <span>900</span>
+                    <span class="color-code">#30392b</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="palette-section">
+            <h2 class="palette-title">Moss Green (Tertiary)</h2>
+            <div class="color-grid">
+                <div class="color-swatch moss-50">
+                    <span>50</span>
+                    <span class="color-code">#f4f6f3</span>
+                </div>
+                <div class="color-swatch moss-100">
+                    <span>100</span>
+                    <span class="color-code">#e5ebe1</span>
+                </div>
+                <div class="color-swatch moss-200">
+                    <span>200</span>
+                    <span class="color-code">#ccd7c5</span>
+                </div>
+                <div class="color-swatch moss-300">
+                    <span>300</span>
+                    <span class="color-code">#a8bba0</span>
+                </div>
+                <div class="color-swatch moss-400">
+                    <span>400</span>
+                    <span class="color-code">#7f9975</span>
+                </div>
+                <div class="color-swatch moss-500">
+                    <span>500</span>
+                    <span class="color-code">#5f7d56</span>
+                </div>
+                <div class="color-swatch moss-600">
+                    <span>600</span>
+                    <span class="color-code">#4a6343</span>
+                </div>
+                <div class="color-swatch moss-700">
+                    <span>700</span>
+                    <span class="color-code">#3c4f37</span>
+                </div>
+                <div class="color-swatch moss-800">
+                    <span>800</span>
+                    <span class="color-code">#32412f</span>
+                </div>
+                <div class="color-swatch moss-900">
+                    <span>900</span>
+                    <span class="color-code">#2b3729</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="palette-section">
+            <h2 class="palette-title">Earth Tones (Accent)</h2>
+            <div class="color-grid">
+                <div class="color-swatch earth-50">
+                    <span>50</span>
+                    <span class="color-code">#f9f7f4</span>
+                </div>
+                <div class="color-swatch earth-100">
+                    <span>100</span>
+                    <span class="color-code">#f0ebe3</span>
+                </div>
+                <div class="color-swatch earth-200">
+                    <span>200</span>
+                    <span class="color-code">#e0d5c5</span>
+                </div>
+                <div class="color-swatch earth-300">
+                    <span>300</span>
+                    <span class="color-code">#cbb89f</span>
+                </div>
+                <div class="color-swatch earth-400">
+                    <span>400</span>
+                    <span class="color-code">#b59778</span>
+                </div>
+                <div class="color-swatch earth-500">
+                    <span>500</span>
+                    <span class="color-code">#a67f5d</span>
+                </div>
+                <div class="color-swatch earth-600">
+                    <span>600</span>
+                    <span class="color-code">#996d51</span>
+                </div>
+                <div class="color-swatch earth-700">
+                    <span>700</span>
+                    <span class="color-code">#7f5844</span>
+                </div>
+                <div class="color-swatch earth-800">
+                    <span>800</span>
+                    <span class="color-code">#69493b</span>
+                </div>
+                <div class="color-swatch earth-900">
+                    <span>900</span>
+                    <span class="color-code">#573d32</span>
+                </div>
+            </div>
+        </div>
+        
+        <h2 class="palette-title" style="margin-top: 3rem;">Component Examples</h2>
+        <div class="examples">
+            <div class="example-card">
+                <div class="leaf-icon">🌿</div>
+                <h3 class="example-title">Buttons</h3>
+                <button class="btn btn-primary">Primary Action</button>
+                <button class="btn btn-secondary">Secondary Action</button>
+                <button class="btn btn-accent">Accent Action</button>
+            </div>
+            
+            <div class="example-card">
+                <div class="leaf-icon">🍃</div>
+                <h3 class="example-title">Input Fields</h3>
+                <label style="color: #1b6844; font-weight: 600;">Event Name</label>
+                <input type="text" class="input-example" placeholder="Enter your event name...">
+            </div>
+            
+            <div class="example-card">
+                <div class="leaf-icon">🌱</div>
+                <h3 class="example-title">Typography</h3>
+                <p style="color: #1b6844; font-size: 1.5rem; font-weight: 700; margin-bottom: 0.5rem;">
+                    Heading Style
+                </p>
+                <p style="color: #576849; font-size: 1rem;">
+                    Body text with natural, earthy colors that are easy on the eyes and promote a sense of calm and sustainability.
+                </p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
