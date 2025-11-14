@@ -33,14 +33,17 @@ export function Navigation() {
   };
 
   return (
-    <header className="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-white/10">
+    <header className="sticky top-0 z-50 backdrop-blur-md bg-forest-50/95 dark:bg-forest-900/95 border-b border-forest-200/50 dark:border-forest-700/50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/">
-            <h1 className="text-2xl font-extrabold bg-gradient-to-r from-emerald-500 to-violet-500 bg-clip-text text-transparent cursor-pointer tracking-tight">
-              VADA
-            </h1>
+            <div className="flex items-center gap-2 cursor-pointer group">
+                <span className="text-3xl animate-leaf-float">🌿</span>
+                <h1 className="text-2xl font-bold bg-gradient-to-r from-forest-600 to-sage-600 bg-clip-text text-transparent tracking-tight group-hover:from-forest-500 group-hover:to-sage-500 transition-all">
+                  VADA
+                </h1>
+              </div>
           </Link>
 
           {/* Desktop Navigation */}
@@ -53,8 +56,8 @@ export function Navigation() {
                   <span className={cn(
                     "text-sm font-medium transition-colors cursor-pointer",
                     isActive
-                      ? "text-white"
-                      : "text-slate-400 hover:text-white"
+                      ? "text-forest-700 dark:text-forest-300 font-semibold"
+                      : "text-sage-600 dark:text-sage-400 hover:text-forest-600 dark:hover:text-forest-400"
                   )}>
                     {item.name}
                   </span>
@@ -63,9 +66,9 @@ export function Navigation() {
             })}
 
             {/* Carbon Score Badge */}
-            <div className="bg-slate-800 px-4 py-2 rounded-full border border-emerald-500/50">
-              <span className="text-sm text-slate-300">
-                Your Score: <span className="font-bold text-emerald-400">{carbonScore}</span>
+            <div className="bg-forest-100 dark:bg-forest-800 px-4 py-2 rounded-full border border-forest-400/50">
+              <span className="text-sm text-forest-700 dark:text-forest-300">
+                Your Score: <span className="font-bold text-forest-600 dark:text-forest-400">{carbonScore}</span>
               </span>
             </div>
           </nav>
@@ -76,7 +79,7 @@ export function Navigation() {
               variant="ghost"
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-9 h-9 p-0 text-white hover:bg-slate-800"
+              className="w-9 h-9 p-0 text-forest-700 dark:text-forest-300 hover:bg-forest-100 dark:hover:bg-forest-800"
             >
               {mobileMenuOpen ? (
                 <X className="w-5 h-5" />
@@ -89,7 +92,7 @@ export function Navigation() {
 
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-white/10">
+          <div className="md:hidden py-4 border-t border-forest-200/50 dark:border-forest-700/50">
             <div className="flex flex-col space-y-2">
               {navigation.map((item) => {
                 const isActive = location === item.href;
@@ -101,7 +104,7 @@ export function Navigation() {
                         "px-3 py-2 rounded-md text-base font-medium transition-colors cursor-pointer",
                         isActive
                           ? "text-white bg-slate-800"
-                          : "text-slate-400 hover:text-white hover:bg-slate-800"
+                          : "text-sage-600 dark:text-sage-400 hover:text-forest-600 dark:hover:text-forest-400 hover:bg-slate-800"
                       )}
                       onClick={() => setMobileMenuOpen(false)}
                     >
@@ -114,8 +117,8 @@ export function Navigation() {
               {/* Carbon Score Badge Mobile */}
               <div className="mt-4 pt-4 border-t border-white/10">
                 <div className="bg-slate-800 px-4 py-2 rounded-lg border border-emerald-500/50 text-center">
-                  <span className="text-sm text-slate-300">
-                    Your Score: <span className="font-bold text-emerald-400">{carbonScore}</span>
+                  <span className="text-sm text-forest-700 dark:text-forest-300">
+                    Your Score: <span className="font-bold text-forest-600 dark:text-forest-400">{carbonScore}</span>
                   </span>
                 </div>
               </div>

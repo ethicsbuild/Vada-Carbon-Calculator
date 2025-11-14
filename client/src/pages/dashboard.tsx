@@ -28,8 +28,8 @@ export default function Dashboard() {
       icon: Zap,
       label: "Energy Use",
       value: "89.2 MWh",
-      color: "text-green-600",
-      bgColor: "bg-green-600"
+      color: "text-forest-600",
+      bgColor: "bg-forest-600"
     },
     {
       icon: Car,
@@ -53,7 +53,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
+            <h1 className="text-4xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100 mb-2">
               Analytics Dashboard
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
@@ -69,7 +69,7 @@ export default function Dashboard() {
               <Share className="w-4 h-4 mr-2" />
               Share Report
             </Button>
-            <Button size="sm" className="bg-green-600 hover:bg-green-700">
+            <Button size="sm" className="bg-forest-600 hover:bg-green-700">
               <Calendar className="w-4 h-4 mr-2" />
               Schedule Review
             </Button>
@@ -83,7 +83,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Total Emissions</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-3xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.total} <span className="text-sm font-normal">tCO2e</span>
                   </p>
                 </div>
@@ -92,8 +92,8 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex items-center mt-4">
-                <TrendingDown className="w-4 h-4 text-green-600 mr-1" />
-                <span className="text-green-600 text-sm font-medium">
+                <TrendingDown className="w-4 h-4 text-forest-600 mr-1" />
+                <span className="text-forest-600 text-sm font-medium">
                   {Math.abs(currentEmissions.change)}% vs last year
                 </span>
               </div>
@@ -105,7 +105,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Scope 1</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope1} <span className="text-sm font-normal">tCO2e</span>
                   </p>
                 </div>
@@ -121,7 +121,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Scope 2</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope2} <span className="text-sm font-normal">tCO2e</span>
                   </p>
                 </div>
@@ -137,7 +137,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm text-gray-600 dark:text-gray-400">Scope 3</p>
-                  <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                  <p className="text-2xl font-bold text-gray-900 dark:text-forest-900 dark:text-forest-100">
                     {currentEmissions.scope3} <span className="text-sm font-normal">tCO2e</span>
                   </p>
                 </div>
@@ -178,7 +178,7 @@ export default function Dashboard() {
                       <div key={index} className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <div className={`w-8 h-8 ${metric.bgColor} rounded-full flex items-center justify-center`}>
-                            <Icon className="w-4 h-4 text-white" />
+                            <Icon className="w-4 h-4 text-forest-900 dark:text-forest-100" />
                           </div>
                           <span className="text-sm text-gray-600 dark:text-gray-400">{metric.label}</span>
                         </div>
@@ -197,19 +197,19 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3 text-sm">
-                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                  <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-xl">
                     <p className="text-blue-800 dark:text-blue-200 font-medium mb-1">Energy Optimization</p>
                     <p className="text-blue-700 dark:text-blue-300">
                       Switch to renewable energy sources could reduce Scope 2 emissions by 30%
                     </p>
                   </div>
-                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                  <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-xl">
                     <p className="text-green-800 dark:text-green-200 font-medium mb-1">Supply Chain</p>
                     <p className="text-green-700 dark:text-green-300">
                       Engage top 5 suppliers for carbon reduction initiatives
                     </p>
                   </div>
-                  <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+                  <div className="p-3 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
                     <p className="text-purple-800 dark:text-purple-200 font-medium mb-1">Transportation</p>
                     <p className="text-purple-700 dark:text-purple-300">
                       Implement hybrid work policy to cut commuting emissions

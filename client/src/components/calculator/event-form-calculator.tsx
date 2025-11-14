@@ -457,15 +457,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
 
   return (
     <div className="space-y-6">
-      <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
+      <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm p-6">
         <div className="flex items-center gap-3 mb-6">
-          <Calculator className="w-6 h-6 text-emerald-400" />
-          <h2 className="text-2xl font-bold text-white">Event Carbon Calculator</h2>
+          <Calculator className="w-6 h-6 text-forest-400" />
+          <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-100">Event Carbon Calculator</h2>
         </div>
         
-        <div className="mb-6 p-4 bg-slate-900/50 rounded-lg border border-slate-700/50">
-          <p className="text-slate-300 text-sm">
-            <span className="text-emerald-400 font-semibold">Required fields:</span> Event Type, Attendance, Duration Days, and Hours per Day are marked with an asterisk (*). 
+        <div className="mb-6 p-4 bg-sage-50 dark:bg-sage-900/50 rounded-xl border border-forest-300 dark:border-forest-700/50">
+          <p className="text-sage-500 dark:text-sage-500 text-sm">
+            <span className="text-forest-400 font-semibold">Required fields:</span> Event Type, Attendance, Duration Days, and Hours per Day are marked with an asterisk (*). 
             <br />
             <span className="text-violet-400 font-semibold">Optional fields:</span> You can still get an estimate even if you leave optional fields blank.
           </p>
@@ -473,15 +473,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         
         {/* Progress Indicator */}
         <div className="mb-6">
-          <div className="flex justify-between text-sm text-slate-400 mb-2">
+          <div className="flex justify-between text-sm text-sage-600 dark:text-sage-400 mb-2">
             <span>Event Details</span>
             <span>Transportation</span>
             <span>Production</span>
             <span>Food & Power</span>
           </div>
-          <div className="w-full bg-slate-700 rounded-full h-2">
+          <div className="w-full bg-sage-100 dark:bg-sage-700 rounded-full h-2">
             <div 
-              className="bg-gradient-to-r from-emerald-500 to-violet-500 h-2 rounded-full transition-all duration-300"
+              className="bg-gradient-to-r from-forest-500 to-violet-500 h-2 rounded-full transition-all duration-300"
               style={{ 
                 width: currentSection === 'event-details' ? '25%' : 
                        currentSection === 'transportation' ? '50%' : 
@@ -495,7 +495,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           {/* Event Type */}
           <div className="space-y-2" onClick={() => handleSectionChange('event-details')}>
             <div className="flex items-center gap-2">
-              <Label className="text-slate-300">Event Type *</Label>
+              <Label className="text-sage-500 dark:text-sage-500">Event Type *</Label>
               {validationErrors.eventType && (
                 <div className="flex items-center gap-1 text-red-400 text-sm">
                   <AlertCircle className="w-4 h-4" />
@@ -504,16 +504,16 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               )}
             </div>
             <Select value={formData.eventType} onValueChange={(value) => updateField('eventType', value)}>
-              <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+              <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                 <SelectValue placeholder="Select event type" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="festival" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🎪 Music Festival</SelectItem>
-                <SelectItem value="conference" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">📋 Corporate Conference</SelectItem>
-                <SelectItem value="wedding" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">💍 Wedding</SelectItem>
-                <SelectItem value="concert" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🎸 Concert/Show</SelectItem>
-                <SelectItem value="sports_event" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚽ Sports Event</SelectItem>
-                <SelectItem value="trade_show" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🏢 Trade Show</SelectItem>
+              <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                <SelectItem value="festival" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🎪 Music Festival</SelectItem>
+                <SelectItem value="conference" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">📋 Corporate Conference</SelectItem>
+                <SelectItem value="wedding" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">💍 Wedding</SelectItem>
+                <SelectItem value="concert" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🎸 Concert/Show</SelectItem>
+                <SelectItem value="sports_event" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">⚽ Sports Event</SelectItem>
+                <SelectItem value="trade_show" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🏢 Trade Show</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -521,7 +521,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           {/* Attendance */}
           <div className="space-y-2">
             <div className="flex items-center gap-2">
-              <Label className="text-slate-300">Expected Attendance *</Label>
+              <Label className="text-sage-500 dark:text-sage-500">Expected Attendance *</Label>
               {validationErrors.attendance && (
                 <div className="flex items-center gap-1 text-red-400 text-sm">
                   <AlertCircle className="w-4 h-4" />
@@ -534,7 +534,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               value={formData.attendance || ''}
               onChange={(e) => updateField('attendance', parseInt(e.target.value) || 0)}
               placeholder="Number of attendees"
-              className="bg-slate-900/50 border-slate-700 text-white"
+              className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
             />
           </div>
 
@@ -542,7 +542,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-slate-300">Duration (Days) *</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Duration (Days) *</Label>
                 {validationErrors.durationDays && (
                   <div className="flex items-center gap-1 text-red-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -555,12 +555,12 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 value={formData.durationDays || ''}
                 onChange={(e) => updateField('durationDays', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="1"
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:text-sage-500"
               />
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-slate-300">Hours per Day *</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Hours per Day *</Label>
                 {validationErrors.durationHours && (
                   <div className="flex items-center gap-1 text-red-400 text-sm">
                     <AlertCircle className="w-4 h-4" />
@@ -573,22 +573,22 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 value={formData.durationHours || ''}
                 onChange={(e) => updateField('durationHours', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="8"
-                className="bg-slate-900/50 border-slate-700 text-white placeholder:text-slate-500"
+                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:text-sage-500"
               />
             </div>
           </div>
 
           {/* Venue Type */}
           <div className="space-y-2">
-            <Label className="text-slate-300">Venue Type</Label>
+            <Label className="text-sage-500 dark:text-sage-500">Venue Type</Label>
             <Select value={formData.venueType} onValueChange={(value) => updateField('venueType', value)}>
-              <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+              <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                 <SelectValue placeholder="Select venue type" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="indoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🏢 Indoor Venue</SelectItem>
-                <SelectItem value="outdoor" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🌳 Outdoor Space</SelectItem>
-                <SelectItem value="mixed" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Mixed Indoor/Outdoor</SelectItem>
+              <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                <SelectItem value="indoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🏢 Indoor Venue</SelectItem>
+                <SelectItem value="outdoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🌳 Outdoor Space</SelectItem>
+                <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Mixed Indoor/Outdoor</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -600,9 +600,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               id="isOutdoor"
               checked={formData.isOutdoor}
               onChange={(e) => updateField('isOutdoor', e.target.checked)}
-              className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+              className="w-4 h-4 text-forest-400 bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 rounded focus:ring-emerald-400"
             />
-            <Label htmlFor="isOutdoor" className="text-slate-300">
+            <Label htmlFor="isOutdoor" className="text-sage-500 dark:text-sage-500">
               Outdoor Event
               <InfoTooltip 
                 title="Outdoor Events"
@@ -612,34 +612,34 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
 
           {/* Attendee Transportation */}
-          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
-            <h3 className="text-lg font-semibold text-white">Audience Transportation</h3>
+          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
+            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Audience Transportation</h3>
             
             <div className="space-y-2">
-              <Label className="text-slate-300">Primary Travel Method</Label>
+              <Label className="text-sage-500 dark:text-sage-500">Primary Travel Method</Label>
               <Select value={formData.attendeeTransportMode} onValueChange={(value) => updateField('attendeeTransportMode', value)}>
-                <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+                <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                   <SelectValue placeholder="Select travel method" />
                 </SelectTrigger>
-                <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                  <SelectItem value="mixed" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Mixed (Local/Regional/Flying)</SelectItem>
-                  <SelectItem value="local" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚗 Local/Regional Travel</SelectItem>
-                  <SelectItem value="flying" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">✈️ Flying (Domestic/International)</SelectItem>
-                  <SelectItem value="transit" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚇 Public Transit</SelectItem>
-                  <SelectItem value="walking" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🚶 Walking/Biking</SelectItem>
+                <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                  <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Mixed (Local/Regional/Flying)</SelectItem>
+                  <SelectItem value="local" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚗 Local/Regional Travel</SelectItem>
+                  <SelectItem value="flying" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">✈️ Flying (Domestic/International)</SelectItem>
+                  <SelectItem value="transit" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚇 Public Transit</SelectItem>
+                  <SelectItem value="walking" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚶 Walking/Biking</SelectItem>
                 </SelectContent>
               </Select>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Average Travel Distance (km)</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Average Travel Distance (km)</Label>
                 <Input
                   type="number"
                   value={formData.attendeeTransportDistance}
                   onChange={(e) => updateField('attendeeTransportDistance', parseInt(e.target.value) || 0)}
                   placeholder="50"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
             </div>
@@ -647,33 +647,33 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             {formData.attendeeTransportMode === 'mixed' && (
               <div className="grid grid-cols-3 gap-4">
                 <div className="space-y-2">
-                  <Label className="text-slate-300">% Local Travel</Label>
+                  <Label className="text-sage-500 dark:text-sage-500">% Local Travel</Label>
                   <Input
                     type="number"
                     value={formData.attendeeLocalPercentage}
                     onChange={(e) => updateField('attendeeLocalPercentage', parseInt(e.target.value) || 0)}
                     placeholder="60"
-                    className="bg-slate-900/50 border-slate-700 text-white"
+                    className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300">% Domestic Flights</Label>
+                  <Label className="text-sage-500 dark:text-sage-500">% Domestic Flights</Label>
                   <Input
                     type="number"
                     value={formData.attendeeDomesticFlightPercentage}
                     onChange={(e) => updateField('attendeeDomesticFlightPercentage', parseInt(e.target.value) || 0)}
                     placeholder="30"
-                    className="bg-slate-900/50 border-slate-700 text-white"
+                    className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-slate-300">% International Flights</Label>
+                  <Label className="text-sage-500 dark:text-sage-500">% International Flights</Label>
                   <Input
                     type="number"
                     value={formData.attendeeInternationalFlightPercentage}
                     onChange={(e) => updateField('attendeeInternationalFlightPercentage', parseInt(e.target.value) || 0)}
                     placeholder="10"
-                    className="bg-slate-900/50 border-slate-700 text-white"
+                    className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                   />
                 </div>
               </div>
@@ -681,14 +681,14 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
 
           {/* Staff Transportation */}
-          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-white">Staff Transportation</h3>
+              <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Staff Transportation</h3>
               <Button 
                 onClick={addStaffGroup}
                 variant="outline" 
                 size="sm"
-                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Group
@@ -696,20 +696,20 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             </div>
 
             {formData.staffTransportGroups.length === 0 ? (
-              <div className="text-slate-400 text-sm">
+              <div className="text-sage-600 dark:text-sage-400 text-sm">
                 No staff transportation groups added. Click "Add Group" to specify how your staff will travel.
               </div>
             ) : (
               <div className="space-y-4">
                 {formData.staffTransportGroups.map((group) => (
-                  <Card key={group.id} className="bg-slate-900/50 border-slate-700/50 p-4">
+                  <Card key={group.id} className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700/50 p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-white">Staff Group</h4>
+                      <h4 className="font-medium text-forest-900 dark:text-forest-100">Staff Group</h4>
                       <Button 
                         onClick={() => removeStaffGroup(group.id)}
                         variant="ghost"
                         size="sm"
-                        className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
+                        className="text-sage-600 dark:text-sage-400 hover:text-red-400 hover:bg-red-400/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -717,43 +717,43 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Number of Staff</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Number of Staff</Label>
                         <Input
                           type="number"
                           value={group.count}
                           onChange={(e) => updateStaffGroup(group.id, 'count', parseInt(e.target.value) || 0)}
-                          className="bg-slate-800/50 border-slate-700 text-white"
+                          className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Travel Method</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Travel Method</Label>
                         <Select value={group.mode} onValueChange={(value) => updateStaffGroup(group.id, 'mode', value)}>
-                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                          <SelectTrigger className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                            <SelectItem value="driving" className="text-white">🚗 Driving</SelectItem>
-                            <SelectItem value="transit" className="text-white">🚇 Public Transit</SelectItem>
-                            <SelectItem value="flying" className="text-white">✈️ Flying</SelectItem>
+                          <SelectContent className="bg-forest-100 dark:bg-forest-800 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                            <SelectItem value="driving" className="text-forest-900 dark:text-forest-100">🚗 Driving</SelectItem>
+                            <SelectItem value="transit" className="text-forest-900 dark:text-forest-100">🚇 Public Transit</SelectItem>
+                            <SelectItem value="flying" className="text-forest-900 dark:text-forest-100">✈️ Flying</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Average Distance (km)</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Average Distance (km)</Label>
                         <Input
                           type="number"
                           value={group.distance}
                           onChange={(e) => updateStaffGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
-                          className="bg-slate-800/50 border-slate-700 text-white"
+                          className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Overnight Stays</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Overnight Stays</Label>
                         <Input
                           type="number"
                           value={group.overnightStays}
                           onChange={(e) => updateStaffGroup(group.id, 'overnightStays', parseInt(e.target.value) || 0)}
-                          className="bg-slate-800/50 border-slate-700 text-white"
+                          className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                         />
                       </div>
                     </div>
@@ -764,14 +764,14 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
 
           {/* Artist/Performer Transportation */}
-          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
+          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
             <div className="flex justify-between items-center">
-              <h3 className="text-lg font-semibold text-white">Artist Transportation</h3>
+              <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Artist Transportation</h3>
               <Button 
                 onClick={addArtistGroup}
                 variant="outline" 
                 size="sm"
-                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Group
@@ -779,20 +779,20 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             </div>
 
             {formData.artistTransportGroups.length === 0 ? (
-              <div className="text-slate-400 text-sm">
+              <div className="text-sage-600 dark:text-sage-400 text-sm">
                 No artist transportation groups added. Click "Add Group" to specify how performers will travel.
               </div>
             ) : (
               <div className="space-y-4">
                 {formData.artistTransportGroups.map((group) => (
-                  <Card key={group.id} className="bg-slate-900/50 border-slate-700/50 p-4">
+                  <Card key={group.id} className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700/50 p-4">
                     <div className="flex justify-between items-start mb-3">
-                      <h4 className="font-medium text-white">Artist Group</h4>
+                      <h4 className="font-medium text-forest-900 dark:text-forest-100">Artist Group</h4>
                       <Button 
                         onClick={() => removeArtistGroup(group.id)}
                         variant="ghost"
                         size="sm"
-                        className="text-slate-400 hover:text-red-400 hover:bg-red-400/10"
+                        className="text-sage-600 dark:text-sage-400 hover:text-red-400 hover:bg-red-400/10"
                       >
                         <Trash2 className="w-4 h-4" />
                       </Button>
@@ -800,34 +800,34 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                     
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Number of Artists</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Number of Artists</Label>
                         <Input
                           type="number"
                           value={group.count}
                           onChange={(e) => updateArtistGroup(group.id, 'count', parseInt(e.target.value) || 0)}
-                          className="bg-slate-800/50 border-slate-700 text-white"
+                          className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Travel Method</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Travel Method</Label>
                         <Select value={group.mode} onValueChange={(value) => updateArtistGroup(group.id, 'mode', value)}>
-                          <SelectTrigger className="bg-slate-800/50 border-slate-700 text-white">
+                          <SelectTrigger className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent className="bg-slate-800 border-slate-700 text-white">
-                            <SelectItem value="driving" className="text-white">🚗 Driving</SelectItem>
-                            <SelectItem value="transit" className="text-white">🚇 Public Transit</SelectItem>
-                            <SelectItem value="flying" className="text-white">✈️ Flying</SelectItem>
+                          <SelectContent className="bg-forest-100 dark:bg-forest-800 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                            <SelectItem value="driving" className="text-forest-900 dark:text-forest-100">🚗 Driving</SelectItem>
+                            <SelectItem value="transit" className="text-forest-900 dark:text-forest-100">🚇 Public Transit</SelectItem>
+                            <SelectItem value="flying" className="text-forest-900 dark:text-forest-100">✈️ Flying</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                       <div className="space-y-2">
-                        <Label className="text-slate-300">Average Distance (km)</Label>
+                        <Label className="text-sage-500 dark:text-sage-500">Average Distance (km)</Label>
                         <Input
                           type="number"
                           value={group.distance}
                           onChange={(e) => updateArtistGroup(group.id, 'distance', parseInt(e.target.value) || 0)}
-                          className="bg-slate-800/50 border-slate-700 text-white"
+                          className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                         />
                       </div>
                       <div className="flex items-center space-x-2">
@@ -836,9 +836,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                           id={`tourBus-${group.id}`}
                           checked={group.tourBus}
                           onChange={(e) => updateArtistGroup(group.id, 'tourBus', e.target.checked)}
-                          className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+                          className="w-4 h-4 text-forest-400 bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 rounded focus:ring-emerald-400"
                         />
-                        <Label htmlFor={`tourBus-${group.id}`} className="text-slate-300">
+                        <Label htmlFor={`tourBus-${group.id}`} className="text-sage-500 dark:text-sage-500">
                           Tour Bus
                         </Label>
                       </div>
@@ -850,102 +850,102 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
 
           {/* Equipment Transportation */}
-          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('transportation')}>
-            <h3 className="text-lg font-semibold text-white">Equipment Transportation</h3>
+          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
+            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Equipment Transportation</h3>
             
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Trucks Required</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Trucks Required</Label>
                 <Input
                   type="number"
                   value={formData.equipmentTrucksRequired}
                   onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Average Distance (km)</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Average Distance (km)</Label>
                 <Input
                   type="number"
                   value={formData.equipmentTransportDistance}
                   onChange={(e) => updateField('equipmentTransportDistance', parseInt(e.target.value) || 0)}
                   placeholder="200"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Freight Flights</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Freight Flights</Label>
                 <Input
                   type="number"
                   value={formData.equipmentFreightFlights}
                   onChange={(e) => updateField('equipmentFreightFlights', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
             </div>
           </div>
 
           {/* Power Source */}
-          <div className="space-y-2 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('production')}>
-            <Label className="text-slate-300">Power Source</Label>
+          <div className="space-y-2 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
+            <Label className="text-sage-500 dark:text-sage-500">Power Source</Label>
             <Select value={formData.powerSource} onValueChange={(value) => updateField('powerSource', value)}>
-              <SelectTrigger className="bg-slate-900/50 border-slate-700 text-white">
+              <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                 <SelectValue placeholder="Select power source" />
               </SelectTrigger>
-              <SelectContent className="bg-slate-900 border-slate-700 text-white">
-                <SelectItem value="grid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔌 Grid Power</SelectItem>
-                <SelectItem value="generator" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">⚡ Generator</SelectItem>
-                <SelectItem value="renewable" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">☀️ Renewable Energy</SelectItem>
-                <SelectItem value="hybrid" className="text-white hover:bg-slate-800 hover:text-white focus:bg-slate-800 focus:text-white">🔄 Hybrid (Grid + Renewable)</SelectItem>
+              <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
+                <SelectItem value="grid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔌 Grid Power</SelectItem>
+                <SelectItem value="generator" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">⚡ Generator</SelectItem>
+                <SelectItem value="renewable" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">☀️ Renewable Energy</SelectItem>
+                <SelectItem value="hybrid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Hybrid (Grid + Renewable)</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           {/* Food & Catering */}
-          <div className="space-y-4 pt-4 border-t border-slate-700/50" onClick={() => handleSectionChange('food-power')}>
-            <h3 className="text-lg font-semibold text-white">Food & Catering</h3>
+          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
+            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Food & Catering</h3>
             
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label className="text-slate-300">Staff Meals</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Staff Meals</Label>
                 <Input
                   type="number"
                   value={formData.meals.staffMeals}
                   onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Attendee Food</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Attendee Food</Label>
                 <Input
                   type="number"
                   value={formData.meals.attendeeFood}
                   onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">VIP Catering</Label>
+                <Label className="text-sage-500 dark:text-sage-500">VIP Catering</Label>
                 <Input
                   type="number"
                   value={formData.meals.vipCatering}
                   onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
               <div className="space-y-2">
-                <Label className="text-slate-300">Talent Catering</Label>
+                <Label className="text-sage-500 dark:text-sage-500">Talent Catering</Label>
                 <Input
                   type="number"
                   value={formData.meals.talentCatering}
                   onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
                   placeholder="0"
-                  className="bg-slate-900/50 border-slate-700 text-white"
+                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
                 />
               </div>
             </div>
@@ -956,9 +956,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 id="localFood"
                 checked={formData.localFood}
                 onChange={(e) => updateField('localFood', e.target.checked)}
-                className="w-4 h-4 text-emerald-400 bg-slate-900 border-slate-700 rounded focus:ring-emerald-400"
+                className="w-4 h-4 text-forest-400 bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 rounded focus:ring-emerald-400"
               />
-              <Label htmlFor="localFood" className="text-slate-300">
+              <Label htmlFor="localFood" className="text-sage-500 dark:text-sage-500">
                 Locally Sourced Food
                 <InfoTooltip 
                   title="Locally Sourced Food"
@@ -970,11 +970,11 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         </div>
 
         {/* Calculate Button */}
-        <div className="pt-6 border-t border-slate-700/50">
+        <div className="pt-6 border-t border-forest-300 dark:border-forest-700/50">
           <Button 
             onClick={calculateEmissions}
             disabled={isCalculating}
-            className="w-full bg-gradient-to-r from-emerald-500 to-violet-500 hover:from-emerald-600 hover:to-violet-600 text-white"
+            className="w-full bg-gradient-to-r from-forest-500 to-violet-500 hover:from-forest-600 hover:to-violet-600 text-forest-900 dark:text-forest-100"
           >
             {isCalculating ? (
               <>
@@ -1004,13 +1004,13 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           />
           
           {/* Export Buttons */}
-          <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm p-6">
-            <h3 className="text-lg font-semibold text-white mb-4">Export Results</h3>
+          <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm p-6">
+            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100 mb-4">Export Results</h3>
             <div className="flex flex-wrap gap-3">
               <Button 
                 onClick={exportToPDF}
                 variant="outline"
-                className="border-emerald-400/50 text-emerald-400 hover:bg-emerald-400/10"
+                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export as PDF

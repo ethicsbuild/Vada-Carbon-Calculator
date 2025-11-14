@@ -41,14 +41,14 @@ export default function Home() {
   const [selectedEventType, setSelectedEventType] = useState<string | null>(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
+    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-sage-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 bg-gradient-to-r from-emerald-400 via-emerald-300 to-violet-400 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-forest-600 via-sage-600 to-moss-600 dark:from-forest-400 dark:via-sage-400 dark:to-moss-400 bg-clip-text text-transparent">
             VADA CarbonCoPilot
           </h1>
-          <p className="text-lg text-slate-400 max-w-2xl mx-auto">
+          <p className="text-lg text-sage-700 dark:text-sage-400 max-w-2xl mx-auto">
             Your AI sustainability guide for events—powered by Sage Riverstone
           </p>
         </div>
@@ -71,7 +71,7 @@ export default function Home() {
             <Link href={`/calculator?type=${selectedEventType}`}>
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-700 text-white shadow-lg shadow-emerald-500/25"
+                className="bg-gradient-to-r from-forest-600 to-sage-600 hover:from-forest-700 hover:to-sage-700 text-white shadow-lg shadow-forest-500/25 rounded-xl"
               >
                 Start Calculating
               </Button>
@@ -81,26 +81,26 @@ export default function Home() {
 
         {/* Features Preview */}
         <div className="grid md:grid-cols-3 gap-6 mt-16">
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 backdrop-blur-sm">
+          <Card className="bg-forest-50/80 dark:bg-forest-900/50 border-forest-200/50 dark:border-forest-700/50 nature-card p-6 backdrop-blur-sm">
             <div className="text-3xl mb-3">🧭</div>
-            <h3 className="text-xl font-semibold text-white mb-2">AI-Guided Journey</h3>
-            <p className="text-slate-400 text-sm">
+            <h3 className="text-xl font-semibold text-forest-800 dark:text-forest-200 mb-2">AI-Guided Journey</h3>
+            <p className="text-sage-700 dark:text-sage-400 text-sm">
               Sage Riverstone walks you through every step with tips, examples, and real festival success stories
             </p>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 backdrop-blur-sm">
+          <Card className="bg-forest-50/80 dark:bg-forest-900/50 border-forest-200/50 dark:border-forest-700/50 nature-card p-6 backdrop-blur-sm">
             <div className="text-3xl mb-3">⛓️</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Blockchain Verified</h3>
-            <p className="text-slate-400 text-sm">
+            <h3 className="text-xl font-semibold text-forest-800 dark:text-forest-200 mb-2">Blockchain Verified</h3>
+            <p className="text-sage-700 dark:text-sage-400 text-sm">
               Immutable records on Hedera for ESG reporting and third-party verification
             </p>
           </Card>
 
-          <Card className="bg-slate-800/50 border-slate-700/50 p-6 backdrop-blur-sm">
+          <Card className="bg-forest-50/80 dark:bg-forest-900/50 border-forest-200/50 dark:border-forest-700/50 nature-card p-6 backdrop-blur-sm">
             <div className="text-3xl mb-3">🏆</div>
-            <h3 className="text-xl font-semibold text-white mb-2">Gamified Journey</h3>
-            <p className="text-slate-400 text-sm">
+            <h3 className="text-xl font-semibold text-forest-800 dark:text-forest-200 mb-2">Gamified Journey</h3>
+            <p className="text-sage-700 dark:text-sage-400 text-sm">
               Unlock achievements, compare with peers, and celebrate sustainability wins
             </p>
           </Card>

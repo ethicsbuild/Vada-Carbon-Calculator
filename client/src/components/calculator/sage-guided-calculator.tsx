@@ -137,16 +137,16 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
     <div ref={containerRef} className="grid lg:grid-cols-2 gap-6 h-full">
       {/* Sage's Guidance Column */}
       <div className="order-2 lg:order-1 lg:sticky lg:top-4 lg:self-start">
-        <Card className="bg-slate-800/50 border-slate-700/50 backdrop-blur-sm flex flex-col lg:max-h-[calc(100vh-2rem)]">
+        <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm flex flex-col lg:max-h-[calc(100vh-2rem)]">
           {/* Header */}
-          <div className="p-4 border-b border-slate-700/50">
+          <div className="p-4 border-b border-forest-300 dark:border-forest-700/50">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-emerald-400 to-violet-400 flex items-center justify-center">
-                <Sparkles className="w-6 h-6 text-white" />
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-forest-400 to-violet-400 flex items-center justify-center">
+                <Sparkles className="w-6 h-6 text-forest-900 dark:text-forest-100" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-lg">Sage Riverstone</h3>
-                <p className="text-sm text-slate-400 flex items-center gap-1">
+                <h3 className="font-bold text-forest-900 dark:text-forest-100 text-lg">Sage Riverstone</h3>
+                <p className="text-sm text-sage-600 dark:text-sage-400 flex items-center gap-1">
                   <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-slate-500'}`} />
                   {isConnected ? 'Here to guide you' : 'Reconnecting...'}
                 </p>
@@ -160,21 +160,21 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
               {messages.map((message, index) => (
                 <div key={index} className="flex gap-3">
                   {message.role === 'sage' && (
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-violet-400 flex items-center justify-center flex-shrink-0">
-                      <Sparkles className="w-4 h-4 text-white" />
+                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-forest-400 to-violet-400 flex items-center justify-center flex-shrink-0">
+                      <Sparkles className="w-4 h-4 text-forest-900 dark:text-forest-100" />
                     </div>
                   )}
                   <div className={`flex-1 ${message.role === 'user' ? 'ml-10' : ''}`}>
-                    <div className={`rounded-lg p-3 ${
+                    <div className={`rounded-xl p-3 ${
                       message.role === 'sage'
-                        ? 'bg-slate-900/50 text-slate-200'
-                        : 'bg-emerald-500/20 text-emerald-100'
+                        ? 'bg-sage-50 dark:bg-sage-900/50 text-slate-200'
+                        : 'bg-forest-500/20 text-emerald-100'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">
                         {message.content}
                       </p>
                     </div>
-                    <p className="text-xs text-slate-500 mt-1 ml-1">
+                    <p className="text-xs text-sage-500 dark:text-sage-500 mt-1 ml-1">
                       {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   </div>
@@ -185,11 +185,11 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
           </ScrollArea>
 
           {/* Quick Tips Section */}
-          <div className="p-4 border-t border-slate-700/50 bg-slate-900/30">
+          <div className="p-4 border-t border-forest-300 dark:border-forest-700/50 bg-sage-50 dark:bg-sage-900/30">
             <div className="flex items-start gap-2">
-              <MessageCircle className="w-4 h-4 text-emerald-400 mt-0.5 flex-shrink-0" />
-              <div className="text-xs text-slate-400">
-                <p className="font-semibold text-emerald-400 mb-1">💡 Pro tip</p>
+              <MessageCircle className="w-4 h-4 text-forest-400 mt-0.5 flex-shrink-0" />
+              <div className="text-xs text-sage-600 dark:text-sage-400">
+                <p className="font-semibold text-forest-400 mb-1">💡 Pro tip</p>
                 <p>
                   {currentSection === 'welcome' && "Start by filling out your event basics on the right. I'll explain each field as you go!"}
                   {currentSection === 'transportation' && "Transportation is usually the biggest source of emissions—60-80% of your footprint. Focus here for maximum impact!"}
