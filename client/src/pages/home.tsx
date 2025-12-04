@@ -45,10 +45,6 @@ export default function Home() {
         
         {/* HERO - Straight Talk */}
         <div className="text-center mb-16">
-          <div className="inline-block bg-forest-100 dark:bg-forest-800 text-forest-800 dark:text-forest-200 px-4 py-2 rounded-full text-sm font-medium mb-4">
-            Used by 2,400+ event producers
-          </div>
-          
           <h1 className="text-4xl md:text-6xl font-bold mb-6 text-forest-900 dark:text-forest-50">
             Get Your Carbon Report.<br/>
             <span className="text-forest-600 dark:text-forest-400">Fast. Free. No Judgment.</span>
@@ -60,19 +56,19 @@ export default function Home() {
             even if you don't have all the data.
           </p>
 
-          {/* Trust Badges */}
+          {/* Trust Badges - Only Verifiable Claims */}
           <div className="flex flex-wrap justify-center gap-6 text-sm text-forest-600 dark:text-forest-400">
             <div className="flex items-center gap-2">
               <Shield className="w-5 h-5" />
-              <span>Insurance Compliant</span>
+              <span>GHG Protocol Compliant</span>
             </div>
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              <span>GHG Protocol Standard</span>
+              <span>Professional PDF Reports</span>
             </div>
             <div className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              <span>Used by Coachella, Bonnaroo</span>
+              <Clock className="w-5 h-5" />
+              <span>~10 Minute Process</span>
             </div>
           </div>
         </div>
@@ -150,25 +146,22 @@ export default function Home() {
           </div>
         )}
 
-        {/* Social Proof - Real Talk */}
+        {/* Common Use Cases - Honest */}
         <div className="bg-forest-50 dark:bg-forest-900 rounded-2xl p-8 mb-16">
           <h2 className="text-2xl font-bold text-forest-900 dark:text-forest-50 mb-6 text-center">
-            Why Producers Actually Use This
+            Common Reasons Producers Need This
           </h2>
           
           <div className="grid md:grid-cols-2 gap-6">
             <Card className="bg-white dark:bg-forest-800 p-6 border-forest-200 dark:border-forest-700">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
+                <Shield className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
                 <div>
                   <p className="text-forest-900 dark:text-forest-50 font-medium mb-2">
-                    "My insurance company required it"
+                    Insurance Requirements
                   </p>
                   <p className="text-sm text-forest-600 dark:text-forest-400">
-                    Got the report in 15 minutes, sent it to my broker, done. Saved me from hiring a $5K consultant.
-                  </p>
-                  <p className="text-xs text-forest-500 dark:text-forest-500 mt-2">
-                    — Festival Producer, 15K attendees
+                    Many event insurance policies now require carbon reporting as part of risk assessment and ESG compliance.
                   </p>
                 </div>
               </div>
@@ -176,16 +169,13 @@ export default function Home() {
 
             <Card className="bg-white dark:bg-forest-800 p-6 border-forest-200 dark:border-forest-700">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
+                <Users className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
                 <div>
                   <p className="text-forest-900 dark:text-forest-50 font-medium mb-2">
-                    "Sponsor wanted ESG numbers"
+                    Sponsor ESG Reporting
                   </p>
                   <p className="text-sm text-forest-600 dark:text-forest-400">
-                    Didn't have time to figure this out. The AI asked simple questions, gave me a professional report. Sponsor was happy.
-                  </p>
-                  <p className="text-xs text-forest-500 dark:text-forest-500 mt-2">
-                    — Conference Organizer, 500 attendees
+                    Corporate sponsors increasingly need carbon data from events they support for their own sustainability reports.
                   </p>
                 </div>
               </div>
@@ -193,16 +183,13 @@ export default function Home() {
 
             <Card className="bg-white dark:bg-forest-800 p-6 border-forest-200 dark:border-forest-700">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
+                <FileText className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
                 <div>
                   <p className="text-forest-900 dark:text-forest-50 font-medium mb-2">
-                    "Venue contract required it"
+                    Venue Contracts
                   </p>
                   <p className="text-sm text-forest-600 dark:text-forest-400">
-                    New venue policy. Needed carbon numbers or lose the booking. This tool saved my ass.
-                  </p>
-                  <p className="text-xs text-forest-500 dark:text-forest-500 mt-2">
-                    — Concert Promoter, 2K capacity
+                    Some venues now include sustainability reporting requirements in their booking contracts.
                   </p>
                 </div>
               </div>
@@ -210,16 +197,13 @@ export default function Home() {
 
             <Card className="bg-white dark:bg-forest-800 p-6 border-forest-200 dark:border-forest-700">
               <div className="flex items-start gap-4">
-                <CheckCircle2 className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
+                <TrendingDown className="w-6 h-6 text-forest-600 flex-shrink-0 mt-1" />
                 <div>
                   <p className="text-forest-900 dark:text-forest-50 font-medium mb-2">
-                    "Actually found ways to save money"
+                    Cost Optimization
                   </p>
                   <p className="text-sm text-forest-600 dark:text-forest-400">
-                    Went in skeptical. Report showed switching to local catering would cut costs AND emissions. Win-win.
-                  </p>
-                  <p className="text-xs text-forest-500 dark:text-forest-500 mt-2">
-                    — Wedding Planner, 150 guests
+                    Understanding your carbon footprint often reveals opportunities to reduce both emissions and operational costs.
                   </p>
                 </div>
               </div>
