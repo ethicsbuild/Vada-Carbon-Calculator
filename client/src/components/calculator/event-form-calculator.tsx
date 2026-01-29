@@ -67,6 +67,20 @@ interface EventFormCalculatorProps {
 }
 
 export function EventFormCalculator({ initialEventType, onSectionChange, onCalculationComplete }: EventFormCalculatorProps) {
+  // Helper function to determine if event type should show artist/staff transport
+  const shouldShowArtistTransport = (eventType: string) => {
+    const typesWithArtists = ['festival', 'concert', 'conference'];
+    return typesWithArtists.includes(eventType.toLowerCase());
+  };
+
+  const shouldShowStaffTransport = (eventType: string) => {
+    const typesWithStaff = ['festival', 'concert', 'conference'];
+    return typesWithStaff.includes(eventType.toLowerCase());
+  };
+
+  // State for progressive disclosure
+  const [showDetailedMeals, setShowDetailedMeals] = useState(false);
+
   const [formData, setFormData] = useState<EventFormData>({
     eventType: initialEventType || '',
     attendance: 0,
@@ -680,7 +694,8 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             )}
           </div>
 
-          {/* Staff Transportation */}
+          {/* Staff Transportation - Only show for relevant event types */}
+          {shouldShowStaffTransport(formData.eventType) && (
           <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Staff Transportation</h3>
@@ -762,8 +777,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               </div>
             )}
           </div>
+          )}
 
-          {/* Artist/Performer Transportation */}
+          {/* Artist/Performer Transportation - Only show for relevant event types */}
+          {shouldShowArtistTransport(formData.eventType) && (
           <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
             <div className="flex justify-between items-center">
               <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Artist Transportation</h3>
@@ -848,6 +865,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               </div>
             )}
           </div>
+          )}
 
           {/* Equipment Transportation */}
           <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
@@ -907,48 +925,107 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
             <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Food & Catering</h3>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Staff Meals</Label>
-                <Input
-                  type="number"
-                  value={formData.meals.staffMeals}
-                  onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
+            {/* Simple View - Total Meals */}
+            {!showDetailedMeals && (
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label className="text-sage-500 dark:text-sage-500">Total Meals Served</Label>
+                  <Input
+                    type="number"
+                    value={formData.meals.staffMeals + formData.meals.attendeeFood + formData.meals.vipCatering + formData.meals.talentCatering}
+                    onChange={(e) => {
+                      const total = parseInt(e.target.value) || 0;
+                      updateMealField('attendeeFood', total);
+                      updateMealField('staffMeals', 0);
+                      updateMealField('vipCatering', 0);
+                      updateMealField('talentCatering', 0);
+                    }}
+                    placeholder="Enter total number of meals"
+                    className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
+                  />
+                  <p className="text-xs text-sage-600 dark:text-sage-400">
+                    Approximate total meals across all attendees, staff, and catering
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowDetailedMeals(true);
+                  }}
+                  className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
+                >
+                  + Show detailed meal breakdown
+                </Button>
               </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Attendee Food</Label>
-                <Input
-                  type="number"
-                  value={formData.meals.attendeeFood}
-                  onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
+            )}
+
+            {/* Detailed View - Breakdown by Category */}
+            {showDetailedMeals && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-sm text-sage-600 dark:text-sage-400">
+                    Break down meals by category for more accurate calculations
+                  </p>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setShowDetailedMeals(false);
+                    }}
+                    className="text-sage-600 dark:text-sage-400 hover:text-sage-700 dark:hover:text-sage-300"
+                  >
+                    - Hide details
+                  </Button>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label className="text-sage-500 dark:text-sage-500">Staff Meals</Label>
+                    <Input
+                      type="number"
+                      value={formData.meals.staffMeals}
+                      onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sage-500 dark:text-sage-500">Attendee Food</Label>
+                    <Input
+                      type="number"
+                      value={formData.meals.attendeeFood}
+                      onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sage-500 dark:text-sage-500">VIP Catering</Label>
+                    <Input
+                      type="number"
+                      value={formData.meals.vipCatering}
+                      onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sage-500 dark:text-sage-500">Talent Catering</Label>
+                    <Input
+                      type="number"
+                      value={formData.meals.talentCatering}
+                      onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
+                      placeholder="0"
+                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">VIP Catering</Label>
-                <Input
-                  type="number"
-                  value={formData.meals.vipCatering}
-                  onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Talent Catering</Label>
-                <Input
-                  type="number"
-                  value={formData.meals.talentCatering}
-                  onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-            </div>
+            )}
 
             <div className="flex items-center space-x-2 pt-2">
               <input
