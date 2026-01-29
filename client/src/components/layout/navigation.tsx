@@ -26,8 +26,6 @@ export function Navigation() {
     { name: 'Resources', href: '/resources', icon: Settings },
   ];
 
-  const carbonScore = 'B+'; // This will come from context/API later
-
   const toggleTheme = () => {
     setTheme(theme === 'dark' ? 'light' : 'dark');
   };
@@ -63,13 +61,6 @@ export function Navigation() {
                 </Link>
               );
             })}
-
-            {/* Carbon Score Badge */}
-            <div className="bg-forest-100 dark:bg-forest-800 px-4 py-2 rounded-full border border-forest-400/50">
-              <span className="text-sm text-forest-700 dark:text-forest-300">
-                Your Score: <span className="font-bold text-forest-600 dark:text-forest-400">{carbonScore}</span>
-              </span>
-            </div>
           </nav>
 
           {/* Mobile menu button */}
@@ -112,15 +103,6 @@ export function Navigation() {
                   </Link>
                 );
               })}
-
-              {/* Carbon Score Badge Mobile */}
-              <div className="mt-4 pt-4 border-t border-white/10">
-                <div className="bg-forest-50 dark:bg-forest-800 px-4 py-2 rounded-lg border border-emerald-500/50 text-center">
-                  <span className="text-sm text-forest-700 dark:text-forest-300">
-                    Your Score: <span className="font-bold text-forest-600 dark:text-forest-400">{carbonScore}</span>
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
         )}
