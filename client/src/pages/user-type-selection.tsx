@@ -75,14 +75,7 @@ export default function UserTypeSelection() {
           </Link>
         </div>
 
-        {/* Footer Note */}
-        <div className="text-center mt-12">
-          <p className="text-sm text-forest-600 dark:text-forest-400">
-            Not sure which option to choose? Event producers are responsible for organizing and managing events.
-            <br />
-            Attendees are individuals participating in events.
-          </p>
-        </div>
+        
       </div>
     </div>
   );
