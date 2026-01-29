@@ -105,6 +105,34 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
 
   return (
     <div className="space-y-6">
+      {/* Plain English Summary - NEW */}
+      <Card className="bg-gradient-to-br from-emerald-50 to-violet-50 dark:from-emerald-900/20 dark:to-violet-900/20 border-emerald-300 dark:border-emerald-700/50 p-6">
+        <div className="space-y-4">
+          <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-100 text-center">
+            Your Event's Carbon Footprint in Plain English
+          </h3>
+          <div className="bg-white/50 dark:bg-forest-900/50 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+            <p className="text-lg text-forest-800 dark:text-forest-200 leading-relaxed">
+              Your event is estimated to generate <span className="font-bold text-emerald-600 dark:text-emerald-400">{total.toFixed(2)} metric tons of CO₂</span> — 
+              roughly equivalent to{' '}
+              <span className="font-bold">
+                {Math.round(total / 4.6)} cars driven for an entire year
+              </span>
+              {' '}or{' '}
+              <span className="font-bold">
+                {Math.round(total / 1.2)} roundtrip flights from LA to NYC
+              </span>.
+            </p>
+          </div>
+          <div className="text-center">
+            <p className="text-sm text-sage-600 dark:text-sage-400">
+              That's <span className="font-semibold text-forest-700 dark:text-forest-300">{emissionsPerAttendee.toFixed(3)} tons per attendee</span> — 
+              about the same as driving <span className="font-semibold">{Math.round((emissionsPerAttendee / 0.000404))} miles</span> in a typical car.
+            </p>
+          </div>
+        </div>
+      </Card>
+
       {/* Hero Results Card */}
       <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm p-6">
         <div className="space-y-6">
@@ -112,7 +140,7 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
           <div className="text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
               {getPerformanceIcon(benchmarkComparison.performance)}
-              <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-100">Total Carbon Footprint</h3>
+              <h3 className="text-2xl font-bold text-forest-900 dark:text-forest-100">Technical Details</h3>
             </div>
             <div className="text-5xl font-bold bg-gradient-to-r from-forest-400 to-violet-400 bg-clip-text text-transparent mb-2">
               {total.toFixed(2)} tCO₂e

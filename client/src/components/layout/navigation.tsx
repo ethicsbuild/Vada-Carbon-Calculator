@@ -40,7 +40,7 @@ export function Navigation() {
           <Link href="/">
             <div className="flex items-center gap-2 cursor-pointer group">
                 <h1 className="text-2xl font-bold bg-gradient-to-r from-forest-600 to-sage-600 bg-clip-text text-transparent tracking-tight group-hover:from-forest-500 group-hover:to-sage-500 transition-all">
-                  VADA
+                  VEDA
                 </h1>
               </div>
           </Link>
