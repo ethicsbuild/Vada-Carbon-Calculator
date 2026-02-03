@@ -33,7 +33,7 @@ export function FloatingSageChat() {
               variant="ghost"
               size="icon"
               onClick={() => setIsOpen(false)}
-              className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
+              className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:hover:text-forest-50"
             >
               <X className="w-5 h-5" />
             </Button>

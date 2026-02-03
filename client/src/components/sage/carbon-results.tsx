@@ -198,7 +198,7 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
             </Button>
             <Button
               variant="outline"
-              className="border-sage-300 dark:border-sage-600 text-sage-500 dark:text-sage-500 hover:bg-sage-100 dark:bg-sage-700"
+              className="border-sage-300 dark:border-sage-600 text-sage-500 dark:text-sage-500 hover:bg-sage-100 dark:hover:bg-sage-700"
               onClick={() => window.location.href = '/history'}
             >
               <History className="w-4 h-4 mr-2" />

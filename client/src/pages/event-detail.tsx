@@ -133,7 +133,7 @@ export default function EventDetail() {
         {/* Header */}
         <div className="mb-8">
           <Link href="/history">
-            <Button variant="ghost" className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50 mb-4">
+            <Button variant="ghost" className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:hover:text-forest-50 mb-4">
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to History
             </Button>

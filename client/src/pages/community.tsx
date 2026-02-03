@@ -99,7 +99,7 @@ export default function Community() {
         {/* Community Features */}
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {communityFeatures.map((feature, index) => (
-            <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 transition-all">
+            <Card key={index} className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-100 dark:hover:bg-forest-800/70 transition-all">
               <div className="flex items-start gap-4">
                 <div className="p-3 bg-emerald-500/10 rounded-lg">
                   <feature.icon className="w-6 h-6 text-emerald-500" />

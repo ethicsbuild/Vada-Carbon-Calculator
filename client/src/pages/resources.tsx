@@ -185,7 +185,7 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 hover:border-emerald-500/50 transition-all">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-100 dark:hover:bg-forest-800/70 hover:border-emerald-500/50 transition-all">
                   <div className="flex gap-4">
                     <div className="p-3 bg-emerald-500/10 rounded-lg h-fit group-hover:bg-emerald-500/20 transition-colors">
                       <guide.icon className="w-6 h-6 text-emerald-500" />
@@ -221,7 +221,7 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-50 dark:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 hover:bg-forest-100 dark:hover:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
                   <div className="mb-3">
                     <span className="inline-block text-xs text-violet-400 bg-violet-500/10 px-3 py-1 rounded-full mb-3">
                       {content.category}
@@ -253,7 +253,7 @@ export default function Resources() {
                 rel="noopener noreferrer"
                 className="block group"
               >
-                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 text-center hover:bg-forest-50 dark:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
+                <Card className="bg-forest-50 dark:bg-forest-800/50 border-forest-200 dark:border-forest-700/50 backdrop-blur-sm p-6 text-center hover:bg-forest-100 dark:hover:bg-forest-800/70 hover:border-violet-500/50 transition-all h-full">
                   <div className="inline-flex p-4 bg-violet-500/10 rounded-full mb-4 group-hover:bg-violet-500/20 transition-colors">
                     <topic.icon className="w-8 h-8 text-violet-500" />
                   </div>

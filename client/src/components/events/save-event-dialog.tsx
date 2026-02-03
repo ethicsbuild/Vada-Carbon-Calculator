@@ -221,7 +221,7 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
             variant="ghost"
             onClick={() => onOpenChange(false)}
             disabled={saving}
-            className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
+            className="text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:hover:text-forest-50"
           >
             Cancel
           </Button>
