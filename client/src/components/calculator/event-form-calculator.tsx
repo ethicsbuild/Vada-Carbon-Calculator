@@ -15,6 +15,9 @@ import { calculateFoodSystemImpacts, estimateFoodEmissions } from '@/lib/food-im
 import { PowerSystemSection } from '@/components/calculator/power-system-section';
 import { PowerImpactResults } from '@/components/calculator/power-impact-results';
 import { calculatePowerSystemImpacts, estimatePowerEmissions } from '@/lib/power-impact-calculator';
+import { ProductionBuildSection } from '@/components/calculator/production-build-section';
+import { ProductionImpactResults } from '@/components/calculator/production-impact-results';
+import { calculateProductionSystemImpacts, estimateProductionEmissions } from '@/lib/production-impact-calculator';
 
 interface StaffTransportGroup {
   id: string;
@@ -32,8 +35,8 @@ interface ArtistTransportGroup {
   tourBus: boolean;
 }
 
-// Import new food and power types
-import { FoodCateringData, FoodLiteMode, FoodAdvancedMode, PowerSystemData } from "@/types/carbon";
+// Import new food, power, and production types
+import { FoodCateringData, FoodLiteMode, FoodAdvancedMode, PowerSystemData, ProductionBuildData } from "@/types/carbon";
 
 interface CateringDetails {
   style: string; // buffet, plated, pre-packaged, grab-and-go, none
@@ -70,6 +73,8 @@ interface EventFormData {
   foodCatering?: FoodCateringData;
   // New power system
   powerSystem?: PowerSystemData;
+  // New production system
+  productionBuild?: ProductionBuildData;
 }
 
 interface EventFormCalculatorProps {
@@ -142,6 +147,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         primarySource: 'grid',
         backupRequired: false,
         estimatedLoad: 'medium',
+      },
+    },
+    // New production system - initialize with basic mode
+    productionBuild: {
+      detailLevel: 'basic',
+      basicMode: {
+        buildStrategy: 'rent-locally',
+        productionScale: 'standard',
+        transportRequired: false,
       },
     },
   });
@@ -280,6 +294,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
       const powerSystemImpacts = calculatePowerSystemImpacts(formData.powerSystem!);
       const powerEmissions = estimatePowerEmissions(formData.powerSystem!);
       
+      // Calculate production system impacts
+      const productionSystemImpacts = calculateProductionSystemImpacts(formData.productionBuild!);
+      const productionEmissions = estimateProductionEmissions(formData.productionBuild!);
+      
       // Total meals served from catering estimate (legacy)
       const totalMealsServed = formData.catering.estimatedMeals;
 
@@ -374,6 +392,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             powerSystemData: formData.powerSystem,
             powerEmissions: powerEmissions,
             powerSystemImpacts: powerSystemImpacts,
+            // New production system data
+            productionBuildData: formData.productionBuild,
+            productionEmissions: productionEmissions,
+            productionSystemImpacts: productionSystemImpacts,
           },
           waste: {
             recyclingProgram: false,
@@ -913,42 +935,12 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
           )}
 
-          {/* Equipment Transportation */}
-          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
-            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Equipment Transportation</h3>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Trucks Required</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentTrucksRequired}
-                  onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Average Distance (km)</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentTransportDistance}
-                  onChange={(e) => updateField('equipmentTransportDistance', parseInt(e.target.value) || 0)}
-                  placeholder="200"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Freight Flights</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentFreightFlights}
-                  onChange={(e) => updateField('equipmentFreightFlights', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-            </div>
+          {/* Production Build &amp; Infrastructure - New Producer-Native Section */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
+            <ProductionBuildSection 
+              data={formData.productionBuild!}
+              onChange={(data) => setFormData(prev => ({ ...prev, productionBuild: data }))}
+            />
           </div>
 
           {/* Power System - New Producer-Native Section */}
@@ -1001,6 +993,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               location: 'Unknown'
             }}
           />
+          
+          {/* Production Impact Results */}
+          <ProductionImpactResults data={formData.productionBuild!} />
           
           {/* Power Impact Results */}
           <PowerImpactResults data={formData.powerSystem!} />

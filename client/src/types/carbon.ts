@@ -448,3 +448,62 @@ export interface PowerSystemImpacts {
   tradeoffNotes: string[];
   leveragePoints: string[];
 }
+
+// Production Build & Infrastructure - Producer-Native Model
+export type ProductionDetailLevel = 'basic' | 'detailed';
+
+export interface ProductionBasicMode {
+  buildStrategy: 'bring-full-rig' | 'rent-locally' | 'hybrid' | 'venue-provided';
+  productionScale: 'minimal' | 'standard' | 'full-production' | 'festival';
+  transportRequired: boolean;
+}
+
+export interface ProductionDetailedMode extends ProductionBasicMode {
+  venueProvides: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    video: boolean;
+    power: boolean;
+    rigging: boolean;
+  };
+  bringingOwn: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    video: boolean;
+    specialEffects: boolean;
+    customRigging: boolean;
+  };
+  vendorStrategy: {
+    approach: 'single-vendor' | 'multiple-specialists' | 'hybrid' | 'in-house';
+    numberOfVendors: number;
+    localVendors: boolean;
+  };
+  transportLogistics: {
+    trucksRequired: number;
+    averageDistance: number;
+    consolidatedShipping: boolean;
+    freightFlights: number;
+  };
+  buildTime: {
+    loadInDays: number;
+    strikeDownDays: number;
+    crewSize: number;
+  };
+}
+
+export interface ProductionBuildData {
+  detailLevel: ProductionDetailLevel;
+  basicMode?: ProductionBasicMode;
+  detailedMode?: ProductionDetailedMode;
+}
+
+// Production system impacts
+export interface ProductionSystemImpacts {
+  controlLevel: 'low' | 'medium' | 'high';
+  carbonIntensity: 'low' | 'medium' | 'high';
+  logisticsComplexity: 'low' | 'medium' | 'high';
+  tradeoffNotes: string[];
+  leveragePoints: string[];
+}
