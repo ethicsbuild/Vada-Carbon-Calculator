@@ -51,7 +51,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setUserType('first-timer');
                   setStep(2);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-100 dark:hover:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">🌱</div>
@@ -72,7 +72,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setUserType('experienced');
                   setStep(2);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-violet-500/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-100 dark:hover:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-violet-500/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">🎯</div>
@@ -109,7 +109,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setNeedsLevel('quick');
                   setStep(3);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-100 dark:hover:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">⚡</div>
@@ -135,7 +135,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setNeedsLevel('detailed');
                   setStep(3);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-violet-500/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-100 dark:hover:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-violet-500/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">📊</div>
@@ -160,7 +160,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
             <Button
               variant="ghost"
               onClick={() => setStep(1)}
-              className="mt-4 text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
+              className="mt-4 text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:hover:text-forest-50"
             >
               <ChevronLeft className="w-4 h-4 mr-2" />
               Back
@@ -220,7 +220,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
               <Button
                 variant="ghost"
                 onClick={() => setStep(2)}
-                className="flex-1 text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:text-forest-50"
+                className="flex-1 text-sage-600 dark:text-sage-400 hover:text-forest-900 dark:hover:text-forest-50"
               >
                 <ChevronLeft className="w-4 h-4 mr-2" />
                 Back
