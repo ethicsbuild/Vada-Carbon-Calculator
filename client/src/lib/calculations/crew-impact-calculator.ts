@@ -163,7 +163,7 @@ function generateLeveragePoints(
   // Travel-related leverage points
   if (data.staffingModel === "full-touring") {
     points.push(
-      "Shifting to 'Touring Core + Local Support' model could reduce travel impact by 30-40% while maintaining consistency for key roles."
+      "Shifting to 'Touring Core + Local Support' model typically reduces travel impact by 25-40% while maintaining consistency for key roles (range depends on crew size and travel distances)."
     );
   }
   

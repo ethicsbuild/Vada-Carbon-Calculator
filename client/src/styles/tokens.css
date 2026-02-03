@@ -1,0 +1,112 @@
+/**
+ * VEDA Carbon Calculator - Design Tokens
+ * Single source of truth for all visual styling
+ * Last updated: 2025-01-03
+ */
+
+:root {
+  /* ============================================
+     NEUTRAL COLORS (Default UI)
+     ============================================ */
+  --color-bg: #ffffff;
+  --color-surface: #f8fafc;
+  --color-border: #e2e8f0;
+  --color-border-subtle: #f1f5f9;
+  --color-text: #334155;
+  --color-text-muted: #64748b;
+  --color-text-heading: #1e293b;
+  
+  /* ============================================
+     EVERGREEN (Primary Actions Only)
+     ============================================ */
+  --color-primary: #059669;
+  --color-primary-light: #d1fae5;
+  --color-primary-border: #a7f3d0;
+  --color-primary-hover: #047857;
+  
+  /* ============================================
+     INFORMATION (Blue - Systems Thinking)
+     ============================================ */
+  --color-info: #2563eb;
+  --color-info-light: #dbeafe;
+  --color-info-border: #bfdbfe;
+  --color-info-text: #1e40af;
+  
+  /* ============================================
+     WARNING (Amber - Tradeoffs/Caution Only)
+     ============================================ */
+  --color-warning: #d97706;
+  --color-warning-light: #fef3c7;
+  --color-warning-border: #fde68a;
+  --color-warning-text: #b45309;
+  
+  /* ============================================
+     SPACING
+     ============================================ */
+  --space-section: 1.5rem;    /* 24px - between major sections */
+  --space-card: 1rem;          /* 16px - within cards */
+  --space-element: 0.75rem;    /* 12px - between elements */
+  --space-tight: 0.5rem;       /* 8px - tight spacing */
+  
+  /* ============================================
+     BORDERS
+     ============================================ */
+  --border-width: 1px;
+  --border-width-accent: 4px;  /* Left accent bars only */
+  --border-radius: 0.5rem;     /* 8px */
+  --border-radius-lg: 0.75rem; /* 12px */
+  
+  /* ============================================
+     SHADOWS (Subtle Only)
+     ============================================ */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+  
+  /* ============================================
+     TYPOGRAPHY
+     ============================================ */
+  --font-size-xs: 0.75rem;     /* 12px */
+  --font-size-sm: 0.875rem;    /* 14px */
+  --font-size-base: 1rem;      /* 16px */
+  --font-size-lg: 1.125rem;    /* 18px */
+  --font-size-xl: 1.25rem;     /* 20px */
+  --font-size-2xl: 1.5rem;     /* 24px */
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+}
+
+/* ============================================
+   SEMANTIC COLOR USAGE RULES
+   ============================================
+   
+   SLATE (Neutral):
+   - Default cards and UI elements
+   - Body text and borders
+   - Use: 95% of interface
+   
+   EVERGREEN (Primary):
+   - Primary action buttons
+   - Positive confirmations
+   - Success states
+   - Use: Sparingly, for actions only
+   
+   BLUE (Information):
+   - Systems thinking callouts
+   - Informational messages
+   - Educational content
+   - Use: Information only, not decoration
+   
+   AMBER (Warning):
+   - Warnings and cautions
+   - Tradeoff analysis
+   - Risk indicators
+   - Use: Warnings only, not themes
+   
+   ============================================ */

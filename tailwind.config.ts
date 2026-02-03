@@ -18,6 +18,28 @@ export default {
            'nature': '1.5rem',
          },
       colors: {
+        // Design System Tokens (from tokens.css)
+        primary: {
+          DEFAULT: "var(--color-primary)",
+          light: "var(--color-primary-light)",
+          border: "var(--color-primary-border)",
+          hover: "var(--color-primary-hover)",
+          foreground: "var(--primary-foreground)", // Keep for shadcn compatibility
+        },
+        info: {
+          DEFAULT: "var(--color-info)",
+          light: "var(--color-info-light)",
+          border: "var(--color-info-border)",
+          text: "var(--color-info-text)",
+        },
+        warning: {
+          DEFAULT: "var(--color-warning)",
+          light: "var(--color-warning-light)",
+          border: "var(--color-warning-border)",
+          text: "var(--color-warning-text)",
+        },
+        
+        // Legacy shadcn colors (keep for compatibility)
         background: "var(--background)",
         foreground: "var(--foreground)",
         card: {
@@ -27,10 +49,6 @@ export default {
         popover: {
           DEFAULT: "var(--popover)",
           foreground: "var(--popover-foreground)",
-        },
-        primary: {
-          DEFAULT: "var(--primary)",
-          foreground: "var(--primary-foreground)",
         },
         secondary: {
           DEFAULT: "var(--secondary)",

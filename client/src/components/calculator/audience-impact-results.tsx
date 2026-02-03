@@ -14,6 +14,8 @@ interface AudienceImpactResultsProps {
     whatYouInfluence: string[];
     leveragePoints: string[];
     tradeoffs: string[];
+    assumptions: string[];
+    methodology: string;
   };
 }
 
@@ -242,13 +244,42 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
         </Card>
       )}
 
+      {/* Assumptions & Methodology */}
+      {impact.assumptions && impact.assumptions.length > 0 && (
+        <Card className="border-slate-200">
+          <CardHeader>
+            <CardTitle className="text-lg text-slate-800">Calculation Assumptions</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="space-y-2">
+              {impact.assumptions.map((assumption, index) => (
+                <li key={index} className="flex items-start space-x-2 text-sm text-slate-600">
+                  <span className="text-slate-400 mt-0.5">•</span>
+                  <span>{assumption}</span>
+                </li>
+              ))}
+            </ul>
+            {impact.methodology && (
+              <details className="mt-4">
+                <summary className="text-sm font-medium text-slate-700 cursor-pointer hover:text-slate-900">
+                  Methodology Details
+                </summary>
+                <p className="text-xs text-slate-600 mt-2 pl-4">
+                  {impact.methodology}
+                </p>
+              </details>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Reality Check Footer */}
       <Alert className="border-slate-200 bg-slate-50">
         <Info className="h-4 w-4" />
         <AlertDescription className="text-sm text-slate-700">
           <strong>Remember:</strong> Venue selection happens early in planning and shapes everything downstream. 
-          An urban core venue with excellent transit can reduce audience travel carbon by 50-70% compared to 
-          a suburban car-dependent venue, but may increase venue costs or limit capacity. 
+          Urban core venues with excellent transit typically see 40-70% lower per-attendee travel emissions compared to 
+          suburban car-dependent venues (range depends on baseline mode share), but may increase venue costs or limit capacity. 
           These are real tradeoffs, not moral judgments.
         </AlertDescription>
       </Alert>

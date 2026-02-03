@@ -9,6 +9,8 @@ interface AudienceImpactResult {
   whatYouInfluence: string[];
   leveragePoints: string[];
   tradeoffs: string[];
+  assumptions: string[];
+  methodology: string;
 }
 
 // Emission factors (kg CO2e per person per mile)
@@ -82,6 +84,10 @@ export function calculateAudienceImpact(data: AudienceAccessDetails): AudienceIm
   const leveragePoints = generateLeveragePoints(data, modeSplit, accessibilityScore);
   const tradeoffs = generateTradeoffs(data);
   
+  // Generate assumptions and methodology
+  const assumptions = generateAssumptions(data, modeSplit);
+  const methodology = generateMethodology();
+  
   return {
     estimatedCO2e: Math.round(totalCO2e),
     perAttendeeCO2e: Math.round(perAttendeeCO2e),
@@ -90,8 +96,42 @@ export function calculateAudienceImpact(data: AudienceAccessDetails): AudienceIm
     whatYouControl,
     whatYouInfluence,
     leveragePoints,
-    tradeoffs
+    tradeoffs,
+    assumptions,
+    methodology
   };
+}
+
+function generateAssumptions(data: AudienceAccessDetails, modeSplit: ModeSplit): string[] {
+  const assumptions: string[] = [];
+  
+  assumptions.push(
+    "Mode split estimated based on venue location type, transit accessibility, and parking strategy"
+  );
+  
+  assumptions.push(
+    `Estimated mode distribution: ${Math.round(modeSplit.transit)}% transit, ${Math.round(modeSplit.carSolo + modeSplit.carShared)}% driving, ${Math.round(modeSplit.air)}% air travel`
+  );
+  
+  if (!data.eventDrawGeography) {
+    assumptions.push(
+      "Travel distance estimated from venue location type (actual distance may vary)"
+    );
+  }
+  
+  assumptions.push(
+    "Emission factors: 0.14 kg CO2e/mile transit, 0.41 kg/mile solo car, 0.21 kg/mile shared car, 0.15-0.26 kg/mile air (distance-dependent)"
+  );
+  
+  assumptions.push(
+    "Individual travel choices vary - these are typical ranges based on venue accessibility characteristics"
+  );
+  
+  return assumptions;
+}
+
+function generateMethodology(): string {
+  return "Mode split estimation algorithm: (1) Baseline from venue location, (2) Adjusted for transit quality, (3) Adjusted for parking strategy, (4) Adjusted for shuttles, (5) Adjusted for draw geography. Emissions calculated using EPA and DEFRA emission factors for each mode.";
 }
 
 function calculateModeSplit(data: AudienceAccessDetails): ModeSplit {
@@ -403,9 +443,9 @@ function generateInfluenceInsights(data: AudienceAccessDetails): string[] {
   const insights: string[] = [];
   
   if (data.carpoolIncentives === "strong") {
-    insights.push("Strong carpool incentives can shift 20-30% of solo drivers to shared rides");
+    insights.push("Strong carpool incentives can shift 15-30% of solo drivers to shared rides (varies by event type and attendee demographics)");
   } else if (data.carpoolIncentives === "moderate") {
-    insights.push("Moderate carpool encouragement may shift 10-15% of solo drivers to shared rides");
+    insights.push("Moderate carpool encouragement may shift 8-15% of solo drivers to shared rides (varies by event context)");
   }
   
   if (data.parkingStrategy === "limited-expensive" || data.parkingStrategy === "none") {
@@ -433,7 +473,7 @@ function generateLeveragePoints(
   // Venue location leverage
   if (data.venueLocationType === "suburban" || data.venueLocationType === "remote-destination") {
     points.push(
-      "Venue location is car-dependent. Selecting an urban core venue with transit access could reduce audience travel carbon by 50-70%."
+      "Venue location is car-dependent. Urban core venues with transit access typically see 40-70% lower per-attendee travel emissions compared to suburban car-dependent venues (range depends on baseline mode share and local transit quality)."
     );
   }
   
@@ -449,7 +489,7 @@ function generateLeveragePoints(
   // Parking leverage
   if (data.parkingStrategy === "abundant-free") {
     points.push(
-      "Free abundant parking encourages driving. Paid/limited parking can shift 20-30% of attendees to transit/rideshare."
+      "Free abundant parking encourages driving. Paid/limited parking typically shifts 15-30% of attendees to transit/rideshare (effectiveness depends on transit quality and pricing levels)."
     );
   }
   
