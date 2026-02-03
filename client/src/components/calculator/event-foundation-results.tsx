@@ -27,9 +27,9 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
 
   const getComplexityColor = (complexity: string | undefined) => {
     const colors: Record<string, string> = {
-      "minimal": "text-emerald-700 bg-emerald-50 border-emerald-200",
-      "standard": "text-blue-700 bg-blue-50 border-blue-200",
-      "complex": "text-amber-700 bg-amber-50 border-amber-200",
+      "minimal": "text-rating-good-text bg-rating-good-bg border-rating-good-border",
+      "standard": "text-rating-excellent-text bg-rating-excellent-bg border-rating-excellent-border",
+      "complex": "text-rating-fair-text bg-rating-fair-bg border-rating-fair-border",
       "festival": "text-purple-700 bg-purple-50 border-purple-200"
     };
     return complexity ? colors[complexity] : colors.standard;
@@ -43,17 +43,17 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
   };
 
   const getVenueCapabilityColor = (score: number) => {
-    if (score >= 5) return "text-emerald-700 bg-emerald-50 border-emerald-200";
-    if (score >= 3) return "text-blue-700 bg-blue-50 border-blue-200";
-    if (score >= 1) return "text-amber-700 bg-amber-50 border-amber-200";
-    return "text-slate-700 bg-slate-50 border-slate-200";
+    if (score >= 5) return "text-rating-good-text bg-rating-good-bg border-rating-good-border";
+    if (score >= 3) return "text-rating-excellent-text bg-rating-excellent-bg border-rating-excellent-border";
+    if (score >= 1) return "text-rating-fair-text bg-rating-fair-bg border-rating-fair-border";
+    return "text-rating-poor-text bg-rating-poor-bg border-rating-poor-border";
   };
 
   return (
     <div className="space-y-6">
       
       {/* Event Overview */}
-      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+      <Card className="border-primary-border bg-gradient-to-br from-primary-light to-white">
         <CardHeader>
           <CardTitle className="text-slate-800">Event Foundation Summary</CardTitle>
         </CardHeader>

@@ -52,19 +52,19 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
 
   const getAccessibilityColor = (score: string) => {
     const colors: Record<string, string> = {
-      "poor": "text-red-700 bg-red-50 border-red-200",
-      "fair": "text-amber-700 bg-amber-50 border-amber-200",
-      "good": "text-emerald-700 bg-emerald-50 border-emerald-200",
-      "excellent": "text-blue-700 bg-blue-50 border-blue-200"
+      "poor": "text-rating-poor-text bg-rating-poor-bg border-rating-poor-border",
+      "fair": "text-rating-fair-text bg-rating-fair-bg border-rating-fair-border",
+      "good": "text-rating-good-text bg-rating-good-bg border-rating-good-border",
+      "excellent": "text-rating-excellent-text bg-rating-excellent-bg border-rating-excellent-border"
     };
     return colors[score] || colors.fair;
   };
 
   const getConfidenceColor = (level: string) => {
     const colors: Record<string, string> = {
-      "low": "text-amber-700",
+      "low": "text-rating-fair-text",
       "medium": "text-slate-700",
-      "high": "text-emerald-700"
+      "high": "text-rating-good-text"
     };
     return colors[level] || colors.medium;
   };
@@ -73,8 +73,8 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
     <div className="space-y-6">
       
       {/* Honesty First: Uncertainty Notice */}
-      <Alert className="border-amber-200 bg-amber-50/50">
-        <AlertTriangle className="h-4 w-4 text-amber-600" />
+      <Alert className="border-warning-border bg-warning-light">
+        <AlertTriangle className="h-4 w-4 text-warning" />
         <AlertDescription className="text-sm text-slate-700">
           <strong>Important:</strong> Audience travel is the largest source of uncertainty in event carbon calculations. 
           You control venue selection and accessibility, but not individual travel choices. 

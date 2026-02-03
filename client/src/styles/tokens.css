@@ -41,6 +41,38 @@
   --color-warning-text: #b45309;
   
   /* ============================================
+     SEMANTIC RATINGS (Results Display)
+     ============================================ */
+  /* Excellent - Blue (aspirational, not judgmental) */
+  --rating-excellent: #2563eb;
+  --rating-excellent-bg: #dbeafe;
+  --rating-excellent-border: #bfdbfe;
+  --rating-excellent-text: #1e40af;
+  
+  /* Good - Evergreen (positive progress) */
+  --rating-good: #059669;
+  --rating-good-bg: #d1fae5;
+  --rating-good-border: #a7f3d0;
+  --rating-good-text: #047857;
+  
+  /* Fair - Amber (room for improvement) */
+  --rating-fair: #d97706;
+  --rating-fair-bg: #fef3c7;
+  --rating-fair-border: #fde68a;
+  --rating-fair-text: #b45309;
+  
+  /* Poor - Slate (neutral, not punitive) */
+  --rating-poor: #64748b;
+  --rating-poor-bg: #f1f5f9;
+  --rating-poor-border: #e2e8f0;
+  --rating-poor-text: #475569;
+  
+  /* Trend Indicators */
+  --trend-up: #d97706;      /* Amber - increasing impact */
+  --trend-down: #059669;    /* Evergreen - decreasing impact */
+  --trend-neutral: #64748b; /* Slate - no change */
+  
+  /* ============================================
      SPACING
      ============================================ */
   --space-section: 1.5rem;    /* 24px - between major sections */

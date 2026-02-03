@@ -22,7 +22,7 @@ export function PowerImpactResults({ data }: PowerImpactResultsProps) {
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Zap className="w-5 h-5 text-amber-500" />
+              <Zap className="w-5 h-5 text-warning" />
               <CardTitle>Power System Impact</CardTitle>
             </div>
             <div className="flex gap-2">
@@ -55,7 +55,7 @@ export function PowerImpactResults({ data }: PowerImpactResultsProps) {
           {impacts.tradeoffNotes.length > 0 && (
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <AlertTriangle className="w-4 h-4 text-warning" />
                 Reliability vs. Efficiency Tradeoffs
               </h4>
               <div className="space-y-2">
@@ -74,7 +74,7 @@ export function PowerImpactResults({ data }: PowerImpactResultsProps) {
           {impacts.leveragePoints.length > 0 && (
             <div className="border-t pt-4">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <Info className="w-4 h-4 text-blue-500" />
+                <Info className="w-4 h-4 text-info" />
                 Highest-Leverage Improvements
               </h4>
               <ul className="space-y-2">

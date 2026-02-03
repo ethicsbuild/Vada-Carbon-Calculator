@@ -39,6 +39,41 @@ export default {
           text: "var(--color-warning-text)",
         },
         
+        // Semantic Ratings (for results display)
+        rating: {
+          excellent: {
+            DEFAULT: "var(--rating-excellent)",
+            bg: "var(--rating-excellent-bg)",
+            border: "var(--rating-excellent-border)",
+            text: "var(--rating-excellent-text)",
+          },
+          good: {
+            DEFAULT: "var(--rating-good)",
+            bg: "var(--rating-good-bg)",
+            border: "var(--rating-good-border)",
+            text: "var(--rating-good-text)",
+          },
+          fair: {
+            DEFAULT: "var(--rating-fair)",
+            bg: "var(--rating-fair-bg)",
+            border: "var(--rating-fair-border)",
+            text: "var(--rating-fair-text)",
+          },
+          poor: {
+            DEFAULT: "var(--rating-poor)",
+            bg: "var(--rating-poor-bg)",
+            border: "var(--rating-poor-border)",
+            text: "var(--rating-poor-text)",
+          },
+        },
+        
+        // Trend Indicators
+        trend: {
+          up: "var(--trend-up)",
+          down: "var(--trend-down)",
+          neutral: "var(--trend-neutral)",
+        },
+        
         // Legacy shadcn colors (keep for compatibility)
         background: "var(--background)",
         foreground: "var(--foreground)",

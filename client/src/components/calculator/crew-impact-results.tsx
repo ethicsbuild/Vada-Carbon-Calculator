@@ -38,26 +38,26 @@ export function CrewImpactResults({ data, impact }: CrewImpactResultsProps) {
 
   const getTrendIcon = (text: string) => {
     if (text.toLowerCase().includes("increase") || text.toLowerCase().includes("higher")) {
-      return <TrendingUp className="h-4 w-4 text-amber-600" />;
+      return <TrendingUp className="h-4 w-4 text-trend-up" />;
     }
     if (text.toLowerCase().includes("reduce") || text.toLowerCase().includes("lower")) {
-      return <TrendingDown className="h-4 w-4 text-emerald-600" />;
+      return <TrendingDown className="h-4 w-4 text-trend-down" />;
     }
-    return <Minus className="h-4 w-4 text-slate-400" />;
+    return <Minus className="h-4 w-4 text-trend-neutral" />;
   };
 
   return (
     <div className="space-y-6">
       
       {/* Impact Summary */}
-      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+      <Card className="border-primary-border bg-gradient-to-br from-primary-light to-white">
         <CardHeader>
           <CardTitle className="text-slate-800">Crew & Operations Impact</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           
           {/* Total Impact */}
-          <div className="flex items-baseline justify-between p-4 bg-white rounded-lg border border-emerald-200">
+          <div className="flex items-baseline justify-between p-4 bg-white rounded-lg border border-primary-border">
             <div>
               <p className="text-sm text-slate-600">Total Crew Carbon</p>
               <p className="text-3xl font-bold text-slate-800">
@@ -120,10 +120,10 @@ export function CrewImpactResults({ data, impact }: CrewImpactResultsProps) {
 
       {/* Leverage Points */}
       {impact.leveragePoints.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50/30">
+        <Card className="border-info-border bg-info-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <Info className="h-5 w-5 text-blue-600 mr-2" />
+              <Info className="h-5 w-5 text-info mr-2" />
               Leverage Points
             </CardTitle>
           </CardHeader>

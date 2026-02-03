@@ -55,7 +55,7 @@ export function ProductionImpactResults({ data }: ProductionImpactResultsProps) 
           {impacts.tradeoffNotes.length > 0 && (
             <div>
               <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <AlertTriangle className="w-4 h-4 text-amber-500" />
+                <AlertTriangle className="w-4 h-4 text-warning" />
                 Control vs. Carbon vs. Cost Tradeoffs
               </h4>
               <div className="space-y-2">
@@ -74,7 +74,7 @@ export function ProductionImpactResults({ data }: ProductionImpactResultsProps) 
           {impacts.leveragePoints.length > 0 && (
             <div className="border-t pt-4">
               <h4 className="font-semibold mb-2 flex items-center gap-2">
-                <Info className="w-4 h-4 text-blue-500" />
+                <Info className="w-4 h-4 text-info" />
                 Highest-Leverage Improvements
               </h4>
               <ul className="space-y-2">
