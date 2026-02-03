@@ -12,6 +12,9 @@ import jsPDF from 'jspdf';
 import { FoodCateringSection } from '@/components/calculator/food-catering-section';
 import { FoodImpactResults } from '@/components/calculator/food-impact-results';
 import { calculateFoodSystemImpacts, estimateFoodEmissions } from '@/lib/food-impact-calculator';
+import { PowerSystemSection } from '@/components/calculator/power-system-section';
+import { PowerImpactResults } from '@/components/calculator/power-impact-results';
+import { calculatePowerSystemImpacts, estimatePowerEmissions } from '@/lib/power-impact-calculator';
 
 interface StaffTransportGroup {
   id: string;
@@ -29,8 +32,8 @@ interface ArtistTransportGroup {
   tourBus: boolean;
 }
 
-// Import new food types
-import { FoodCateringData, FoodLiteMode, FoodAdvancedMode } from "@/types/carbon";
+// Import new food and power types
+import { FoodCateringData, FoodLiteMode, FoodAdvancedMode, PowerSystemData } from "@/types/carbon";
 
 interface CateringDetails {
   style: string; // buffet, plated, pre-packaged, grab-and-go, none
@@ -65,6 +68,8 @@ interface EventFormData {
   catering: CateringDetails;
   // New food system
   foodCatering?: FoodCateringData;
+  // New power system
+  powerSystem?: PowerSystemData;
 }
 
 interface EventFormCalculatorProps {
@@ -128,6 +133,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         sourcing: 'mixed',
         plantForward: false,
         scale: '51-250',
+      },
+    },
+    // New power system - initialize with basic mode
+    powerSystem: {
+      detailLevel: 'basic',
+      basicMode: {
+        primarySource: 'grid',
+        backupRequired: false,
+        estimatedLoad: 'medium',
       },
     },
   });
@@ -262,6 +276,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
       const foodSystemImpacts = calculateFoodSystemImpacts(formData.foodCatering!);
       const foodEmissions = estimateFoodEmissions(formData.foodCatering!);
       
+      // Calculate power system impacts
+      const powerSystemImpacts = calculatePowerSystemImpacts(formData.powerSystem!);
+      const powerEmissions = estimatePowerEmissions(formData.powerSystem!);
+      
       // Total meals served from catering estimate (legacy)
       const totalMealsServed = formData.catering.estimatedMeals;
 
@@ -352,6 +370,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             foodCateringData: formData.foodCatering,
             foodEmissions: foodEmissions,
             foodSystemImpacts: foodSystemImpacts,
+            // New power system data
+            powerSystemData: formData.powerSystem,
+            powerEmissions: powerEmissions,
+            powerSystemImpacts: powerSystemImpacts,
           },
           waste: {
             recyclingProgram: false,
@@ -929,20 +951,12 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             </div>
           </div>
 
-          {/* Power Source */}
-          <div className="space-y-2 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
-            <Label className="text-sage-500 dark:text-sage-500">Power Source</Label>
-            <Select value={formData.powerSource} onValueChange={(value) => updateField('powerSource', value)}>
-              <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectValue placeholder="Select power source" />
-              </SelectTrigger>
-              <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectItem value="grid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔌 Grid Power</SelectItem>
-                <SelectItem value="generator" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">⚡ Generator</SelectItem>
-                <SelectItem value="renewable" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">☀️ Renewable Energy</SelectItem>
-                <SelectItem value="hybrid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Hybrid (Grid + Renewable)</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Power System - New Producer-Native Section */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
+            <PowerSystemSection 
+              data={formData.powerSystem!}
+              onChange={(data) => setFormData(prev => ({ ...prev, powerSystem: data }))}
+            />
           </div>
 
           {/* Food & Catering - New Two-Tier System */}
@@ -987,6 +1001,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               location: 'Unknown'
             }}
           />
+          
+          {/* Power Impact Results */}
+          <PowerImpactResults data={formData.powerSystem!} />
           
           {/* Food Impact Results */}
           <FoodImpactResults data={formData.foodCatering!} />
