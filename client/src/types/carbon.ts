@@ -566,3 +566,58 @@ export interface CrewOperationsDetails {
   localHiringConstraint?: 'no-constraint' | 'skill-availability' | 'consistency-required' | 'union-requirements' | 'trust-relationships';
   notes?: string;
 }
+
+// Audience Access & Transportation - Producer-Native Model
+export type AudienceDetailLevel = 'basic' | 'detailed';
+
+export interface AudienceBasicMode {
+  venueLocationType: 'urban-core' | 'urban-edge' | 'suburban' | 'remote-destination';
+  transitAccessibility: 'excellent' | 'good' | 'limited' | 'none';
+  parkingStrategy: 'abundant-free' | 'available-paid' | 'limited-expensive' | 'none';
+  shuttleServices: {
+    hotelShuttles: boolean;
+    transitHubShuttles: boolean;
+    parkingLotShuttles: boolean;
+  };
+}
+
+export interface AudienceDetailedMode extends AudienceBasicMode {
+  eventDrawGeography: 'hyper-local' | 'city-metro' | 'regional' | 'national' | 'international';
+  expectedAttendance: number;
+  carpoolIncentives: 'strong' | 'moderate' | 'none';
+  accommodationStrategy?: 'on-site-camping' | 'nearby-hotels' | 'dispersed';
+}
+
+export interface AudienceAccessData {
+  detailLevel: AudienceDetailLevel;
+  basicMode?: AudienceBasicMode;
+  detailedMode?: AudienceDetailedMode;
+}
+
+// Audience system impacts
+export interface AudienceSystemImpacts {
+  estimatedCO2e: number;
+  perAttendeeCO2e: number;
+  confidenceLevel: 'low' | 'medium' | 'high';
+  accessibilityScore: 'poor' | 'fair' | 'good' | 'excellent';
+  whatYouControl: string[];
+  whatYouInfluence: string[];
+  leveragePoints: string[];
+  tradeoffs: string[];
+}
+
+// Legacy interface for backward compatibility
+export interface AudienceAccessDetails {
+  venueLocationType?: 'urban-core' | 'urban-edge' | 'suburban' | 'remote-destination';
+  transitAccessibility?: 'excellent' | 'good' | 'limited' | 'none';
+  parkingStrategy?: 'abundant-free' | 'available-paid' | 'limited-expensive' | 'none';
+  shuttleServices?: {
+    hotelShuttles: boolean;
+    transitHubShuttles: boolean;
+    parkingLotShuttles: boolean;
+  };
+  eventDrawGeography?: 'hyper-local' | 'city-metro' | 'regional' | 'national' | 'international';
+  expectedAttendance?: number;
+  carpoolIncentives?: 'strong' | 'moderate' | 'none';
+  accommodationStrategy?: 'on-site-camping' | 'nearby-hotels' | 'dispersed';
+}
