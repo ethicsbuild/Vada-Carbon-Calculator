@@ -83,14 +83,14 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
       </Alert>
 
       {/* Impact Summary */}
-      <Card className="border-emerald-200 bg-gradient-to-br from-emerald-50 to-white">
+      <Card className="border-primary-border bg-gradient-to-br from-primary-light to-white">
         <CardHeader>
           <CardTitle className="text-slate-800">Audience Travel Impact (Estimated)</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           
           {/* Total Impact with Confidence Level */}
-          <div className="flex items-baseline justify-between p-4 bg-white rounded-lg border border-emerald-200">
+          <div className="flex items-baseline justify-between p-4 bg-white rounded-lg border border-primary-border">
             <div>
               <p className="text-sm text-slate-600">Estimated Total Impact</p>
               <p className="text-3xl font-bold text-slate-800">
@@ -152,10 +152,10 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
 
       {/* What You Control */}
       {impact.whatYouControl.length > 0 && (
-        <Card className="border-emerald-200 bg-emerald-50/30">
+        <Card className="border-primary-border bg-primary-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <TrendingDown className="h-5 w-5 text-emerald-600 mr-2" />
+              <TrendingDown className="h-5 w-5 text-trend-down mr-2" />
               What You Control
             </CardTitle>
           </CardHeader>
@@ -166,7 +166,7 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
             <ul className="space-y-3">
               {impact.whatYouControl.map((item, index) => (
                 <li key={index} className="flex items-start space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600 mt-2 flex-shrink-0" />
+                  <div className="h-2 w-2 rounded-full bg-trend-down mt-2 flex-shrink-0" />
                   <span className="text-sm text-slate-700 flex-1">{item}</span>
                 </li>
               ))}
@@ -177,10 +177,10 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
 
       {/* What You Influence */}
       {impact.whatYouInfluence.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50/30">
+        <Card className="border-info-border bg-info-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <TrendingUp className="h-5 w-5 text-blue-600 mr-2" />
+              <TrendingUp className="h-5 w-5 text-info mr-2" />
               What You Influence
             </CardTitle>
           </CardHeader>
@@ -191,7 +191,7 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
             <ul className="space-y-3">
               {impact.whatYouInfluence.map((item, index) => (
                 <li key={index} className="flex items-start space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                  <div className="h-2 w-2 rounded-full bg-info mt-2 flex-shrink-0" />
                   <span className="text-sm text-slate-700 flex-1">{item}</span>
                 </li>
               ))}
@@ -202,10 +202,10 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
 
       {/* Leverage Points */}
       {impact.leveragePoints.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/30">
+        <Card className="border-warning-border bg-warning-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <Lightbulb className="h-5 w-5 text-amber-600 mr-2" />
+              <Lightbulb className="h-5 w-5 text-warning mr-2" />
               Highest-Leverage Decisions
             </CardTitle>
           </CardHeader>
@@ -215,8 +215,8 @@ export function AudienceImpactResults({ data, impact }: AudienceImpactResultsPro
             </p>
             <ul className="space-y-3">
               {impact.leveragePoints.map((point, index) => (
-                <li key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-amber-200">
-                  <Lightbulb className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                <li key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-warning-border">
+                  <Lightbulb className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-slate-700">{point}</span>
                 </li>
               ))}

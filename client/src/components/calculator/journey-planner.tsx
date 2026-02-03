@@ -42,10 +42,10 @@ interface JourneyPlannerProps {
 const transportModes = [
   { mode: 'car_petrol' as TransportMode, name: 'Petrol Car', icon: Car, color: 'text-red-600' },
   { mode: 'car_diesel' as TransportMode, name: 'Diesel Car', icon: Car, color: 'text-orange-600' },
-  { mode: 'car_hybrid' as TransportMode, name: 'Hybrid Car', icon: Car, color: 'text-blue-600' },
+  { mode: 'car_hybrid' as TransportMode, name: 'Hybrid Car', icon: Car, color: 'text-info' },
   { mode: 'car_electric' as TransportMode, name: 'Electric Car', icon: Car, color: 'text-green-600' },
-  { mode: 'van_petrol' as TransportMode, name: 'Petrol Van', icon: Truck, color: 'text-amber-600' },
-  { mode: 'van_diesel' as TransportMode, name: 'Diesel Van', icon: Truck, color: 'text-amber-700' },
+  { mode: 'van_petrol' as TransportMode, name: 'Petrol Van', icon: Truck, color: 'text-warning' },
+  { mode: 'van_diesel' as TransportMode, name: 'Diesel Van', icon: Truck, color: 'text-warning' },
   { mode: 'truck_diesel' as TransportMode, name: 'Diesel Truck', icon: Truck, color: 'text-stone-600' },
   { mode: 'ferry' as TransportMode, name: 'Ferry', icon: Ship, color: 'text-cyan-600' },
   { mode: 'flight_domestic' as TransportMode, name: 'Domestic Flight', icon: Plane, color: 'text-purple-600' },
@@ -180,7 +180,7 @@ export function JourneyPlanner({
     <Card className={className}>
       <CardHeader>
         <CardTitle className="flex items-center">
-          <Route className="w-5 h-5 mr-2 text-blue-600" />
+          <Route className="w-5 h-5 mr-2 text-info" />
           Journey Planner & Emission Calculator
         </CardTitle>
       </CardHeader>
@@ -335,7 +335,7 @@ export function JourneyPlanner({
           <Button
             onClick={calculateAllJourneys}
             disabled={isCalculating || isLoading}
-            className="flex-1 bg-blue-600 hover:bg-blue-700"
+            className="flex-1 bg-info hover:bg-info"
             data-testid="calculate-journeys"
           >
             {isCalculating ? (
@@ -353,25 +353,25 @@ export function JourneyPlanner({
         </div>
 
         {getTotalEmissions() > 0 && (
-          <Card className="bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
+          <Card className="bg-info-light dark:bg-info/20 border-info dark:border-info">
             <CardContent className="p-4">
-              <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">
+              <h4 className="font-semibold text-info dark:text-info mb-2">
                 Total Journey Summary
               </h4>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-info">
                     {getTotalDistance().toFixed(1)} km
                   </div>
-                  <div className="text-sm text-blue-700 dark:text-blue-300">
+                  <div className="text-sm text-info dark:text-info">
                     Total Distance
                   </div>
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-blue-600">
+                  <div className="text-2xl font-bold text-info">
                     {getTotalEmissions().toFixed(3)} tCO2e
                   </div>
-                  <div className="text-sm text-blue-700 dark:text-blue-300">
+                  <div className="text-sm text-info dark:text-info">
                     Total Emissions
                   </div>
                 </div>
