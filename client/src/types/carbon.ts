@@ -402,3 +402,49 @@ export interface FoodSystemImpacts {
   increasesPower: boolean; // full-service, on-site cooking, food trucks
   impactNotes: string[];
 }
+
+// Power System - Producer-Native Model
+export type PowerDetailLevel = 'basic' | 'detailed';
+
+export interface PowerBasicMode {
+  primarySource: 'grid' | 'generator' | 'renewable' | 'hybrid';
+  backupRequired: boolean;
+  estimatedLoad: 'small' | 'medium' | 'large' | 'festival';
+}
+
+export interface PowerDetailedMode extends PowerBasicMode {
+  backupStrategy: {
+    hasBackup: boolean;
+    backupType: 'generator' | 'battery' | 'redundant-grid' | 'none';
+    backupCapacity: 'partial' | 'full' | 'critical-only';
+  };
+  distribution: {
+    strategy: 'centralized' | 'distributed' | 'hybrid';
+    zones: number;
+  };
+  loadProfile: {
+    peakLoad: 'low' | 'medium' | 'high' | 'extreme';
+    sustainedLoad: 'low' | 'medium' | 'high';
+    criticalSystems: boolean; // lighting, sound, safety
+  };
+  venueCapabilities: {
+    gridAvailable: boolean;
+    gridCapacity: 'insufficient' | 'adequate' | 'abundant';
+    existingInfrastructure: boolean;
+  };
+}
+
+export interface PowerSystemData {
+  detailLevel: PowerDetailLevel;
+  basicMode?: PowerBasicMode;
+  detailedMode?: PowerDetailedMode;
+}
+
+// Power system impacts
+export interface PowerSystemImpacts {
+  reliabilityScore: 'low' | 'medium' | 'high';
+  efficiencyScore: 'low' | 'medium' | 'high';
+  carbonIntensity: 'low' | 'medium' | 'high';
+  tradeoffNotes: string[];
+  leveragePoints: string[];
+}
