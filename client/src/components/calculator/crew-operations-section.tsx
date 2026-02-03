@@ -1,5 +1,5 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -8,6 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Info, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import type { CrewOperationsDetails } from "@/lib/types/carbon";
+import { SectionCard } from "@/components/ui/section-card";
+import { Callout } from "@/components/ui/callout";
+import { QuestionBlock } from "@/components/ui/question-block";
 
 interface CrewOperationsSectionProps {
   data: CrewOperationsDetails;
@@ -38,14 +41,9 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
       </div>
 
       {/* Basic Mode */}
-      <Card className="border-emerald-200 bg-white">
-        <CardHeader className="bg-emerald-50/50">
-          <CardTitle className="text-lg text-slate-800">Core Staffing Strategy</CardTitle>
-          <CardDescription className="text-slate-600">
+      <SectionCard title="Core Staffing Strategy" description="
             3 questions • ~2 minutes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6 pt-6">
+          " variant="default">
           
           {/* Question 1: Staffing Model */}
           <div className="space-y-3">
@@ -60,7 +58,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
               onValueChange={(value) => updateField("staffingModel", value as CrewOperationsDetails["staffingModel"])}
               className="space-y-3"
             >
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="local-hire" id="local-hire" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="local-hire" className="font-medium text-slate-800 cursor-pointer">
@@ -72,7 +70,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="touring-core" id="touring-core" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="touring-core" className="font-medium text-slate-800 cursor-pointer">
@@ -84,7 +82,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="full-touring" id="full-touring" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="full-touring" className="font-medium text-slate-800 cursor-pointer">
@@ -96,7 +94,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="hybrid-regional" id="hybrid-regional" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="hybrid-regional" className="font-medium text-slate-800 cursor-pointer">
@@ -145,7 +143,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
               onValueChange={(value) => updateField("accommodationStrategy", value as CrewOperationsDetails["accommodationStrategy"])}
               className="space-y-3"
             >
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="hotel-standard" id="hotel-standard" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="hotel-standard" className="font-medium text-slate-800 cursor-pointer">
@@ -157,7 +155,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="tour-bus" id="tour-bus" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="tour-bus" className="font-medium text-slate-800 cursor-pointer">
@@ -169,7 +167,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="local-commute" id="local-commute" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="local-commute" className="font-medium text-slate-800 cursor-pointer">
@@ -181,7 +179,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="mixed" id="mixed" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="mixed" className="font-medium text-slate-800 cursor-pointer">
@@ -195,14 +193,13 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
             </RadioGroup>
           </div>
 
-        </CardContent>
-      </Card>
+        </SectionCard>
 
       {/* Detailed Mode Toggle */}
       <Button
         variant="outline"
         onClick={() => setShowDetailed(!showDetailed)}
-        className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+        className="w-full border-primary text-primary hover:bg-primary/5"
       >
         {showDetailed ? (
           <>
@@ -219,14 +216,9 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
 
       {/* Detailed Mode */}
       {showDetailed && (
-        <Card className="border-amber-200 bg-white">
-          <CardHeader className="bg-amber-50/50">
-            <CardTitle className="text-lg text-slate-800">Detailed Crew Operations</CardTitle>
-            <CardDescription className="text-slate-600">
+        <SectionCard title="Detailed Crew Operations" description="
               6 additional questions • ~3 minutes • More precise carbon modeling
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+            " variant="detailed">
 
             {/* Question 4: Travel Mode Distribution */}
             <div className="space-y-3">
@@ -453,16 +445,11 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
               />
             </div>
 
-          </CardContent>
-        </Card>
+          </SectionCard>
       )}
 
       {/* Systems Thinking Callout */}
-      <Card className="border-blue-200 bg-blue-50/30">
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2">
+      <Callout variant="info" icon={Info}>
               <p className="text-sm font-medium text-slate-800">
                 Systems Connections
               </p>
@@ -472,10 +459,7 @@ export function CrewOperationsSection({ data, onChange }: CrewOperationsSectionP
                 <li>• <strong>Production:</strong> Local hiring enables venue-provided equipment use</li>
                 <li>• <strong>Transport:</strong> Touring crew requires freight coordination</li>
               </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+            </Callout>
 
     </div>
   );

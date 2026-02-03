@@ -1,5 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
@@ -8,6 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Info, ChevronDown, ChevronUp, MapPin, Train, Car, Bus } from "lucide-react";
 import { useState } from "react";
 import type { AudienceAccessDetails } from "@/types/carbon";
+import { SectionCard } from "@/components/ui/section-card";
+import { Callout } from "@/components/ui/callout";
+import { QuestionBlock } from "@/components/ui/question-block";
 
 interface AudienceAccessSectionProps {
   data: AudienceAccessDetails;
@@ -38,38 +39,26 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
       </div>
 
       {/* Reality Check Callout */}
-      <Card className="border-blue-200 bg-blue-50/40">
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-800">
-                What You Control vs. What You Don't
-              </p>
-              <div className="text-sm text-slate-700 space-y-1">
-                <p><strong>You control:</strong> Venue location, transit access, parking availability, shuttle services</p>
-                <p><strong>You influence:</strong> Mode choice through pricing, convenience, and incentives</p>
-                <p><strong>You don't control:</strong> Individual attendee travel decisions</p>
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Callout variant="info" icon={Info}>
+        <p className="text-sm font-medium text-slate-800">
+          What You Control vs. What You Don't
+        </p>
+        <div className="text-sm text-slate-700 space-y-1">
+          <p><strong>You control:</strong> Venue location, transit access, parking availability, shuttle services</p>
+          <p><strong>You influence:</strong> Mode choice through pricing, convenience, and incentives</p>
+          <p><strong>You don't control:</strong> Individual attendee travel decisions</p>
+        </div>
+      </Callout>
 
       {/* Basic Mode */}
-      <Card className="border-emerald-200 bg-white">
-        <CardHeader className="bg-emerald-50/50">
-          <CardTitle className="text-lg text-slate-800">Venue Accessibility Strategy</CardTitle>
-          <CardDescription className="text-slate-600">
+      <SectionCard title="Venue Accessibility Strategy" description="
             4 questions • ~2 minutes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6 pt-6">
+          " variant="default">
           
           {/* Question 1: Venue Location Type */}
           <div className="space-y-3">
             <Label className="text-base font-medium text-slate-800 flex items-center">
-              <MapPin className="h-4 w-4 mr-2 text-emerald-600" />
+              <MapPin className="h-4 w-4 mr-2 text-primary" />
               Where is the venue located?
             </Label>
             <p className="text-sm text-slate-600">
@@ -80,7 +69,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
               onValueChange={(value) => updateField("venueLocationType", value as AudienceAccessDetails["venueLocationType"])}
               className="space-y-3"
             >
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="urban-core" id="urban-core" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="urban-core" className="font-medium text-slate-800 cursor-pointer">
@@ -92,7 +81,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="urban-edge" id="urban-edge" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="urban-edge" className="font-medium text-slate-800 cursor-pointer">
@@ -104,7 +93,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="suburban" id="suburban" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="suburban" className="font-medium text-slate-800 cursor-pointer">
@@ -116,7 +105,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary/30 transition-colors">
                 <RadioGroupItem value="remote-destination" id="remote-destination" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="remote-destination" className="font-medium text-slate-800 cursor-pointer">
@@ -133,7 +122,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
           {/* Question 2: Transit Accessibility */}
           <div className="space-y-3">
             <Label className="text-base font-medium text-slate-800 flex items-center">
-              <Train className="h-4 w-4 mr-2 text-emerald-600" />
+              <Train className="h-4 w-4 mr-2 text-primary" />
               Public transit accessibility
             </Label>
             <p className="text-sm text-slate-600">
@@ -174,7 +163,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
           {/* Question 3: Parking Strategy */}
           <div className="space-y-3">
             <Label className="text-base font-medium text-slate-800 flex items-center">
-              <Car className="h-4 w-4 mr-2 text-emerald-600" />
+              <Car className="h-4 w-4 mr-2 text-primary" />
               Parking strategy
             </Label>
             <p className="text-sm text-slate-600">
@@ -215,7 +204,7 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
           {/* Question 4: Shuttle Services */}
           <div className="space-y-3">
             <Label className="text-base font-medium text-slate-800 flex items-center">
-              <Bus className="h-4 w-4 mr-2 text-emerald-600" />
+              <Bus className="h-4 w-4 mr-2 text-primary" />
               Shuttle or transit partnerships
             </Label>
             <p className="text-sm text-slate-600">
@@ -307,14 +296,13 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
             </div>
           </div>
 
-        </CardContent>
-      </Card>
+        </SectionCard>
 
       {/* Detailed Mode Toggle */}
       <Button
         variant="outline"
         onClick={() => setShowDetailed(!showDetailed)}
-        className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+        className="w-full border-primary text-primary hover:bg-primary/5"
       >
         {showDetailed ? (
           <>
@@ -331,14 +319,9 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
 
       {/* Detailed Mode */}
       {showDetailed && (
-        <Card className="border-amber-200 bg-white">
-          <CardHeader className="bg-amber-50/50">
-            <CardTitle className="text-lg text-slate-800">Detailed Accessibility Context</CardTitle>
-            <CardDescription className="text-slate-600">
+        <SectionCard title="Detailed Accessibility Context" description="
               4 additional questions • ~2 minutes • More precise impact modeling
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+            " variant="detailed">
 
             {/* Question 5: Event Draw Geography */}
             <div className="space-y-3">
@@ -478,29 +461,21 @@ export function AudienceAccessSection({ data, onChange }: AudienceAccessSectionP
               </div>
             )}
 
-          </CardContent>
-        </Card>
+          </SectionCard>
       )}
 
       {/* Systems Thinking Callout */}
-      <Card className="border-blue-200 bg-blue-50/30">
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-800">
-                How Venue Selection Shapes Everything
-              </p>
-              <ul className="text-sm text-slate-600 space-y-1">
-                <li>• <strong>Urban core venue:</strong> Enables transit, reduces parking needs, favors local draw</li>
-                <li>• <strong>Suburban venue:</strong> Requires parking, limits transit, increases driving</li>
-                <li>• <strong>Remote venue:</strong> Requires accommodation, increases travel distance, often multi-day</li>
-                <li>• <strong>Shuttle services:</strong> Can offset poor transit but add operational complexity</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Callout variant="info" icon={Info}>
+        <p className="text-sm font-medium text-slate-800">
+          How Venue Selection Shapes Everything
+        </p>
+        <ul className="text-sm text-slate-600 space-y-1">
+          <li>• <strong>Urban core venue:</strong> Enables transit, reduces parking needs, favors local draw</li>
+          <li>• <strong>Suburban venue:</strong> Requires parking, limits transit, increases driving</li>
+          <li>• <strong>Remote venue:</strong> Requires accommodation, increases travel distance, often multi-day</li>
+          <li>• <strong>Shuttle services:</strong> Can offset poor transit but add operational complexity</li>
+        </ul>
+      </Callout>
 
     </div>
   );

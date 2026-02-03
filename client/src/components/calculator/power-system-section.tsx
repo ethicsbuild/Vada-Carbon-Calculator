@@ -1,10 +1,13 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Label } from "@/components/ui/label";
+
+
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Info, Zap, AlertTriangle } from "lucide-react";
 import { PowerSystemData, PowerDetailLevel, PowerBasicMode, PowerDetailedMode } from "@/types/carbon";
+import { SectionCard } from "@/components/ui/section-card";
+import { Callout } from "@/components/ui/callout";
+import { QuestionBlock } from "@/components/ui/question-block";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface PowerSystemSectionProps {
@@ -97,7 +100,7 @@ export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) 
       {/* Section Header */}
       <div className="space-y-3">
         <h2 className="text-2xl font-semibold text-slate-800 flex items-center">
-          <Zap className="h-5 w-5 text-emerald-600 mr-2" />
+          <Zap className="h-5 w-5 text-primary mr-2" />
           How the Event Is Powered (and Backed Up)
         </h2>
         <p className="text-slate-600 leading-relaxed">
@@ -106,14 +109,7 @@ export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) 
       </div>
 
       {/* Basic Mode */}
-      <Card className="border-emerald-200 bg-white">
-        <CardHeader className="bg-emerald-50/50">
-          <CardTitle className="text-lg text-slate-800">Core Power Strategy</CardTitle>
-          <CardDescription className="text-slate-600">
-            3 questions • ~2 minutes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6">
+      <SectionCard title="Core Power Strategy" description="3 questions • ~2 minutes" variant="default">
           {/* Mode Selection */}
           <div className="space-y-3">
             <Label className="text-base font-semibold">How detailed do you want to be about power planning?</Label>
@@ -155,8 +151,7 @@ export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) 
               onVenueCapabilitiesChange={handleVenueCapabilitiesChange}
             />
           )}
-        </CardContent>
-      </Card>
+        </SectionCard>
     </div>
   );
 }
