@@ -507,3 +507,62 @@ export interface ProductionSystemImpacts {
   tradeoffNotes: string[];
   leveragePoints: string[];
 }
+
+// Crew &amp; Operations Reality - Producer-Native Model
+export type CrewDetailLevel = 'basic' | 'detailed';
+
+export interface CrewBasicMode {
+  staffingModel: 'local-hire' | 'touring-core' | 'full-touring' | 'hybrid-regional';
+  totalCrewSize: number;
+  accommodationStrategy: 'hotel-standard' | 'tour-bus' | 'local-commute' | 'mixed';
+}
+
+export interface CrewDetailedMode extends CrewBasicMode {
+  travelModeDistribution: {
+    air: number;
+    ground: number;
+    local: number;
+  };
+  averageTravelDistance: number;
+  distanceUnit: 'miles' | 'kilometers';
+  buildDays: number;
+  strikeDays: number;
+  crewWelfarePriority: 'cost-minimum' | 'standard-comfort' | 'premium-welfare';
+  localHiringConstraint: 'no-constraint' | 'skill-availability' | 'consistency-required' | 'union-requirements' | 'trust-relationships';
+  notes?: string;
+}
+
+export interface CrewOperationsData {
+  detailLevel: CrewDetailLevel;
+  basicMode?: CrewBasicMode;
+  detailedMode?: CrewDetailedMode;
+}
+
+// Crew system impacts
+export interface CrewSystemImpacts {
+  travelCO2e: number;
+  accommodationCO2e: number;
+  totalCO2e: number;
+  perPersonCO2e: number;
+  leveragePoints: string[];
+  tradeoffs: string[];
+}
+
+// Legacy interface for backward compatibility
+export interface CrewOperationsDetails {
+  staffingModel?: 'local-hire' | 'touring-core' | 'full-touring' | 'hybrid-regional';
+  totalCrewSize?: number;
+  accommodationStrategy?: 'hotel-standard' | 'tour-bus' | 'local-commute' | 'mixed';
+  travelModeDistribution?: {
+    air: number;
+    ground: number;
+    local: number;
+  };
+  averageTravelDistance?: number;
+  distanceUnit?: 'miles' | 'kilometers';
+  buildDays?: number;
+  strikeDays?: number;
+  crewWelfarePriority?: 'cost-minimum' | 'standard-comfort' | 'premium-welfare';
+  localHiringConstraint?: 'no-constraint' | 'skill-availability' | 'consistency-required' | 'union-requirements' | 'trust-relationships';
+  notes?: string;
+}
