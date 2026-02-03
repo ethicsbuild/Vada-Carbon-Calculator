@@ -364,3 +364,41 @@ export interface EventCalculationData {
     similarEvents: number;
   };
 }
+
+// Food & Catering - Two-Tier System
+export type FoodDetailLevel = 'lite' | 'advanced';
+
+export interface FoodLiteMode {
+  foodProvided: 'none' | 'light-catering' | 'full-meals';
+  serviceModel: 'full-service' | 'buffet' | 'pre-packaged' | 'food-trucks' | 'attendee-purchase';
+  sourcing: 'local' | 'mixed' | 'national' | 'unknown';
+  plantForward: boolean;
+  scale: '1-50' | '51-250' | '251-1000' | '1000+';
+}
+
+export interface FoodAdvancedMode extends FoodLiteMode {
+  groupsFed: {
+    staff: boolean;
+    talent: boolean;
+    attendees: boolean;
+    vip: boolean;
+  };
+  foodStrategy: 'standard' | 'plant-forward' | 'vegetarian-vegan' | 'no-strategy';
+  serviceWare: 'reusable' | 'compostable' | 'mixed-disposable' | 'single-use-plastic' | 'unknown';
+  wasteHandling: 'composting' | 'donation' | 'landfill' | 'no-plan';
+  portionControl: boolean;
+  vendorWasteMitigation: boolean;
+}
+
+export interface FoodCateringData {
+  detailLevel: FoodDetailLevel;
+  liteMode?: FoodLiteMode;
+  advancedMode?: FoodAdvancedMode;
+}
+
+// Cross-section impact flags for systems alignment
+export interface FoodSystemImpacts {
+  increasesTransport: boolean; // food trucks, external vendors, national sourcing
+  increasesPower: boolean; // full-service, on-site cooking, food trucks
+  impactNotes: string[];
+}
