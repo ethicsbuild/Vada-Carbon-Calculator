@@ -364,3 +364,205 @@ export interface EventCalculationData {
     similarEvents: number;
   };
 }
+
+// Food & Catering - Two-Tier System
+export type FoodDetailLevel = 'lite' | 'advanced';
+
+export interface FoodLiteMode {
+  foodProvided: 'none' | 'light-catering' | 'full-meals';
+  serviceModel: 'full-service' | 'buffet' | 'pre-packaged' | 'food-trucks' | 'attendee-purchase';
+  sourcing: 'local' | 'mixed' | 'national' | 'unknown';
+  plantForward: boolean;
+  scale: '1-50' | '51-250' | '251-1000' | '1000+';
+}
+
+export interface FoodAdvancedMode extends FoodLiteMode {
+  groupsFed: {
+    staff: boolean;
+    talent: boolean;
+    attendees: boolean;
+    vip: boolean;
+  };
+  foodStrategy: 'standard' | 'plant-forward' | 'vegetarian-vegan' | 'no-strategy';
+  serviceWare: 'reusable' | 'compostable' | 'mixed-disposable' | 'single-use-plastic' | 'unknown';
+  wasteHandling: 'composting' | 'donation' | 'landfill' | 'no-plan';
+  portionControl: boolean;
+  vendorWasteMitigation: boolean;
+}
+
+export interface FoodCateringData {
+  detailLevel: FoodDetailLevel;
+  liteMode?: FoodLiteMode;
+  advancedMode?: FoodAdvancedMode;
+}
+
+// Cross-section impact flags for systems alignment
+export interface FoodSystemImpacts {
+  increasesTransport: boolean; // food trucks, external vendors, national sourcing
+  increasesPower: boolean; // full-service, on-site cooking, food trucks
+  impactNotes: string[];
+}
+
+// Power System - Producer-Native Model
+export type PowerDetailLevel = 'basic' | 'detailed';
+
+export interface PowerBasicMode {
+  primarySource: 'grid' | 'generator' | 'renewable' | 'hybrid';
+  backupRequired: boolean;
+  estimatedLoad: 'small' | 'medium' | 'large' | 'festival';
+}
+
+export interface PowerDetailedMode extends PowerBasicMode {
+  backupStrategy: {
+    hasBackup: boolean;
+    backupType: 'generator' | 'battery' | 'redundant-grid' | 'none';
+    backupCapacity: 'partial' | 'full' | 'critical-only';
+  };
+  distribution: {
+    strategy: 'centralized' | 'distributed' | 'hybrid';
+    zones: number;
+  };
+  loadProfile: {
+    peakLoad: 'low' | 'medium' | 'high' | 'extreme';
+    sustainedLoad: 'low' | 'medium' | 'high';
+    criticalSystems: boolean; // lighting, sound, safety
+  };
+  venueCapabilities: {
+    gridAvailable: boolean;
+    gridCapacity: 'insufficient' | 'adequate' | 'abundant';
+    existingInfrastructure: boolean;
+  };
+}
+
+export interface PowerSystemData {
+  detailLevel: PowerDetailLevel;
+  basicMode?: PowerBasicMode;
+  detailedMode?: PowerDetailedMode;
+}
+
+// Power system impacts
+export interface PowerSystemImpacts {
+  reliabilityScore: 'low' | 'medium' | 'high';
+  efficiencyScore: 'low' | 'medium' | 'high';
+  carbonIntensity: 'low' | 'medium' | 'high';
+  tradeoffNotes: string[];
+  leveragePoints: string[];
+}
+
+// Production Build & Infrastructure - Producer-Native Model
+export type ProductionDetailLevel = 'basic' | 'detailed';
+
+export interface ProductionBasicMode {
+  buildStrategy: 'bring-full-rig' | 'rent-locally' | 'hybrid' | 'venue-provided';
+  productionScale: 'minimal' | 'standard' | 'full-production' | 'festival';
+  transportRequired: boolean;
+}
+
+export interface ProductionDetailedMode extends ProductionBasicMode {
+  venueProvides: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    video: boolean;
+    power: boolean;
+    rigging: boolean;
+  };
+  bringingOwn: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    video: boolean;
+    specialEffects: boolean;
+    customRigging: boolean;
+  };
+  vendorStrategy: {
+    approach: 'single-vendor' | 'multiple-specialists' | 'hybrid' | 'in-house';
+    numberOfVendors: number;
+    localVendors: boolean;
+  };
+  transportLogistics: {
+    trucksRequired: number;
+    averageDistance: number;
+    consolidatedShipping: boolean;
+    freightFlights: number;
+  };
+  buildTime: {
+    loadInDays: number;
+    strikeDownDays: number;
+    crewSize: number;
+  };
+}
+
+export interface ProductionBuildData {
+  detailLevel: ProductionDetailLevel;
+  basicMode?: ProductionBasicMode;
+  detailedMode?: ProductionDetailedMode;
+}
+
+// Production system impacts
+export interface ProductionSystemImpacts {
+  controlLevel: 'low' | 'medium' | 'high';
+  carbonIntensity: 'low' | 'medium' | 'high';
+  logisticsComplexity: 'low' | 'medium' | 'high';
+  tradeoffNotes: string[];
+  leveragePoints: string[];
+}
+
+// Crew &amp; Operations Reality - Producer-Native Model
+export type CrewDetailLevel = 'basic' | 'detailed';
+
+export interface CrewBasicMode {
+  staffingModel: 'local-hire' | 'touring-core' | 'full-touring' | 'hybrid-regional';
+  totalCrewSize: number;
+  accommodationStrategy: 'hotel-standard' | 'tour-bus' | 'local-commute' | 'mixed';
+}
+
+export interface CrewDetailedMode extends CrewBasicMode {
+  travelModeDistribution: {
+    air: number;
+    ground: number;
+    local: number;
+  };
+  averageTravelDistance: number;
+  distanceUnit: 'miles' | 'kilometers';
+  buildDays: number;
+  strikeDays: number;
+  crewWelfarePriority: 'cost-minimum' | 'standard-comfort' | 'premium-welfare';
+  localHiringConstraint: 'no-constraint' | 'skill-availability' | 'consistency-required' | 'union-requirements' | 'trust-relationships';
+  notes?: string;
+}
+
+export interface CrewOperationsData {
+  detailLevel: CrewDetailLevel;
+  basicMode?: CrewBasicMode;
+  detailedMode?: CrewDetailedMode;
+}
+
+// Crew system impacts
+export interface CrewSystemImpacts {
+  travelCO2e: number;
+  accommodationCO2e: number;
+  totalCO2e: number;
+  perPersonCO2e: number;
+  leveragePoints: string[];
+  tradeoffs: string[];
+}
+
+// Legacy interface for backward compatibility
+export interface CrewOperationsDetails {
+  staffingModel?: 'local-hire' | 'touring-core' | 'full-touring' | 'hybrid-regional';
+  totalCrewSize?: number;
+  accommodationStrategy?: 'hotel-standard' | 'tour-bus' | 'local-commute' | 'mixed';
+  travelModeDistribution?: {
+    air: number;
+    ground: number;
+    local: number;
+  };
+  averageTravelDistance?: number;
+  distanceUnit?: 'miles' | 'kilometers';
+  buildDays?: number;
+  strikeDays?: number;
+  crewWelfarePriority?: 'cost-minimum' | 'standard-comfort' | 'premium-welfare';
+  localHiringConstraint?: 'no-constraint' | 'skill-availability' | 'consistency-required' | 'union-requirements' | 'trust-relationships';
+  notes?: string;
+}

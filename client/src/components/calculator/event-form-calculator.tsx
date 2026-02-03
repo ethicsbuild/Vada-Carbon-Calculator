@@ -9,6 +9,15 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Calculator, Loader2, Plus, Trash2, AlertCircle, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
+import { FoodCateringSection } from '@/components/calculator/food-catering-section';
+import { FoodImpactResults } from '@/components/calculator/food-impact-results';
+import { calculateFoodSystemImpacts, estimateFoodEmissions } from '@/lib/food-impact-calculator';
+import { PowerSystemSection } from '@/components/calculator/power-system-section';
+import { PowerImpactResults } from '@/components/calculator/power-impact-results';
+import { calculatePowerSystemImpacts, estimatePowerEmissions } from '@/lib/power-impact-calculator';
+import { ProductionBuildSection } from '@/components/calculator/production-build-section';
+import { ProductionImpactResults } from '@/components/calculator/production-impact-results';
+import { calculateProductionSystemImpacts, estimateProductionEmissions } from '@/lib/production-impact-calculator';
 
 interface StaffTransportGroup {
   id: string;
@@ -26,11 +35,14 @@ interface ArtistTransportGroup {
   tourBus: boolean;
 }
 
-interface MealBreakdown {
-  staffMeals: number;
-  attendeeFood: number;
-  vipCatering: number;
-  talentCatering: number;
+// Import new food, power, and production types
+import { FoodCateringData, FoodLiteMode, FoodAdvancedMode, PowerSystemData, ProductionBuildData } from "@/types/carbon";
+
+interface CateringDetails {
+  style: string; // buffet, plated, pre-packaged, grab-and-go, none
+  scale: string; // staff-only, staff-talent, full-audience, vip-tiers
+  sourcing: string; // local, external-vendor, self-catered
+  estimatedMeals: number; // Total meal count for calculation
 }
 
 interface EventFormData {
@@ -56,8 +68,13 @@ interface EventFormData {
   equipmentFreightFlights: number;
   // Power and Food
   powerSource: string;
-  meals: MealBreakdown;
-  localFood: boolean;
+  catering: CateringDetails;
+  // New food system
+  foodCatering?: FoodCateringData;
+  // New power system
+  powerSystem?: PowerSystemData;
+  // New production system
+  productionBuild?: ProductionBuildData;
 }
 
 interface EventFormCalculatorProps {
@@ -67,6 +84,11 @@ interface EventFormCalculatorProps {
 }
 
 export function EventFormCalculator({ initialEventType, onSectionChange, onCalculationComplete }: EventFormCalculatorProps) {
+  // Ensure page loads at top
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, []);
+
   // Helper function to determine if event type should show artist/staff transport
   const shouldShowArtistTransport = (eventType: string) => {
     const typesWithArtists = ['festival', 'concert', 'conference'];
@@ -77,9 +99,6 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
     const typesWithStaff = ['festival', 'concert', 'conference'];
     return typesWithStaff.includes(eventType.toLowerCase());
   };
-
-  // State for progressive disclosure
-  const [showDetailedMeals, setShowDetailedMeals] = useState(false);
 
   const [formData, setFormData] = useState<EventFormData>({
     eventType: initialEventType || '',
@@ -104,13 +123,41 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
     equipmentFreightFlights: 0,
     // Power and Food
     powerSource: 'grid',
-    meals: {
-      staffMeals: 0,
-      attendeeFood: 0,
-      vipCatering: 0,
-      talentCatering: 0,
+    catering: {
+      style: 'none',
+      scale: 'staff-only',
+      sourcing: 'external-vendor',
+      estimatedMeals: 0,
     },
-    localFood: false,
+    // New food system - initialize with lite mode
+    foodCatering: {
+      detailLevel: 'lite',
+      liteMode: {
+        foodProvided: 'none',
+        serviceModel: 'buffet',
+        sourcing: 'mixed',
+        plantForward: false,
+        scale: '51-250',
+      },
+    },
+    // New power system - initialize with basic mode
+    powerSystem: {
+      detailLevel: 'basic',
+      basicMode: {
+        primarySource: 'grid',
+        backupRequired: false,
+        estimatedLoad: 'medium',
+      },
+    },
+    // New production system - initialize with basic mode
+    productionBuild: {
+      detailLevel: 'basic',
+      basicMode: {
+        buildStrategy: 'rent-locally',
+        productionScale: 'standard',
+        transportRequired: false,
+      },
+    },
   });
 
   const [calculation, setCalculation] = useState<any>(null);
@@ -180,10 +227,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
     }));
   };
 
-  const updateMealField = (field: keyof MealBreakdown, value: number) => {
+  const updateCateringField = (field: keyof CateringDetails, value: string | number) => {
     setFormData(prev => ({
       ...prev,
-      meals: { ...prev.meals, [field]: value }
+      catering: { ...prev.catering, [field]: value }
     }));
   };
 
@@ -239,9 +286,20 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         ? formData.artistTransportGroups.reduce((sum, g) => sum + (g.distance * g.count), 0) / totalArtistCount
         : 200;
 
-      // Total meals served
-      const totalMealsServed = formData.meals.staffMeals + formData.meals.attendeeFood +
-                               formData.meals.vipCatering + formData.meals.talentCatering;
+      // Calculate food system impacts
+      const foodSystemImpacts = calculateFoodSystemImpacts(formData.foodCatering!);
+      const foodEmissions = estimateFoodEmissions(formData.foodCatering!);
+      
+      // Calculate power system impacts
+      const powerSystemImpacts = calculatePowerSystemImpacts(formData.powerSystem!);
+      const powerEmissions = estimatePowerEmissions(formData.powerSystem!);
+      
+      // Calculate production system impacts
+      const productionSystemImpacts = calculateProductionSystemImpacts(formData.productionBuild!);
+      const productionEmissions = estimateProductionEmissions(formData.productionBuild!);
+      
+      // Total meals served from catering estimate (legacy)
+      const totalMealsServed = formData.catering.estimatedMeals;
 
       const response = await fetch('/api/calculate-event', {
         method: 'POST',
@@ -326,6 +384,18 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             alcoholServed: formData.attendance > 100,
             // Include meal breakdown for detailed calculation
             mealBreakdown: formData.meals,
+            // New food system data
+            foodCateringData: formData.foodCatering,
+            foodEmissions: foodEmissions,
+            foodSystemImpacts: foodSystemImpacts,
+            // New power system data
+            powerSystemData: formData.powerSystem,
+            powerEmissions: powerEmissions,
+            powerSystemImpacts: powerSystemImpacts,
+            // New production system data
+            productionBuildData: formData.productionBuild,
+            productionEmissions: productionEmissions,
+            productionSystemImpacts: productionSystemImpacts,
           },
           waste: {
             recyclingProgram: false,
@@ -592,10 +662,17 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             </div>
           </div>
 
-          {/* Venue Type */}
+          {/* Venue Type - Consolidated */}
           <div className="space-y-2">
             <Label className="text-sage-500 dark:text-sage-500">Venue Type</Label>
-            <Select value={formData.venueType} onValueChange={(value) => updateField('venueType', value)}>
+            <Select 
+              value={formData.venueType} 
+              onValueChange={(value) => {
+                updateField('venueType', value);
+                // Auto-set isOutdoor based on selection
+                updateField('isOutdoor', value === 'outdoor' || value === 'mixed');
+              }}
+            >
               <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
                 <SelectValue placeholder="Select venue type" />
               </SelectTrigger>
@@ -605,24 +682,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Mixed Indoor/Outdoor</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-
-          {/* Outdoor Venue Toggle */}
-          <div className="flex items-center space-x-2">
-            <input
-              type="checkbox"
-              id="isOutdoor"
-              checked={formData.isOutdoor}
-              onChange={(e) => updateField('isOutdoor', e.target.checked)}
-              className="w-4 h-4 text-forest-400 bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 rounded focus:ring-emerald-400"
-            />
-            <Label htmlFor="isOutdoor" className="text-sage-500 dark:text-sage-500">
-              Outdoor Event
-              <InfoTooltip 
-                title="Outdoor Events"
-                content="Outdoor events typically have different energy requirements and may need additional infrastructure like temporary power or shelter."
-              />
-            </Label>
+            
+            {/* Contextual outdoor callout - only show when relevant */}
+            {(formData.venueType === 'outdoor' || formData.venueType === 'mixed') && (
+              <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                <p className="text-xs text-amber-800 dark:text-amber-200">
+                  Outdoor events typically require temporary power infrastructure and may have different energy needs than indoor venues.
+                </p>
+              </div>
+            )}
           </div>
 
           {/* Attendee Transportation */}
@@ -867,182 +935,28 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
           </div>
           )}
 
-          {/* Equipment Transportation */}
-          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('transportation')}>
-            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Equipment Transportation</h3>
-            
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Trucks Required</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentTrucksRequired}
-                  onChange={(e) => updateField('equipmentTrucksRequired', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Average Distance (km)</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentTransportDistance}
-                  onChange={(e) => updateField('equipmentTransportDistance', parseInt(e.target.value) || 0)}
-                  placeholder="200"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Freight Flights</Label>
-                <Input
-                  type="number"
-                  value={formData.equipmentFreightFlights}
-                  onChange={(e) => updateField('equipmentFreightFlights', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-              </div>
-            </div>
+          {/* Production Build &amp; Infrastructure - New Producer-Native Section */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
+            <ProductionBuildSection 
+              data={formData.productionBuild!}
+              onChange={(data) => setFormData(prev => ({ ...prev, productionBuild: data }))}
+            />
           </div>
 
-          {/* Power Source */}
-          <div className="space-y-2 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
-            <Label className="text-sage-500 dark:text-sage-500">Power Source</Label>
-            <Select value={formData.powerSource} onValueChange={(value) => updateField('powerSource', value)}>
-              <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectValue placeholder="Select power source" />
-              </SelectTrigger>
-              <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectItem value="grid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔌 Grid Power</SelectItem>
-                <SelectItem value="generator" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">⚡ Generator</SelectItem>
-                <SelectItem value="renewable" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">☀️ Renewable Energy</SelectItem>
-                <SelectItem value="hybrid" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Hybrid (Grid + Renewable)</SelectItem>
-              </SelectContent>
-            </Select>
+          {/* Power System - New Producer-Native Section */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('production')}>
+            <PowerSystemSection 
+              data={formData.powerSystem!}
+              onChange={(data) => setFormData(prev => ({ ...prev, powerSystem: data }))}
+            />
           </div>
 
-          {/* Food & Catering */}
-          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
-            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Food & Catering</h3>
-            
-            {/* Simple View - Total Meals */}
-            {!showDetailedMeals && (
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label className="text-sage-500 dark:text-sage-500">Total Meals Served</Label>
-                  <Input
-                    type="number"
-                    value={formData.meals.staffMeals + formData.meals.attendeeFood + formData.meals.vipCatering + formData.meals.talentCatering}
-                    onChange={(e) => {
-                      const total = parseInt(e.target.value) || 0;
-                      updateMealField('attendeeFood', total);
-                      updateMealField('staffMeals', 0);
-                      updateMealField('vipCatering', 0);
-                      updateMealField('talentCatering', 0);
-                    }}
-                    placeholder="Enter total number of meals"
-                    className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                  />
-                  <p className="text-xs text-sage-600 dark:text-sage-400">
-                    Approximate total meals across all attendees, staff, and catering
-                  </p>
-                </div>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setShowDetailedMeals(true);
-                  }}
-                  className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300"
-                >
-                  + Show detailed meal breakdown
-                </Button>
-              </div>
-            )}
-
-            {/* Detailed View - Breakdown by Category */}
-            {showDetailedMeals && (
-              <div className="space-y-4">
-                <div className="flex items-center justify-between mb-2">
-                  <p className="text-sm text-sage-600 dark:text-sage-400">
-                    Break down meals by category for more accurate calculations
-                  </p>
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowDetailedMeals(false);
-                    }}
-                    className="text-sage-600 dark:text-sage-400 hover:text-sage-700 dark:hover:text-sage-300"
-                  >
-                    - Hide details
-                  </Button>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label className="text-sage-500 dark:text-sage-500">Staff Meals</Label>
-                    <Input
-                      type="number"
-                      value={formData.meals.staffMeals}
-                      onChange={(e) => updateMealField('staffMeals', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sage-500 dark:text-sage-500">Attendee Food</Label>
-                    <Input
-                      type="number"
-                      value={formData.meals.attendeeFood}
-                      onChange={(e) => updateMealField('attendeeFood', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sage-500 dark:text-sage-500">VIP Catering</Label>
-                    <Input
-                      type="number"
-                      value={formData.meals.vipCatering}
-                      onChange={(e) => updateMealField('vipCatering', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label className="text-sage-500 dark:text-sage-500">Talent Catering</Label>
-                    <Input
-                      type="number"
-                      value={formData.meals.talentCatering}
-                      onChange={(e) => updateMealField('talentCatering', parseInt(e.target.value) || 0)}
-                      placeholder="0"
-                      className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="flex items-center space-x-2 pt-2">
-              <input
-                type="checkbox"
-                id="localFood"
-                checked={formData.localFood}
-                onChange={(e) => updateField('localFood', e.target.checked)}
-                className="w-4 h-4 text-forest-400 bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 rounded focus:ring-emerald-400"
-              />
-              <Label htmlFor="localFood" className="text-sage-500 dark:text-sage-500">
-                Locally Sourced Food
-                <InfoTooltip 
-                  title="Locally Sourced Food"
-                  content="Using locally sourced food can significantly reduce transportation emissions from your catering."
-                />
-              </Label>
-            </div>
+          {/* Food & Catering - New Two-Tier System */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
+            <FoodCateringSection 
+              data={formData.foodCatering!}
+              onChange={(data) => setFormData(prev => ({ ...prev, foodCatering: data }))}
+            />
           </div>
         </div>
 
@@ -1079,6 +993,15 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               location: 'Unknown'
             }}
           />
+          
+          {/* Production Impact Results */}
+          <ProductionImpactResults data={formData.productionBuild!} />
+          
+          {/* Power Impact Results */}
+          <PowerImpactResults data={formData.powerSystem!} />
+          
+          {/* Food Impact Results */}
+          <FoodImpactResults data={formData.foodCatering!} />
           
           {/* Export Buttons */}
           <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm p-6">

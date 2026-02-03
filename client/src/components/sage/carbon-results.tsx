@@ -150,10 +150,10 @@ export function CarbonResults({ calculation, eventData }: CarbonResultsProps) {
             </p>
           </div>
 
-          {/* Performance Comparison */}
+          {/* Industry Comparison */}
           <div className="bg-sage-50 dark:bg-sage-900/50 rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sage-500 dark:text-sage-500 font-medium">Performance Rating</span>
+              <span className="text-sage-500 dark:text-sage-500 font-medium">Industry Comparison</span>
               <span className={`font-bold capitalize ${getPerformanceColor(benchmarkComparison.performance)}`}>
                 {benchmarkComparison.performance}
               </span>
