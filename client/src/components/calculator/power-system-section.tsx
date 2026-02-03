@@ -94,15 +94,23 @@ export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) 
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <div className="flex items-center gap-2">
-            <Zap className="w-5 h-5 text-amber-500" />
-            <CardTitle>How the Event Is Powered (and Backed Up)</CardTitle>
-          </div>
-          <CardDescription>
-            Power strategy is about reliability, redundancy, and operational reality—not just choosing a source.
-            Model your primary power, backup systems, and distribution strategy.
+      {/* Section Header */}
+      <div className="space-y-3">
+        <h2 className="text-2xl font-semibold text-slate-800 flex items-center">
+          <Zap className="h-5 w-5 text-emerald-600 mr-2" />
+          How the Event Is Powered (and Backed Up)
+        </h2>
+        <p className="text-slate-600 leading-relaxed">
+          Power strategy shapes reliability, cost, and carbon impact. Model your primary source, backup requirements, and distribution approach.
+        </p>
+      </div>
+
+      {/* Basic Mode */}
+      <Card className="border-emerald-200 bg-white">
+        <CardHeader className="bg-emerald-50/50">
+          <CardTitle className="text-lg text-slate-800">Core Power Strategy</CardTitle>
+          <CardDescription className="text-slate-600">
+            3 questions • ~2 minutes
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

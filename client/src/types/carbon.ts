@@ -621,3 +621,63 @@ export interface AudienceAccessDetails {
   carpoolIncentives?: 'strong' | 'moderate' | 'none';
   accommodationStrategy?: 'on-site-camping' | 'nearby-hotels' | 'dispersed';
 }
+
+// Event Foundation - Producer-Native Model
+export type EventDetailLevel = 'basic' | 'detailed';
+
+export interface EventBasicMode {
+  productionComplexity: 'minimal' | 'standard' | 'complex' | 'festival';
+  loadInDays: number;
+  showDays: number;
+  strikeDays: number;
+  venueProvides: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    av: boolean;
+    power: boolean;
+    rigging: boolean;
+  };
+  expectedAttendance: number;
+}
+
+export interface EventDetailedMode extends EventBasicMode {
+  eventFormat: 'single-day' | 'multi-day-same' | 'multi-day-different' | 'festival';
+  indoorOutdoor: 'fully-indoor' | 'fully-outdoor' | 'mixed' | 'covered-outdoor';
+  weatherContingency?: 'rain-or-shine' | 'covered-areas' | 'indoor-backup' | 'postponement';
+}
+
+export interface EventFoundationData {
+  detailLevel: EventDetailLevel;
+  basicMode?: EventBasicMode;
+  detailedMode?: EventDetailedMode;
+}
+
+// Event foundation summary
+export interface EventFoundationSummary {
+  totalDays: number;
+  complexityLevel: string;
+  venueCapabilityScore: number;
+  operationalInsights: string[];
+  systemsConnections: string[];
+}
+
+// Legacy interface for backward compatibility
+export interface EventFoundationDetails {
+  productionComplexity?: 'minimal' | 'standard' | 'complex' | 'festival';
+  loadInDays?: number;
+  showDays?: number;
+  strikeDays?: number;
+  venueProvides?: {
+    stage: boolean;
+    lighting: boolean;
+    sound: boolean;
+    av: boolean;
+    power: boolean;
+    rigging: boolean;
+  };
+  expectedAttendance?: number;
+  eventFormat?: 'single-day' | 'multi-day-same' | 'multi-day-different' | 'festival';
+  indoorOutdoor?: 'fully-indoor' | 'fully-outdoor' | 'mixed' | 'covered-outdoor';
+  weatherContingency?: 'rain-or-shine' | 'covered-areas' | 'indoor-backup' | 'postponement';
+}
