@@ -42,7 +42,7 @@ export function LiveEmissionsDisplay({
   ];
 
   return (
-    <div className="bg-gradient-to-br from-emerald-500/10 to-violet-500/10 rounded-xl p-6 border border-emerald-500/30">
+    <div className="bg-gradient-to-br from-emerald-500/10 to-violet-500/10 rounded-xl p-6 border border-primary/30">
       {/* Header */}
       <div className="flex justify-between items-start mb-6">
         <div>
@@ -51,7 +51,7 @@ export function LiveEmissionsDisplay({
           </div>
           <div className={cn(
             "text-sm font-medium",
-            isGood ? "text-emerald-400" : "text-orange-400"
+            isGood ? "text-primary" : "text-orange-400"
           )}>
             {Math.abs(percentBelowAverage)}% {isGood ? 'below' : 'above'} average for your event type
           </div>
@@ -71,7 +71,7 @@ export function LiveEmissionsDisplay({
             </div>
             <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
               <div
-                className="h-full bg-emerald-500 rounded-full"
+                className="h-full bg-primary rounded-full"
                 style={{ width: `${item.percentage}%` }}
               />
             </div>

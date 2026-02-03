@@ -1,0 +1,57 @@
+name: Design System Enforcement
+
+on:
+  pull_request:
+    paths:
+      - 'client/src/components/calculator/**/*.tsx'
+      - 'client/src/components/calculator/**/*.ts'
+  push:
+    branches:
+      - main
+    paths:
+      - 'client/src/components/calculator/**/*.tsx'
+      - 'client/src/components/calculator/**/*.ts'
+
+jobs:
+  check-hardcoded-colors:
+    runs-on: ubuntu-latest
+    name: Check for hardcoded colors
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Check for hardcoded emerald/blue/amber colors
+        run: |
+          echo "Checking for hardcoded colors in calculator components..."
+          
+          # Check for hardcoded color classes
+          if grep -rn "text-\(emerald\|blue\|amber\)-[0-9]\|bg-\(emerald\|blue\|amber\)-[0-9]\|border-\(emerald\|blue\|amber\)-[0-9]" client/src/components/calculator --include="*.tsx" --include="*.ts"; then
+            echo ""
+            echo "❌ Error: Hardcoded colors found in calculator components."
+            echo ""
+            echo "Use design tokens instead:"
+            echo "  - text-primary, bg-primary, border-primary (for emerald)"
+            echo "  - text-info, bg-info, border-info (for blue)"
+            echo "  - text-warning, bg-warning, border-warning (for amber)"
+            echo "  - text-rating-excellent, text-rating-good, text-rating-fair, text-rating-poor"
+            echo "  - text-trend-up, text-trend-down, text-trend-neutral"
+            echo ""
+            echo "See client/src/styles/tokens.css for all available tokens."
+            exit 1
+          fi
+          
+          echo "✓ No hardcoded colors found. Design system tokens are being used correctly."
+      
+      - name: Verify design token usage
+        run: |
+          echo "Verifying design token usage..."
+          
+          # Count token usage
+          TOKEN_COUNT=$(grep -rn "text-primary\|text-info\|text-warning\|text-rating-\|text-trend-\|bg-primary\|bg-info\|bg-warning\|border-primary\|border-info\|border-warning" client/src/components/calculator --include="*.tsx" --include="*.ts" | wc -l)
+          
+          echo "✓ Found $TOKEN_COUNT instances of design token usage."
+          
+          if [ "$TOKEN_COUNT" -lt 10 ]; then
+            echo "⚠️  Warning: Low token usage count. Verify tokens are being used."
+          fi

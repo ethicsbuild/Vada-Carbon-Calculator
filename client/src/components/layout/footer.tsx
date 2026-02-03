@@ -118,9 +118,10 @@ export function Footer() {
         {/* Bottom section */}
         <div className="border-t border-forest-800 dark:border-forest-900 mt-8 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sage-300 dark:text-sage-400 text-sm">
-              © {currentYear} CarbonCoPilot. All rights reserved. GHG Protocol compliant. Powered by Hedera Guardian.
-            </p>
+            <div className="text-sage-300 dark:text-sage-400 text-sm space-y-1">
+              <p>© {currentYear} CarbonCoPilot. All rights reserved. GHG Protocol compliant. Powered by Hedera Guardian.</p>
+              <p className="text-xs text-sage-400 dark:text-sage-500">This is a working tool for producers, not a marketing site.</p>
+            </div>
             <div className="flex space-x-6 mt-4 md:mt-0">
               <Link href="#privacy">
                 <span className="text-sage-300 dark:text-sage-400 hover:text-forest-50 transition-colors text-sm cursor-pointer">

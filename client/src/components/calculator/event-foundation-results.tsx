@@ -91,7 +91,7 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
                   <p className="text-xs text-slate-600">Strike</p>
                 </div>
                 <div className="text-center border-l border-slate-200">
-                  <p className="text-2xl font-bold text-emerald-700">{summary.totalDays}</p>
+                  <p className="text-2xl font-bold text-primary">{summary.totalDays}</p>
                   <p className="text-xs text-slate-600">Total Days</p>
                 </div>
               </div>
@@ -151,10 +151,10 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
 
       {/* Operational Insights */}
       {summary.operationalInsights.length > 0 && (
-        <Card className="border-blue-200 bg-blue-50/30">
+        <Card className="border-info-border bg-info-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <Info className="h-5 w-5 text-blue-600 mr-2" />
+              <Info className="h-5 w-5 text-info mr-2" />
               Operational Insights
             </CardTitle>
           </CardHeader>
@@ -165,7 +165,7 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
             <ul className="space-y-3">
               {summary.operationalInsights.map((insight, index) => (
                 <li key={index} className="flex items-start space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-blue-600 mt-2 flex-shrink-0" />
+                  <div className="h-2 w-2 rounded-full bg-info mt-2 flex-shrink-0" />
                   <span className="text-sm text-slate-700 flex-1">{insight}</span>
                 </li>
               ))}
@@ -176,10 +176,10 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
 
       {/* Systems Connections */}
       {summary.systemsConnections.length > 0 && (
-        <Card className="border-emerald-200 bg-emerald-50/30">
+        <Card className="border-primary-border bg-primary-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800 flex items-center">
-              <Calendar className="h-5 w-5 text-emerald-600 mr-2" />
+              <Calendar className="h-5 w-5 text-primary mr-2" />
               Systems Connections
             </CardTitle>
           </CardHeader>
@@ -189,8 +189,8 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
             </p>
             <ul className="space-y-3">
               {summary.systemsConnections.map((connection, index) => (
-                <li key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600 mt-2 flex-shrink-0" />
+                <li key={index} className="flex items-start space-x-3 p-3 bg-white rounded-lg border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary mt-2 flex-shrink-0" />
                   <span className="text-sm text-slate-700">{connection}</span>
                 </li>
               ))}
@@ -208,38 +208,38 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
           <CardContent>
             <div className="grid grid-cols-2 gap-3">
               {data.venueProvides.stage && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">Stage/Platform</span>
                 </div>
               )}
               {data.venueProvides.lighting && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">Lighting System</span>
                 </div>
               )}
               {data.venueProvides.sound && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">Sound System</span>
                 </div>
               )}
               {data.venueProvides.av && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">AV/Video</span>
                 </div>
               )}
               {data.venueProvides.power && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">Adequate Power</span>
                 </div>
               )}
               {data.venueProvides.rigging && (
-                <div className="flex items-center space-x-2 p-3 bg-emerald-50 rounded border border-emerald-200">
-                  <div className="h-2 w-2 rounded-full bg-emerald-600" />
+                <div className="flex items-center space-x-2 p-3 bg-primary-light rounded border border-primary-border">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <span className="text-sm text-slate-700">Rigging Points</span>
                 </div>
               )}
@@ -255,7 +255,7 @@ export function EventFoundationResults({ data, summary }: EventFoundationResults
 
       {/* Weather Contingency (if outdoor) */}
       {data.weatherContingency && (
-        <Alert className="border-blue-200 bg-blue-50">
+        <Alert className="border-info-border bg-info-light">
           <Info className="h-4 w-4" />
           <AlertDescription className="text-sm text-slate-700">
             <strong>Weather Contingency:</strong> {data.weatherContingency.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}

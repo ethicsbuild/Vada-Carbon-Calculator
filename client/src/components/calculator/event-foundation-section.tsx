@@ -64,7 +64,7 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
               onValueChange={(value) => updateField("productionComplexity", value as EventFoundationDetails["productionComplexity"])}
               className="space-y-3"
             >
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary transition-colors">
                 <RadioGroupItem value="minimal" id="complexity-minimal" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="complexity-minimal" className="font-medium text-slate-800 cursor-pointer">
@@ -79,7 +79,7 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary transition-colors">
                 <RadioGroupItem value="standard" id="complexity-standard" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="complexity-standard" className="font-medium text-slate-800 cursor-pointer">
@@ -94,7 +94,7 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary transition-colors">
                 <RadioGroupItem value="complex" id="complexity-complex" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="complexity-complex" className="font-medium text-slate-800 cursor-pointer">
@@ -109,7 +109,7 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </div>
               </div>
 
-              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-emerald-300 transition-colors">
+              <div className="flex items-start space-x-3 p-4 rounded-lg border-2 border-slate-200 hover:border-primary transition-colors">
                 <RadioGroupItem value="festival" id="complexity-festival" className="mt-1" />
                 <div className="flex-1">
                   <Label htmlFor="complexity-festival" className="font-medium text-slate-800 cursor-pointer">
@@ -286,7 +286,7 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
       <Button
         variant="outline"
         onClick={() => setShowDetailed(!showDetailed)}
-        className="w-full border-emerald-300 text-emerald-700 hover:bg-emerald-50"
+        className="w-full border-primary text-primary hover:bg-primary-light"
       >
         {showDetailed ? (
           <>

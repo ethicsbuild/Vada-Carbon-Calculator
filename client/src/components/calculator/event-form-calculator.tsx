@@ -685,8 +685,8 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             
             {/* Contextual outdoor callout - only show when relevant */}
             {(formData.venueType === 'outdoor' || formData.venueType === 'mixed') && (
-              <div className="mt-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                <p className="text-xs text-amber-800 dark:text-amber-200">
+              <div className="mt-2 p-3 bg-warning-light dark:bg-warning/20 border border-warning dark:border-warning rounded-lg">
+                <p className="text-xs text-warning dark:text-warning">
                   Outdoor events typically require temporary power infrastructure and may have different energy needs than indoor venues.
                 </p>
               </div>
@@ -771,7 +771,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 onClick={addStaffGroup}
                 variant="outline" 
                 size="sm"
-                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
+                className="border-primary/50 text-forest-400 hover:bg-primary/10"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Group
@@ -856,7 +856,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 onClick={addArtistGroup}
                 variant="outline" 
                 size="sm"
-                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
+                className="border-primary/50 text-forest-400 hover:bg-primary/10"
               >
                 <Plus className="w-4 h-4 mr-1" />
                 Add Group
@@ -1010,7 +1010,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               <Button 
                 onClick={exportToPDF}
                 variant="outline"
-                className="border-emerald-400/50 text-forest-400 hover:bg-emerald-400/10"
+                className="border-primary/50 text-forest-400 hover:bg-primary/10"
               >
                 <Download className="w-4 h-4 mr-2" />
                 Export as PDF

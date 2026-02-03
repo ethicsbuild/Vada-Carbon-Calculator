@@ -28,7 +28,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
         <div className="mb-8">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-sage-600 dark:text-sage-400">Step {step} of {totalSteps}</span>
-            <span className="text-sm text-emerald-400">{Math.round(progress)}% Complete</span>
+            <span className="text-sm text-primary">{Math.round(progress)}% Complete</span>
           </div>
           <Progress value={progress} className="h-2" />
         </div>
@@ -51,12 +51,12 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setUserType('first-timer');
                   setStep(2);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-emerald-500/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">🌱</div>
                   <div>
-                    <h3 className="text-xl font-semibold text-forest-900 dark:text-forest-50 mb-2 group-hover:text-emerald-400 transition-colors">
+                    <h3 className="text-xl font-semibold text-forest-900 dark:text-forest-50 mb-2 group-hover:text-primary transition-colors">
                       Yes, I'm new to this!
                     </h3>
                     <p className="text-sage-600 dark:text-sage-400 text-sm">
@@ -109,12 +109,12 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                   setNeedsLevel('quick');
                   setStep(3);
                 }}
-                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-emerald-500/50 rounded-lg transition-all text-left group"
+                className="p-6 bg-sage-50 dark:bg-forest-900/50 hover:bg-sage-50 dark:bg-forest-900/70 border-2 border-forest-200 dark:border-forest-700 hover:border-primary/50 rounded-lg transition-all text-left group"
               >
                 <div className="flex items-start gap-4">
                   <div className="text-3xl">⚡</div>
                   <div>
-                    <h3 className="text-xl font-semibold text-forest-900 dark:text-forest-50 mb-2 group-hover:text-emerald-400 transition-colors">
+                    <h3 className="text-xl font-semibold text-forest-900 dark:text-forest-50 mb-2 group-hover:text-primary transition-colors">
                       Quick Estimate (5 minutes)
                     </h3>
                     <p className="text-sage-600 dark:text-sage-400 text-sm">
@@ -122,9 +122,9 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
                       or seeing if sustainability is feasible for your budget.
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
-                      <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">Basic inputs</span>
-                      <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">±20% accuracy</span>
-                      <span className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded">5 min</span>
+                      <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded">Basic inputs</span>
+                      <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded">±20% accuracy</span>
+                      <span className="text-xs px-2 py-1 bg-primary/20 text-primary rounded">5 min</span>
                     </div>
                   </div>
                 </div>
@@ -172,8 +172,8 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
         {step === 3 && (
           <div className="space-y-6">
             <div className="text-center">
-              <div className="inline-block p-3 bg-emerald-500/20 rounded-full mb-4">
-                <Sparkles className="w-8 h-8 text-emerald-400" />
+              <div className="inline-block p-3 bg-primary/20 rounded-full mb-4">
+                <Sparkles className="w-8 h-8 text-primary" />
               </div>
               <h2 className="text-3xl font-bold text-forest-900 dark:text-forest-50 mb-3">
                 Perfect! You're all set.
@@ -196,8 +196,8 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
               )}
 
               {userType === 'first-timer' && (
-                <div className="bg-gradient-to-r from-emerald-500/10 to-violet-500/10 border border-emerald-500/20 rounded-lg p-4 text-left">
-                  <div className="text-sm font-semibold text-emerald-400 mb-2">💡 Pro Tip</div>
+                <div className="bg-gradient-to-r from-emerald-500/10 to-violet-500/10 border border-primary/20 rounded-lg p-4 text-left">
+                  <div className="text-sm font-semibold text-primary mb-2">💡 Pro Tip</div>
                   <p className="text-sage-700 dark:text-sage-300 text-sm">
                     Don't stress about having perfect numbers. Even rough estimates give you valuable insights.
                     You can always refine later as you get more data.

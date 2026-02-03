@@ -59,8 +59,8 @@ export function QuestionFlow({
             className={cn(
               "p-5 rounded-xl border-2 cursor-pointer transition-all duration-200 text-center",
               selectedTransport === option.id
-                ? "bg-emerald-500/10 border-emerald-500"
-                : "bg-white/5 border-forest-200 dark:border-forest-700 hover:bg-white/10 hover:border-emerald-500/50"
+                ? "bg-primary/10 border-primary"
+                : "bg-white/5 border-forest-200 dark:border-forest-700 hover:bg-white/10 hover:border-primary/50"
             )}
           >
             <div className="text-4xl mb-3">{option.icon}</div>

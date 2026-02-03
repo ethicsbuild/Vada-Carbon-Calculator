@@ -145,7 +145,7 @@ export function CrewImpactResults({ data, impact }: CrewImpactResultsProps) {
 
       {/* Tradeoffs */}
       {impact.tradeoffs.length > 0 && (
-        <Card className="border-amber-200 bg-amber-50/30">
+        <Card className="border-warning-border bg-warning-light">
           <CardHeader>
             <CardTitle className="text-lg text-slate-800">Tradeoffs to Consider</CardTitle>
           </CardHeader>
@@ -153,7 +153,7 @@ export function CrewImpactResults({ data, impact }: CrewImpactResultsProps) {
             <ul className="space-y-3">
               {impact.tradeoffs.map((tradeoff, index) => (
                 <li key={index} className="flex items-start space-x-3">
-                  <Minus className="h-4 w-4 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <Minus className="h-4 w-4 text-warning mt-0.5 flex-shrink-0" />
                   <span className="text-sm text-slate-700">{tradeoff}</span>
                 </li>
               ))}
@@ -191,7 +191,7 @@ export function CrewImpactResults({ data, impact }: CrewImpactResultsProps) {
             </div>
             
             {data.averageTravelDistance && (
-              <div className="mt-4 p-3 bg-blue-50 rounded">
+              <div className="mt-4 p-3 bg-info-light rounded">
                 <p className="text-sm text-slate-700">
                   Average travel distance: <span className="font-medium">{data.averageTravelDistance} {data.distanceUnit || 'miles'}</span>
                 </p>

@@ -24,7 +24,7 @@ export function EventTypeCard({
       onClick={onSelect}
       className={cn(
         "relative overflow-hidden cursor-pointer transition-all duration-300 p-6 bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 hover:bg-forest-100 dark:bg-forest-800/70 hover:-translate-y-1 hover:shadow-lg hover:shadow-emerald-500/20",
-        isSelected && "border-emerald-500 bg-forest-100 dark:bg-forest-800/70 shadow-lg shadow-emerald-500/20"
+        isSelected && "border-primary bg-forest-100 dark:bg-forest-800/70 shadow-lg shadow-emerald-500/20"
       )}
     >
       {/* Top gradient bar - appears on hover and selection */}

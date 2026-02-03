@@ -147,7 +147,7 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
               <div>
                 <h3 className="font-bold text-forest-900 dark:text-forest-100 text-lg">Sage Riverstone</h3>
                 <p className="text-sm text-sage-600 dark:text-sage-400 flex items-center gap-1">
-                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-primary' : 'bg-slate-500'}`} />
                   {isConnected ? 'Here to guide you' : 'Reconnecting...'}
                 </p>
               </div>
@@ -168,7 +168,7 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
                     <div className={`rounded-xl p-3 ${
                       message.role === 'sage'
                         ? 'bg-sage-50 dark:bg-sage-900/50 text-forest-700 dark:text-forest-200'
-                        : 'bg-forest-500/20 text-emerald-100'
+                        : 'bg-forest-500/20 text-primary'
                     }`}>
                       <p className="text-sm whitespace-pre-wrap leading-relaxed">
                         {message.content}
