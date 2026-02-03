@@ -9,6 +9,9 @@ import { InfoTooltip } from '@/components/ui/info-tooltip';
 import { Calculator, Loader2, Plus, Trash2, AlertCircle, Download } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import jsPDF from 'jspdf';
+import { FoodCateringSection } from '@/components/calculator/food-catering-section';
+import { FoodImpactResults } from '@/components/calculator/food-impact-results';
+import { calculateFoodSystemImpacts, estimateFoodEmissions } from '@/lib/food-impact-calculator';
 
 interface StaffTransportGroup {
   id: string;
@@ -25,6 +28,9 @@ interface ArtistTransportGroup {
   distance: number;
   tourBus: boolean;
 }
+
+// Import new food types
+import { FoodCateringData, FoodLiteMode, FoodAdvancedMode } from "@/types/carbon";
 
 interface CateringDetails {
   style: string; // buffet, plated, pre-packaged, grab-and-go, none
@@ -57,6 +63,8 @@ interface EventFormData {
   // Power and Food
   powerSource: string;
   catering: CateringDetails;
+  // New food system
+  foodCatering?: FoodCateringData;
 }
 
 interface EventFormCalculatorProps {
@@ -110,6 +118,17 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
       scale: 'staff-only',
       sourcing: 'external-vendor',
       estimatedMeals: 0,
+    },
+    // New food system - initialize with lite mode
+    foodCatering: {
+      detailLevel: 'lite',
+      liteMode: {
+        foodProvided: 'none',
+        serviceModel: 'buffet',
+        sourcing: 'mixed',
+        plantForward: false,
+        scale: '51-250',
+      },
     },
   });
 
@@ -239,7 +258,11 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
         ? formData.artistTransportGroups.reduce((sum, g) => sum + (g.distance * g.count), 0) / totalArtistCount
         : 200;
 
-      // Total meals served from catering estimate
+      // Calculate food system impacts
+      const foodSystemImpacts = calculateFoodSystemImpacts(formData.foodCatering!);
+      const foodEmissions = estimateFoodEmissions(formData.foodCatering!);
+      
+      // Total meals served from catering estimate (legacy)
       const totalMealsServed = formData.catering.estimatedMeals;
 
       const response = await fetch('/api/calculate-event', {
@@ -325,6 +348,10 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             alcoholServed: formData.attendance > 100,
             // Include meal breakdown for detailed calculation
             mealBreakdown: formData.meals,
+            // New food system data
+            foodCateringData: formData.foodCatering,
+            foodEmissions: foodEmissions,
+            foodSystemImpacts: foodSystemImpacts,
           },
           waste: {
             recyclingProgram: false,
@@ -918,74 +945,12 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
             </Select>
           </div>
 
-          {/* Food & Catering - Decision-Based */}
-          <div className="space-y-4 pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
-            <h3 className="text-lg font-semibold text-forest-900 dark:text-forest-100">Food & Catering</h3>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Catering Style */}
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Catering Style</Label>
-                <Select value={formData.catering.style} onValueChange={(value) => updateCateringField('style', value)}>
-                  <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                    <SelectValue placeholder="Select catering style" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700">
-                    <SelectItem value="none">No catering</SelectItem>
-                    <SelectItem value="grab-and-go">Grab-and-go (pre-packaged)</SelectItem>
-                    <SelectItem value="buffet">Buffet service</SelectItem>
-                    <SelectItem value="plated">Plated service</SelectItem>
-                    <SelectItem value="food-trucks">Food trucks/vendors</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Scale of Service */}
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Who Gets Fed?</Label>
-                <Select value={formData.catering.scale} onValueChange={(value) => updateCateringField('scale', value)}>
-                  <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                    <SelectValue placeholder="Select scale" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700">
-                    <SelectItem value="staff-only">Staff only</SelectItem>
-                    <SelectItem value="staff-talent">Staff + talent/speakers</SelectItem>
-                    <SelectItem value="vip-tiers">VIP tiers only</SelectItem>
-                    <SelectItem value="full-audience">Full audience</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Sourcing */}
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Sourcing</Label>
-                <Select value={formData.catering.sourcing} onValueChange={(value) => updateCateringField('sourcing', value)}>
-                  <SelectTrigger className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                    <SelectValue placeholder="Select sourcing" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700">
-                    <SelectItem value="local">Local vendors/farms</SelectItem>
-                    <SelectItem value="external-vendor">External catering company</SelectItem>
-                    <SelectItem value="self-catered">Self-catered/in-house</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Estimated Meals */}
-              <div className="space-y-2">
-                <Label className="text-sage-500 dark:text-sage-500">Estimated Total Meals</Label>
-                <Input
-                  type="number"
-                  value={formData.catering.estimatedMeals}
-                  onChange={(e) => updateCateringField('estimatedMeals', parseInt(e.target.value) || 0)}
-                  placeholder="0"
-                  className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100"
-                />
-                <p className="text-xs text-sage-600 dark:text-sage-400">
-                  Approximate total across all service
-                </p>
-              </div>
-            </div>
+          {/* Food & Catering - New Two-Tier System */}
+          <div className="pt-4 border-t border-forest-300 dark:border-forest-700/50" onClick={() => handleSectionChange('food-power')}>
+            <FoodCateringSection 
+              data={formData.foodCatering!}
+              onChange={(data) => setFormData(prev => ({ ...prev, foodCatering: data }))}
+            />
           </div>
         </div>
 
@@ -1022,6 +987,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
               location: 'Unknown'
             }}
           />
+          
+          {/* Food Impact Results */}
+          <FoodImpactResults data={formData.foodCatering!} />
           
           {/* Export Buttons */}
           <Card className="bg-forest-100 dark:bg-forest-800/50 border-forest-300 dark:border-forest-700/50 backdrop-blur-sm p-6">
