@@ -1,11 +1,12 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
-import { Info, ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock } from "lucide-react";
+import { SectionCard } from "@/components/ui/section-card";
+import { Callout } from "@/components/ui/callout";
+import { QuestionBlock } from "@/components/ui/question-block";
+import { ChevronDown, ChevronUp, Calendar, MapPin, Users, Clock } from "lucide-react";
 import { useState } from "react";
 import type { EventFoundationDetails } from "@/types/carbon";
 
@@ -38,42 +39,26 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
       </div>
 
       {/* Reality Check Callout */}
-      <Card className="border-blue-200 bg-blue-50/40">
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-800">
-                Why "Production Complexity" Instead of "Event Type"
-              </p>
-              <p className="text-sm text-slate-700">
-                A 500-person corporate conference can have more complex production than a 5,000-person festival if it requires extensive AV, staging, and custom builds. 
-                Event type doesn't tell us what we need to know - production complexity does.
-              </p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Callout variant="info" title="Why 'Production Complexity' Instead of 'Event Type'">
+        <p>
+          A 500-person corporate conference can have more complex production than a 5,000-person festival if it requires extensive AV, staging, and custom builds. 
+          Event type doesn't tell us what we need to know - production complexity does.
+        </p>
+      </Callout>
 
       {/* Basic Mode */}
-      <Card className="border-emerald-200 bg-white">
-        <CardHeader className="bg-emerald-50/50">
-          <CardTitle className="text-lg text-slate-800">Core Event Parameters</CardTitle>
-          <CardDescription className="text-slate-600">
-            4 questions • ~2 minutes
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-6 pt-6">
+      <SectionCard 
+        title="Core Event Parameters"
+        description="4 questions • ~2 minutes"
+        variant="default"
+      >
           
           {/* Question 1: Production Complexity */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium text-slate-800 flex items-center">
-              <Users className="h-4 w-4 mr-2 text-emerald-600" />
-              Production complexity level
-            </Label>
-            <p className="text-sm text-slate-600">
-              How complex is the production build? This affects crew, power, equipment, and timeline.
-            </p>
+          <QuestionBlock
+            label="Production complexity level"
+            description="How complex is the production build? This affects crew, power, equipment, and timeline."
+            icon={Users}
+          >
             <RadioGroup
               value={data.productionComplexity || ""}
               onValueChange={(value) => updateField("productionComplexity", value as EventFoundationDetails["productionComplexity"])}
@@ -139,17 +124,14 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </div>
               </div>
             </RadioGroup>
-          </div>
+          </QuestionBlock>
 
           {/* Question 2: Operational Duration */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium text-slate-800 flex items-center">
-              <Clock className="h-4 w-4 mr-2 text-emerald-600" />
-              Operational phases
-            </Label>
-            <p className="text-sm text-slate-600">
-              How long are load-in, show, and strike? This determines crew duration and accommodation needs.
-            </p>
+          <QuestionBlock
+            label="Operational phases"
+            description="How long are load-in, show, and strike? This determines crew duration and accommodation needs."
+            icon={Clock}
+          >
             <div className="grid grid-cols-3 gap-4">
               <div>
                 <Label htmlFor="load-in-days" className="text-sm text-slate-700">Load-In Days</Label>
@@ -198,17 +180,14 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </span>
               </p>
             )}
-          </div>
+          </QuestionBlock>
 
           {/* Question 3: Venue Capabilities */}
-          <div className="space-y-3">
-            <Label className="text-base font-medium text-slate-800 flex items-center">
-              <MapPin className="h-4 w-4 mr-2 text-emerald-600" />
-              Venue capabilities
-            </Label>
-            <p className="text-sm text-slate-600">
-              What does the venue provide vs. what you need to bring? This shapes production strategy.
-            </p>
+          <QuestionBlock
+            label="Venue capabilities"
+            description="What does the venue provide vs. what you need to bring? This shapes production strategy."
+            icon={MapPin}
+          >
             <div className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div className="flex items-center space-x-2 p-3 bg-slate-50 rounded">
@@ -279,17 +258,14 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
                 </div>
               </div>
             </div>
-          </div>
+          </QuestionBlock>
 
           {/* Question 4: Expected Attendance */}
-          <div className="space-y-3">
-            <Label htmlFor="attendance" className="text-base font-medium text-slate-800 flex items-center">
-              <Users className="h-4 w-4 mr-2 text-emerald-600" />
-              Expected attendance
-            </Label>
-            <p className="text-sm text-slate-600">
-              Rough estimate of total attendees. This affects catering, waste, and venue selection.
-            </p>
+          <QuestionBlock
+            label="Expected attendance"
+            description="Rough estimate of total attendees. This affects catering, waste, and venue selection."
+            icon={Users}
+          >
             <div className="flex items-center space-x-3">
               <Input
                 id="attendance"
@@ -302,10 +278,9 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
               />
               <span className="text-sm text-slate-600">people</span>
             </div>
-          </div>
+          </QuestionBlock>
 
-        </CardContent>
-      </Card>
+        </SectionCard>
 
       {/* Detailed Mode Toggle */}
       <Button
@@ -328,14 +303,11 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
 
       {/* Detailed Mode */}
       {showDetailed && (
-        <Card className="border-amber-200 bg-white">
-          <CardHeader className="bg-amber-50/50">
-            <CardTitle className="text-lg text-slate-800">Detailed Event Context</CardTitle>
-            <CardDescription className="text-slate-600">
-              3 additional questions • ~2 minutes • More precise context
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6 pt-6">
+        <SectionCard
+          title="Detailed Event Context"
+          description="3 additional questions • ~2 minutes • More precise context"
+          variant="detailed"
+        >
 
             {/* Question 5: Event Format */}
             <div className="space-y-3">
@@ -461,29 +433,18 @@ export function EventFoundationSection({ data, onChange }: EventFoundationSectio
               </div>
             )}
 
-          </CardContent>
-        </Card>
+        </SectionCard>
       )}
 
       {/* Systems Thinking Callout */}
-      <Card className="border-blue-200 bg-blue-50/30">
-        <CardContent className="pt-6">
-          <div className="flex items-start space-x-3">
-            <Info className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-            <div className="space-y-2">
-              <p className="text-sm font-medium text-slate-800">
-                How Event Foundation Shapes Everything
-              </p>
-              <ul className="text-sm text-slate-600 space-y-1">
-                <li>• <strong>Production Complexity:</strong> Determines crew size, equipment needs, and build time</li>
-                <li>• <strong>Operational Duration:</strong> Affects crew accommodation, catering days, and power usage</li>
-                <li>• <strong>Venue Capabilities:</strong> Shapes production strategy (bring vs. rent vs. venue-provided)</li>
-                <li>• <strong>Indoor/Outdoor:</strong> Affects power requirements, weather contingency, and infrastructure</li>
-              </ul>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <Callout variant="info" title="How Event Foundation Shapes Everything">
+        <ul className="space-y-1">
+          <li>• <strong>Production Complexity:</strong> Determines crew size, equipment needs, and build time</li>
+          <li>• <strong>Operational Duration:</strong> Affects crew accommodation, catering days, and power usage</li>
+          <li>• <strong>Venue Capabilities:</strong> Shapes production strategy (bring vs. rent vs. venue-provided)</li>
+          <li>• <strong>Indoor/Outdoor:</strong> Affects power requirements, weather contingency, and infrastructure</li>
+        </ul>
+      </Callout>
 
     </div>
   );
