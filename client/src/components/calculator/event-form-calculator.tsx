@@ -592,12 +592,12 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 <SelectValue placeholder="Select event type" />
               </SelectTrigger>
               <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectItem value="festival" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🎪 Music Festival</SelectItem>
-                <SelectItem value="conference" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">📋 Corporate Conference</SelectItem>
-                <SelectItem value="wedding" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">💍 Wedding</SelectItem>
-                <SelectItem value="concert" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🎸 Concert/Show</SelectItem>
-                <SelectItem value="sports_event" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">⚽ Sports Event</SelectItem>
-                <SelectItem value="trade_show" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🏢 Trade Show</SelectItem>
+                <SelectItem value="festival" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🎪 Music Festival</SelectItem>
+                <SelectItem value="conference" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">📋 Corporate Conference</SelectItem>
+                <SelectItem value="wedding" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">💍 Wedding</SelectItem>
+                <SelectItem value="concert" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🎸 Concert/Show</SelectItem>
+                <SelectItem value="sports_event" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">⚽ Sports Event</SelectItem>
+                <SelectItem value="trade_show" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🏢 Trade Show</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -639,7 +639,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 value={formData.durationDays || ''}
                 onChange={(e) => updateField('durationDays', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="1"
-                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:text-sage-500"
+                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:placeholder:text-sage-400"
               />
             </div>
             <div className="space-y-2">
@@ -657,7 +657,7 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 value={formData.durationHours || ''}
                 onChange={(e) => updateField('durationHours', e.target.value === '' ? 0 : parseInt(e.target.value))}
                 placeholder="8"
-                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:text-sage-500"
+                className="bg-sage-50 dark:bg-sage-900/50 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100 placeholder:text-sage-500 dark:placeholder:text-sage-400"
               />
             </div>
           </div>
@@ -677,9 +677,9 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                 <SelectValue placeholder="Select venue type" />
               </SelectTrigger>
               <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                <SelectItem value="indoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🏢 Indoor Venue</SelectItem>
-                <SelectItem value="outdoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🌳 Outdoor Space</SelectItem>
-                <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Mixed Indoor/Outdoor</SelectItem>
+                <SelectItem value="indoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🏢 Indoor Venue</SelectItem>
+                <SelectItem value="outdoor" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🌳 Outdoor Space</SelectItem>
+                <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🔄 Mixed Indoor/Outdoor</SelectItem>
               </SelectContent>
             </Select>
             
@@ -704,11 +704,11 @@ export function EventFormCalculator({ initialEventType, onSectionChange, onCalcu
                   <SelectValue placeholder="Select travel method" />
                 </SelectTrigger>
                 <SelectContent className="bg-sage-50 dark:bg-sage-900 border-forest-300 dark:border-forest-700 text-forest-900 dark:text-forest-100">
-                  <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🔄 Mixed (Local/Regional/Flying)</SelectItem>
-                  <SelectItem value="local" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚗 Local/Regional Travel</SelectItem>
-                  <SelectItem value="flying" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">✈️ Flying (Domestic/International)</SelectItem>
-                  <SelectItem value="transit" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚇 Public Transit</SelectItem>
-                  <SelectItem value="walking" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:bg-forest-800 hover:text-forest-900 dark:text-forest-100 focus:bg-forest-100 dark:bg-forest-800 focus:text-forest-900 dark:text-forest-100">🚶 Walking/Biking</SelectItem>
+                  <SelectItem value="mixed" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🔄 Mixed (Local/Regional/Flying)</SelectItem>
+                  <SelectItem value="local" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🚗 Local/Regional Travel</SelectItem>
+                  <SelectItem value="flying" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">✈️ Flying (Domestic/International)</SelectItem>
+                  <SelectItem value="transit" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🚇 Public Transit</SelectItem>
+                  <SelectItem value="walking" className="text-forest-900 dark:text-forest-100 hover:bg-forest-100 dark:hover:bg-forest-800 hover:text-forest-900 dark:hover:text-forest-100 focus:bg-forest-100 dark:focus:bg-forest-800 focus:text-forest-900 dark:focus:text-forest-100">🚶 Walking/Biking</SelectItem>
                 </SelectContent>
               </Select>
             </div>
