@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import { ProgressiveOnboarding } from '@/components/calculator/progressive-onboarding';
 import { SageGuidedCalculator } from '@/components/calculator/sage-guided-calculator';
+import { ErrorBoundary } from '@/components/error-boundary';
 
 export default function Calculator() {
   const [location] = useLocation();
@@ -34,23 +35,27 @@ export default function Calculator() {
   }, [showOnboarding]);
 
   const handleOnboardingComplete = () => {
+    console.log('🎯 Onboarding complete, transitioning to calculator');
     setShowOnboarding(false);
     localStorage.setItem('vada_onboarding_complete', 'true');
+    console.log('✅ Calculator should now render');
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Show Onboarding First */}
-        {showOnboarding ? (
-          <ProgressiveOnboarding
-            onComplete={handleOnboardingComplete}
-            eventType={eventType}
-          />
-        ) : (
-          <SageGuidedCalculator initialEventType={eventType} />
-        )}
+    <ErrorBoundary>
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 via-forest-50 to-moss-50 dark:from-forest-950 dark:via-sage-950 dark:to-forest-950">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Show Onboarding First */}
+          {showOnboarding ? (
+            <ProgressiveOnboarding
+              onComplete={handleOnboardingComplete}
+              eventType={eventType}
+            />
+          ) : (
+            <SageGuidedCalculator initialEventType={eventType} />
+          )}
+        </div>
       </div>
-    </div>
+    </ErrorBoundary>
   );
 }
