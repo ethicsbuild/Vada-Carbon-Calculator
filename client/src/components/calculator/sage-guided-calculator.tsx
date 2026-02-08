@@ -29,65 +29,6 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
     containerRef.current?.scrollIntoView({ behavior: 'instant', block: 'start' });
   }, []);
 
-  // Connect to Sage WebSocket
-  useEffect(() => {
-    connectToSage();
-    return () => {
-      if (ws) {
-        ws.close();
-      }
-    };
-  }, []);
-
-  const connectToSage = () => {
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/api/chat`;
-
-    const socket = new WebSocket(wsUrl);
-
-    socket.onopen = () => {
-      console.log('🟢 Connected to Sage');
-      setIsConnected(true);
-
-      // Send initial context message
-      const contextMessage = {
-        type: 'context',
-        eventType: initialEventType,
-        mode: 'guided-calculator',
-        message: 'I\'m ready to calculate my event\'s carbon footprint. Guide me through the process.'
-      };
-
-      socket.send(JSON.stringify(contextMessage));
-
-      // Add welcome message from Sage
-      addSageMessage(getWelcomeMessage(initialEventType));
-    };
-
-    socket.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        if (data.response) {
-          addSageMessage(data.response);
-        }
-      } catch (error) {
-        console.error('Error parsing message:', error);
-      }
-    };
-
-    socket.onerror = (error) => {
-      console.error('WebSocket error:', error);
-      setIsConnected(false);
-    };
-
-    socket.onclose = () => {
-      console.log('🔴 Disconnected from Sage');
-      setIsConnected(false);
-      // Could auto-reconnect here
-    };
-
-    setWs(socket);
-  };
-
   const addSageMessage = (content: string) => {
     setMessages(prev => [...prev, {
       role: 'sage',
@@ -110,17 +51,103 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
     return "Hey friend! 👋 I'm Sage, and I'm here to help you calculate your event's carbon footprint. I'll guide you through each section, explain what everything means, and give you tips along the way. Let's do this together!";
   };
 
-  const sendContextualMessage = (section: string, action: string, data?: any) => {
-    if (!ws || !isConnected) return;
+  // Connect to Sage WebSocket (optional - calculator works without it)
+  useEffect(() => {
+    // Always show welcome message first
+    addSageMessage(getWelcomeMessage(initialEventType));
 
-    const contextMessage = {
-      type: 'context-update',
-      section,
-      action,
-      data
+    // Try to connect to WebSocket, but don't block if it fails
+    try {
+      connectToSage();
+    } catch (error) {
+      console.error('Failed to initialize WebSocket:', error);
+      // Calculator will still work without WebSocket
+    }
+
+    return () => {
+      if (ws) {
+        try {
+          ws.close();
+        } catch (error) {
+          console.error('Error closing WebSocket:', error);
+        }
+      }
     };
+  }, []);
 
-    ws.send(JSON.stringify(contextMessage));
+  const connectToSage = () => {
+    try {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsUrl = `${protocol}//${window.location.host}/api/chat`;
+
+      console.log('Attempting to connect to Sage at:', wsUrl);
+      const socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log('🟢 Connected to Sage');
+        setIsConnected(true);
+
+        // Send initial context message
+        try {
+          const contextMessage = {
+            type: 'context',
+            eventType: initialEventType,
+            mode: 'guided-calculator',
+            message: "I'm ready to calculate my event's carbon footprint. Guide me through the process."
+          };
+          socket.send(JSON.stringify(contextMessage));
+        } catch (error) {
+          console.error('Error sending context message:', error);
+        }
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          if (data.response) {
+            addSageMessage(data.response);
+          }
+        } catch (error) {
+          console.error('Error parsing WebSocket message:', error);
+        }
+      };
+
+      socket.onerror = (error) => {
+        console.error('WebSocket error:', error);
+        setIsConnected(false);
+        // Calculator continues to work without WebSocket
+      };
+
+      socket.onclose = () => {
+        console.log('🔴 Disconnected from Sage');
+        setIsConnected(false);
+      };
+
+      setWs(socket);
+    } catch (error) {
+      console.error('Failed to create WebSocket:', error);
+      setIsConnected(false);
+      // Calculator continues to work without WebSocket
+    }
+  };
+
+  const sendContextualMessage = (section: string, action: string, data?: any) => {
+    if (!ws || !isConnected) {
+      console.log('WebSocket not connected, skipping contextual message');
+      return;
+    }
+
+    try {
+      const contextMessage = {
+        type: 'context-update',
+        section,
+        action,
+        data
+      };
+      ws.send(JSON.stringify(contextMessage));
+    } catch (error) {
+      console.error('Error sending contextual message:', error);
+    }
   };
 
   // Send contextual tips as user progresses
@@ -148,7 +175,7 @@ export function SageGuidedCalculator({ initialEventType }: SageGuidedCalculatorP
                 <h3 className="font-bold text-forest-900 dark:text-forest-100 text-lg">Sage Riverstone</h3>
                 <p className="text-sm text-sage-600 dark:text-sage-400 flex items-center gap-1">
                   <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-primary' : 'bg-slate-500'}`} />
-                  {isConnected ? 'Here to guide you' : 'Reconnecting...'}
+                  {isConnected ? 'Here to guide you' : 'Offline mode'}
                 </p>
               </div>
             </div>
