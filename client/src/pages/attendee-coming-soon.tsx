@@ -75,10 +75,10 @@ export default function AttendeeComingSoon() {
               <p className="text-sm text-forest-500 dark:text-forest-500">
                 Contact us at{' '}
                 <a 
-                  href="mailto:hello@veda.earth" 
+                  href="mailto:hello@vada.earth" 
                   className="text-sage-600 dark:text-sage-400 hover:underline font-medium"
                 >
-                  hello@veda.earth
+                  hello@vada.earth
                 </a>
                 {' '}to join our waitlist
               </p>

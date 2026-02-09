@@ -46,7 +46,7 @@ export default function Home() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-6xl font-bold mb-4 bg-gradient-to-r from-forest-600 via-sage-600 to-moss-600 dark:from-forest-400 dark:via-sage-400 dark:to-moss-400 bg-clip-text text-transparent">
-            VEDA CarbonCoPilot
+            VADA CarbonCoPilot
           </h1>
           <p className="text-lg text-sage-700 dark:text-sage-400 max-w-2xl mx-auto">
             Your AI sustainability guide for events—powered by Sage Riverstone

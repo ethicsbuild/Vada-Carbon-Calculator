@@ -38,7 +38,7 @@ export function ProgressiveOnboarding({ onComplete, eventType }: ProgressiveOnbo
           <div className="space-y-6">
             <div className="text-center">
               <h2 className="text-3xl font-bold text-forest-900 dark:text-forest-50 mb-3">
-                Hey there! Welcome to VEDA 👋
+                Hey there! Welcome to VADA 👋
               </h2>
               <p className="text-sage-700 dark:text-sage-300 text-lg">
                 First things first—is this your first time calculating carbon for an event?

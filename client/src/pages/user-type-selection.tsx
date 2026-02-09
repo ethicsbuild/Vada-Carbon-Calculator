@@ -10,7 +10,7 @@ export default function UserTypeSelection() {
         {/* Header */}
         <div className="text-center mb-12">
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-forest-900 dark:text-forest-50">
-            Welcome to VEDA CarbonCoPilot
+            Welcome to VADA CarbonCoPilot
           </h1>
           <p className="text-xl text-forest-700 dark:text-forest-300 max-w-2xl mx-auto">
             Professional carbon footprint calculator for events

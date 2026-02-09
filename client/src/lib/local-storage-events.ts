@@ -21,7 +21,7 @@ export interface SavedEventLocal {
   updatedAt: string;
 }
 
-const STORAGE_KEY = 'veda_saved_events';
+const STORAGE_KEY = 'vada_saved_events';
 
 /**
  * Get all saved events from localStorage
