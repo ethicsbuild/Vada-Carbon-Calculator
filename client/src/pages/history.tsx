@@ -3,19 +3,20 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Link } from 'wouter';
 import { TrendingDown, TrendingUp, Calendar, MapPin, Users, ChevronRight, ArrowLeft } from 'lucide-react';
+import { getSavedEvents, type SavedEventLocal } from '@/lib/local-storage-events';
 
 interface SavedEvent {
-  id: number;
+  id: string;
   eventName: string;
   eventType: string;
   eventYear: number;
   eventDate: string | null;
   attendance: number;
   location: string | null;
-  totalEmissions: string;
-  emissionsPerAttendee: string;
+  totalEmissions: number;
+  emissionsPerAttendee: number;
   performance: string;
-  emissionsChange: string | null;
+  emissionsChange: number | null;
   createdAt: string;
 }
 
@@ -30,16 +31,32 @@ export default function History() {
 
   const fetchEvents = async () => {
     try {
-      // TODO: Get actual userId from auth context (for now using mock)
-      const userId = 1;
-
-      const response = await fetch(`/api/events/user/${userId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch events');
-      }
-
-      const data = await response.json();
-      setEvents(data);
+      // Load events from localStorage
+      const localEvents = getSavedEvents();
+      
+      // Calculate year-over-year changes
+      const eventsWithChanges = localEvents.map((event) => {
+        // Find previous year's event with same name
+        const previousYear = localEvents.find(
+          e => e.eventName === event.eventName && e.eventYear === event.eventYear - 1
+        );
+        
+        let emissionsChange: number | null = null;
+        if (previousYear) {
+          const change = ((event.totalEmissions - previousYear.totalEmissions) / previousYear.totalEmissions) * 100;
+          emissionsChange = change;
+        }
+        
+        return {
+          ...event,
+          emissionsChange,
+        };
+      });
+      
+      // Sort by year descending (newest first)
+      eventsWithChanges.sort((a, b) => b.eventYear - a.eventYear);
+      
+      setEvents(eventsWithChanges);
     } catch (err) {
       console.error('Failed to fetch events:', err);
       setError(err instanceof Error ? err.message : 'Failed to load events');
@@ -172,10 +189,10 @@ export default function History() {
                             <div>
                               <div className="text-sm text-sage-600 dark:text-sage-400 mb-1">Total Emissions</div>
                               <div className="text-2xl font-bold text-forest-900 dark:text-forest-50">
-                                {parseFloat(event.totalEmissions).toFixed(2)} <span className="text-sm text-sage-600 dark:text-sage-400">tCO₂e</span>
+                                {event.totalEmissions.toFixed(2)} <span className="text-sm text-sage-600 dark:text-sage-400">tCO₂e</span>
                               </div>
                               <div className="text-xs text-slate-500">
-                                {parseFloat(event.emissionsPerAttendee).toFixed(4)} per attendee
+                                {event.emissionsPerAttendee.toFixed(4)} per attendee
                               </div>
                             </div>
 
