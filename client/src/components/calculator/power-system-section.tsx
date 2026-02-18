@@ -18,9 +18,43 @@ interface PowerSystemSectionProps {
 
 export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) {
   const handleModeChange = (mode: PowerDetailLevel) => {
+    const updates: Partial<PowerSystemData> = {
+      detailLevel: mode,
+    };
+    
+    // Initialize detailedMode when switching to detailed
+    if (mode === 'detailed' && !data.detailedMode) {
+      updates.detailedMode = {
+        // Copy basic mode values
+        primarySource: data.basicMode?.primarySource || 'grid',
+        backupRequired: data.basicMode?.backupRequired || false,
+        estimatedLoad: data.basicMode?.estimatedLoad || 'medium',
+        // Initialize detailed-specific fields
+        backupStrategy: {
+          hasBackup: data.basicMode?.backupRequired || false,
+          backupType: 'generator',
+          backupCapacity: 'partial',
+        },
+        distribution: {
+          strategy: 'centralized',
+          zones: 1,
+        },
+        loadProfile: {
+          peakLoad: 'medium',
+          sustainedLoad: 'medium',
+          criticalSystems: true,
+        },
+        venueCapabilities: {
+          gridAvailable: data.basicMode?.primarySource === 'grid',
+          gridCapacity: 'adequate',
+          existingInfrastructure: false,
+        },
+      };
+    }
+    
     onChange({
       ...data,
-      detailLevel: mode,
+      ...updates,
     });
   };
 

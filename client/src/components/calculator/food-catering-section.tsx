@@ -13,9 +13,37 @@ interface FoodCateringSectionProps {
 
 export function FoodCateringSection({ data, onChange }: FoodCateringSectionProps) {
   const handleModeChange = (mode: FoodDetailLevel) => {
+    const updates: Partial<FoodCateringData> = {
+      detailLevel: mode,
+    };
+    
+    // Initialize advancedMode when switching to advanced
+    if (mode === 'advanced' && !data.advancedMode) {
+      updates.advancedMode = {
+        // Copy lite mode values
+        foodProvided: data.liteMode?.foodProvided || 'light-catering',
+        serviceModel: data.liteMode?.serviceModel || 'buffet',
+        sourcing: data.liteMode?.sourcing || 'mixed',
+        plantForward: data.liteMode?.plantForward || false,
+        scale: data.liteMode?.scale || '51-250',
+        // Initialize advanced-specific fields
+        groupsFed: {
+          staff: true,
+          talent: true,
+          attendees: false,
+          vip: false,
+        },
+        foodStrategy: 'standard',
+        serviceWare: 'mixed-disposable',
+        wasteHandling: 'no-plan',
+        portionControl: false,
+        vendorWasteMitigation: false,
+      };
+    }
+    
     onChange({
       ...data,
-      detailLevel: mode,
+      ...updates,
     });
   };
 
