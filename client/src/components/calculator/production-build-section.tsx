@@ -15,9 +15,56 @@ interface ProductionBuildSectionProps {
 
 export function ProductionBuildSection({ data, onChange }: ProductionBuildSectionProps) {
   const handleModeChange = (mode: ProductionDetailLevel) => {
+    const updates: Partial<ProductionBuildData> = {
+      detailLevel: mode,
+    };
+    
+    // Initialize detailedMode when switching to detailed
+    if (mode === 'detailed' && !data.detailedMode) {
+      updates.detailedMode = {
+        // Copy basic mode values
+        buildStrategy: data.basicMode?.buildStrategy || 'hybrid',
+        productionScale: data.basicMode?.productionScale || 'standard',
+        transportRequired: data.basicMode?.transportRequired || false,
+        // Initialize detailed-specific fields
+        venueProvides: {
+          stage: false,
+          lighting: false,
+          sound: false,
+          video: false,
+          power: false,
+          rigging: false,
+        },
+        bringingOwn: {
+          stage: false,
+          lighting: false,
+          sound: false,
+          video: false,
+          specialEffects: false,
+          customRigging: false,
+        },
+        vendorStrategy: {
+          approach: 'hybrid',
+          numberOfVendors: 1,
+          localVendors: true,
+        },
+        transportLogistics: {
+          trucksRequired: 0,
+          averageDistance: 0,
+          consolidatedShipping: true,
+          freightFlights: 0,
+        },
+        buildTime: {
+          loadInDays: 1,
+          strikeDownDays: 1,
+          crewSize: 10,
+        },
+      };
+    }
+    
     onChange({
       ...data,
-      detailLevel: mode,
+      ...updates,
     });
   };
 
