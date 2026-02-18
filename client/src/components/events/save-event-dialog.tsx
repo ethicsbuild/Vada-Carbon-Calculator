@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Save, Loader2 } from 'lucide-react';
+import { saveEvent } from '@/lib/local-storage-events';
 
 interface SaveEventDialogProps {
   open: boolean;
@@ -52,11 +53,8 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
     setError('');
 
     try {
-      // TODO: Get actual userId from auth context (for now using mock)
-      const userId = 1; // Placeholder - will be replaced with real auth
-
+      // Prepare event data for localStorage
       const savedEventData = {
-        userId,
         eventName: eventName.trim(),
         eventType: eventData.eventType || 'unknown',
         eventYear,
@@ -67,40 +65,21 @@ export function SaveEventDialog({ open, onOpenChange, calculation, eventData, on
         // Store full form data
         formData: eventData,
 
-        // Emissions breakdowns
-        totalEmissions: calculation.total.toString(),
-        transportationEmissions: calculation.transportation.toString(),
-        energyEmissions: calculation.energy.toString(),
-        cateringEmissions: calculation.catering.toString(),
-        wasteEmissions: calculation.waste.toString(),
-        productionEmissions: calculation.production.toString(),
-        venueEmissions: calculation.venue.toString(),
-        emissionsPerAttendee: calculation.emissionsPerAttendee.toString(),
+        // Store full calculation object for future reference
+        calculation: calculation,
 
-        // Benchmarking
-        industryAverage: calculation.benchmarkComparison.industryAverage.toString(),
-        percentile: calculation.benchmarkComparison.percentile,
+        // Emissions data
+        totalEmissions: calculation.total,
+        emissionsPerAttendee: calculation.emissionsPerAttendee,
         performance: calculation.benchmarkComparison.performance,
 
         // Notes
         notes: notes.trim() || null,
       };
 
-      const response = await fetch('/api/events/save', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(savedEventData),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to save event');
-      }
-
-      const savedEvent = await response.json();
-      console.log('✅ Event saved:', savedEvent);
+      // Save to localStorage
+      const savedEvent = saveEvent(savedEventData);
+      console.log('✅ Event saved to localStorage:', savedEvent);
 
       // Success!
       onOpenChange(false);
