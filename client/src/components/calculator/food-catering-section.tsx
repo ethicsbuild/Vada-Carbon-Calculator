@@ -109,9 +109,9 @@ export function FoodCateringSection({ data, onChange }: FoodCateringSectionProps
           )}
 
           {/* Advanced Mode */}
-          {data.detailLevel === 'advanced' && (
+          {data.detailLevel === 'advanced' && data.advancedMode && (
             <AdvancedModeForm 
-              data={data.advancedMode!} 
+              data={data.advancedMode} 
               onChange={handleAdvancedModeChange}
             />
           )}

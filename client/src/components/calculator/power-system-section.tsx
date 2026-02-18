@@ -176,9 +176,9 @@ export function PowerSystemSection({ data, onChange }: PowerSystemSectionProps) 
           )}
 
           {/* Detailed Mode */}
-          {data.detailLevel === 'detailed' && (
+          {data.detailLevel === 'detailed' && data.detailedMode && (
             <DetailedModeForm 
-              data={data.detailedMode!} 
+              data={data.detailedMode} 
               onBasicChange={handleDetailedModeChange}
               onBackupChange={handleBackupStrategyChange}
               onDistributionChange={handleDistributionChange}
