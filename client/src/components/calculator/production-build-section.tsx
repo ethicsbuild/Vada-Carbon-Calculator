@@ -198,9 +198,9 @@ export function ProductionBuildSection({ data, onChange }: ProductionBuildSectio
           )}
 
           {/* Detailed Mode */}
-          {data.detailLevel === 'detailed' && (
+          {data.detailLevel === 'detailed' && data.detailedMode && (
             <DetailedModeForm 
-              data={data.detailedMode!} 
+              data={data.detailedMode} 
               onBasicChange={handleDetailedModeChange}
               onVenueProvidesChange={handleVenueProvidesChange}
               onBringingOwnChange={handleBringingOwnChange}
